@@ -28,11 +28,6 @@ namespace ElectronicsFactory
 
     }
 
-    internal class CalibrationMachine
-    {
-
-    }
-
     internal class TrackingMachine
     {
 
