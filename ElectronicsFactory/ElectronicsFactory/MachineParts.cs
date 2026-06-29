@@ -33,6 +33,4 @@ namespace ElectronicsFactory
     {
         
     }
-
-
 }
