@@ -19,7 +19,7 @@ namespace ElectronicsFactory
 
         public virtual void DisplayInfo()
         {
-            Console.WriteLine($"[{Id}] Angajat: {Name} | Departament: {Department} | Salariu: {Salary} RON");
+            Console.WriteLine($"[{Id}] Angajat: {Name}, Departament: {Department}, Salariu: {Salary} lei");
         }
     }
 
@@ -39,7 +39,8 @@ namespace ElectronicsFactory
 
         public override void DisplayInfo()
         {
-            base.DisplayInfo();
+            base.DisplayInfo(); 
+            Console.WriteLine("Directorul verifica statisticile productiei.");
         
         }
     }
@@ -55,11 +56,13 @@ namespace ElectronicsFactory
         public void CreateProductionOrder(string productType, int quantity)
         {
 
+
         }
 
         public override void DisplayInfo()
         {
             base.DisplayInfo();
+            Console.WriteLine("Managerul de productie creeaza o comanda de productie.");
         }
     }
 
@@ -78,7 +81,8 @@ namespace ElectronicsFactory
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-           
+            Console.WriteLine("Inginerul inspecteaza masina selectata.");
+
         }
     }
 
@@ -96,7 +100,8 @@ namespace ElectronicsFactory
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-           
+            Console.WriteLine("Tehnicianul repara masina daca este necesar");
+
         }
     }
 
@@ -114,6 +119,7 @@ namespace ElectronicsFactory
         public override void DisplayInfo()
         {
             base.DisplayInfo();
+            Console.WriteLine("Operatorul de masina porneste masina.");
         }
     }
 
@@ -130,7 +136,8 @@ namespace ElectronicsFactory
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-           
+            Console.WriteLine("Agentul de vanzari vinde produse");
+
         }
     }
 
@@ -147,7 +154,8 @@ namespace ElectronicsFactory
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-          
+            Console.WriteLine("Contabilul calculeaza productia");
+
         }
     }
 }

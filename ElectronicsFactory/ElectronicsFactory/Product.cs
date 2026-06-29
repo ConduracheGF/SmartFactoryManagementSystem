@@ -4,26 +4,26 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
-    internal class Product
+    abstract class Product
     {
     }
 
-    internal class Phones
-    {
-
-    }
-
-    internal class Tablets
+    internal class Phones : Product
     {
 
     }
 
-    internal class Computers
+    internal class Tablets : Product
     {
 
     }
 
-    internal class Headphones
+    internal class Computers : Product
+    {
+
+    }
+
+    internal class Headphones : Product
     {
 
     }

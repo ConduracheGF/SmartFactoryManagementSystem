@@ -4,43 +4,35 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
-    internal class MachineParts
-    {
-    }
-
-    internal class Motor
+    abstract public class MachineParts
     {
 
     }
 
-    internal class Senzor
+    internal class Motor : MachineParts
     {
 
     }
 
-    internal class Controler
+    internal class Senzor : MachineParts
     {
 
     }
 
-    internal class TransportLine
+    internal class Controler : MachineParts
+    {
+
+    }
+    
+    internal class Display : MachineParts
     {
 
     }
 
-    internal class Display
-    {
-
-    }
-
-    internal class CoolingFan
+    internal class CoolingFan : MachineParts
     {
         
     }
 
 
-    internal class ArmBot
-    {
-
-    }
 }
