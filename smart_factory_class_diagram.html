@@ -1,0 +1,136 @@
+<style>
+#cd svg.classDiagram .divider path { stroke-opacity: 0.5; }
+</style>
+<div id="cd"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+  },
+});
+const src = `classDiagram
+  class Employee {
+    <<abstract>>
+    +string Id
+    +string Name
+    +string Department
+    +double Salary
+    +DisplayInfo()
+  }
+  class Director { +ReviewProductionStatistics() }
+  class ProductionManager { +CreateProductionOrder() }
+  class Engineer { +InspectMachine() bool }
+  class Technician { +RepairMachine() }
+  class MachineOperator { +SimulateMachineProduction() }
+  class SalesAgent { +SellElectronics() }
+  class Accountant { +CalculateProductionValue() }
+
+  Employee <|-- Director
+  Employee <|-- ProductionManager
+  Employee <|-- Engineer
+  Employee <|-- Technician
+  Employee <|-- MachineOperator
+  Employee <|-- SalesAgent
+  Employee <|-- Accountant
+
+  class Machine {
+    <<abstract>>
+    +string SerialNumber
+    +MachineStatus Status
+    +string Condition
+    +Stop()
+    +Inspect() bool
+    +Start()
+    +Repair()
+  }
+  class PackagingMachine { +Start() }
+  class PcbFabricationMachine { +Start() }
+  class AssemblyMachine { +Start() }
+  class TestingMachine { +Start() +Inspect() bool }
+
+  Machine <|-- PackagingMachine
+  Machine <|-- PcbFabricationMachine
+  Machine <|-- AssemblyMachine
+  Machine <|-- TestingMachine
+
+  class MachineParts {
+    <<abstract>>
+    -float valoare
+    -string brand
+    -int clasaConsum
+    +Cheltuiala() float
+  }
+  class Motor { +float Power +int CaiPutere +Cheltuiala() float }
+  class Senzor { +float PercentAccuracy +int Frequency +Cheltuiala() float }
+  class Controler { +int Frequency +Cheltuiala() float }
+  class Display { +float Rezolutie }
+  class CoolingFan
+
+  MachineParts <|-- Motor
+  MachineParts <|-- Senzor
+  MachineParts <|-- Controler
+  MachineParts <|-- Display
+  MachineParts <|-- CoolingFan
+
+  class Product {
+    <<abstract>>
+    -float valoare
+    -float consum
+    -float baterie
+    -string brand
+    -string calitate
+    +VandProdus() float
+    +TestezProdus()
+  }
+  class Phones { +int AnProductie +string Procesor +Start() +Stop() }
+  class Tablets { +int AnProductie +string Procesor +Start() +Stop() }
+  class Computers { +int AnProductie +string Procesor +int Greutate +Start() +Stop() +Search() }
+  class Headphones { +int AnProductie +int Putere +CalitateSunet() float }
+
+  Product <|-- Phones
+  Product <|-- Tablets
+  Product <|-- Computers
+  Product <|-- Headphones
+
+  class Factory {
+    +Employee[] Employees
+    +Machine[] Machines
+    +Product[] Inventory
+  }
+
+  Factory "1" o-- "*" Employee : owns
+  Factory "1" o-- "*" Machine : owns
+  Factory "1" o-- "*" Product : stores
+  Machine "1" *-- "0..*" MachineParts : contains
+  Machine "1" ..> "0..*" Product : produces
+  MachineOperator ..> Machine : operates
+  Technician ..> Machine : repairs
+  Engineer ..> Machine : inspects
+  ProductionManager ..> Employee : supervises
+  SalesAgent ..> Product : sells
+
+  class MachineStatus {
+    <<enumeration>>
+    Stopped
+    Running
+    Maintenance
+    Broken
+  }
+`;
+const { svg } = await mermaid.render('cd-svg', src);
+document.getElementById('cd').innerHTML = svg;
+
+document.querySelectorAll('#cd svg.classDiagram g.node rect, #cd svg.classDiagram g.classGroup rect').forEach(r => {
+  r.setAttribute('rx', '8');
+});
+</script>
