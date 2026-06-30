@@ -105,24 +105,6 @@ namespace ElectronicsFactory
         }
     }
 
-
-    internal class MachineOperator : Employee
-    {
-        public MachineOperator(string id, string name, double salary)
-            : base(id, name, "Production", salary) { }
-
-        
-        public void SimulateMachineProduction(string machineName, ref string machineStatus, ref int productStock, int quantityToProduce)
-        {
-        }
-
-        public override void DisplayInfo()
-        {
-            base.DisplayInfo();
-            Console.WriteLine("Operatorul de masina porneste masina.");
-        }
-    }
-
     internal class SalesAgent : Employee
     {
         public SalesAgent(string id, string name, double salary)
