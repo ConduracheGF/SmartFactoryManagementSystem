@@ -12,6 +12,59 @@ namespace ElectronicsFactory
         Maintenance,
         Broken
     }
+
+    internal class MachineManagement
+    {
+        private Machine[] machines;
+        private int machineCount = 0;
+
+        public MachineManagement(int maxCapacity) 
+        {
+            this.machines = new Machine[maxCapacity];
+            this.machineCount = 0;
+        }
+        public void AddMachine(Machine machine)
+        {
+            if (machineCount >= machines.Length)
+            {
+                Console.WriteLine("Fabrica a atins limita maximă de mașini!");
+                return;
+            }
+
+            for (int i = 0; i < machineCount; i++)
+            {
+                if (machines[i].SerialNumber == machine.SerialNumber)
+                {
+                    Console.WriteLine($"O mașină cu seria {machine.SerialNumber} există deja!");
+                    return;
+                }
+            }
+
+            machines[machineCount] = machine;
+            machineCount++;
+
+            Console.WriteLine($"Mașina cu seria {machine.SerialNumber} a fost adăugată.");
+        }
+
+        public void DisplayMachinesStatus( string serialNumber )
+        {
+            if (machineCount == 0)
+            {
+                Console.WriteLine("Nu există mașini în fabrică.");
+                return;
+            }
+
+            for (int i = 0; i < machineCount; i++)
+            {
+                if (machines[i].SerialNumber == serialNumber)
+                {
+                    machines[i].Start();
+                    return;
+                }
+            }
+            Console.WriteLine($"Mașina cu seria {serialNumber} nu a fost găsită.");
+        }
+    }
     abstract public class Machine
     {
         public string SerialNumber { get; set; }
@@ -33,7 +86,6 @@ namespace ElectronicsFactory
 
         public virtual bool Inspect()
         {
- 
             return (Condition == "Rea" || Condition == "Critica");
         }
 
@@ -46,12 +98,10 @@ namespace ElectronicsFactory
             }
 
             Status = MachineStatus.Running;
-         
         }
 
         public virtual void Repair()
         {
-            
             if (Status == MachineStatus.Running)
             {
                 Console.WriteLine($"Nu se poate efectua reparatia masinii {SerialNumber} in timp ce este in functiune");
@@ -62,10 +112,7 @@ namespace ElectronicsFactory
            
             Condition = "Buna"; 
             Status = MachineStatus.Stopped;
-           
         }
-
-
     }
 
     internal class PackagingMachine : Machine
@@ -77,11 +124,9 @@ namespace ElectronicsFactory
             base.Start();
             if (Status == MachineStatus.Running)
             {
-                Console.WriteLine(" Masina de ambalare impacheteaza cutiile cu produse.");
+                Console.WriteLine("Masina de ambalare impacheteaza cutiile cu produse.");
             }
         }
-
-
     }
 
     internal class PcbFabricationMachine : Machine
@@ -93,7 +138,7 @@ namespace ElectronicsFactory
             base.Start();
             if (Status == MachineStatus.Running)
             {
-                Console.WriteLine(" PCB pt lipirea circuitelor");
+                Console.WriteLine("PCB pt lipirea circuitelor");
             }
         }
     }
@@ -110,8 +155,6 @@ namespace ElectronicsFactory
                 Console.WriteLine("Se monteaza componentele masinii");
             }
         }
-
-
     }
 
     internal class TestingMachine : Machine
@@ -132,18 +175,13 @@ namespace ElectronicsFactory
         {
             if (Condition == "Buna")
             {
-                Console.WriteLine(" -> Toate sistemele digitale, senzorii optici și modulele de calibrare funcționează la 100%.");
+                Console.WriteLine("Toate sistemele digitale, senzorii optici și modulele de calibrare funcționează la 100%.");
             }
             else
             {
-                Console.WriteLine($" -> ATENȚIE: S-au detectat fluctuații de tensiune. Condiția raportată este {Condition}.");
+                Console.WriteLine($"S-au detectat fluctuații de tensiune. Condiția raportată este {Condition}.");
             }
-
             return (Condition == "Rea" || Condition == "Critica");
         }
-
-
     }
-
-
 }
