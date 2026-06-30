@@ -5,12 +5,19 @@ using System.Xml.Linq;
 
 namespace ElectronicsFactory
 {
-    public enum MachineStatus
+    public enum MachineStatus_t
     {
         Stopped,
         Running,
         Maintenance,
         Broken
+    }
+
+    public enum ConditionStatus_t
+    {
+        Buna,
+        Rea,
+        Critica
     }
 
     internal class MachineManagement
@@ -20,8 +27,8 @@ namespace ElectronicsFactory
 
         public MachineManagement(int maxCapacity) 
         {
-            this.machines = new Machine[maxCapacity];
-            this.machineCount = 0;
+            machines = new Machine[maxCapacity];
+            machineCount = 0;
         }
         public void AddMachine(Machine machine)
         {
@@ -67,62 +74,66 @@ namespace ElectronicsFactory
     }
     abstract public class Machine
     {
+        private MachineParts[] components;
+        private int nrOfComponents = 0;
         public string SerialNumber { get; set; }
-        public MachineStatus Status { get; set; }
-        public string Condition { get; set; } 
+        public MachineStatus_t Status { get; set; }
+        public ConditionStatus_t Condition { get; set; }
 
-        public Machine(string serialNumber)
+        public Machine(string serialNumber, int maxCapacity)
         {
             SerialNumber = serialNumber;
-            Status = MachineStatus.Stopped;
-            Condition = "Buna";
+            Status = MachineStatus_t.Stopped;
+            Condition = ConditionStatus_t.Buna;
+            components = new MachineParts[maxCapacity];
+            nrOfComponents = 0;
         }
 
         public void Stop()
         {
-            Status = MachineStatus.Stopped;
+            Status = MachineStatus_t.Stopped;
             Console.WriteLine($"Masina cu serialNumber {SerialNumber} a fost oprita.");
         }
 
         public virtual bool Inspect()
         {
-            return (Condition == "Rea" || Condition == "Critica");
+            return (Condition == ConditionStatus_t.Rea || Condition == ConditionStatus_t.Critica);
         }
 
         public virtual void Start()
         {
-            if (Condition == "Critica" || Condition == "Rea")
+            if (Condition == ConditionStatus_t.Critica || Condition == ConditionStatus_t.Rea)
             {
-                Status = MachineStatus.Broken;
+                Status = MachineStatus_t.Broken;
                 return;
             }
 
-            Status = MachineStatus.Running;
+            Status = MachineStatus_t.Running;
         }
 
         public virtual void Repair()
         {
-            if (Status == MachineStatus.Running)
+            if (Status == MachineStatus_t.Running)
             {
                 Console.WriteLine($"Nu se poate efectua reparatia masinii {SerialNumber} in timp ce este in functiune");
                 return;
             }
 
-            Status = MachineStatus.Maintenance;
+            Status = MachineStatus_t.Maintenance;
            
-            Condition = "Buna"; 
-            Status = MachineStatus.Stopped;
+            Condition = ConditionStatus_t.Buna; 
+            Status = MachineStatus_t.Stopped;
         }
     }
 
     internal class PackagingMachine : Machine
     {
-        public PackagingMachine(string serialNumber) : base(serialNumber) { }
+        public PackagingMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
 
         public override void Start()
         {
             base.Start();
-            if (Status == MachineStatus.Running)
+            if (Status == MachineStatus_t.Running)
             {
                 Console.WriteLine("Masina de ambalare impacheteaza cutiile cu produse.");
             }
@@ -131,12 +142,12 @@ namespace ElectronicsFactory
 
     internal class PcbFabricationMachine : Machine
     {
-        public PcbFabricationMachine(string serialNumber) : base(serialNumber) { }
+        public PcbFabricationMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
 
         public override void Start()
         {
             base.Start();
-            if (Status == MachineStatus.Running)
+            if (Status == MachineStatus_t.Running)
             {
                 Console.WriteLine("PCB pt lipirea circuitelor");
             }
@@ -145,12 +156,12 @@ namespace ElectronicsFactory
 
     internal class AssemblyMachine : Machine
     {
-        public AssemblyMachine(string serialNumber) : base(serialNumber) { }
+        public AssemblyMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
 
         public override void Start()
         {
             base.Start();
-            if (Status == MachineStatus.Running)
+            if (Status == MachineStatus_t.Running)
             {
                 Console.WriteLine("Se monteaza componentele masinii");
             }
@@ -159,12 +170,12 @@ namespace ElectronicsFactory
 
     internal class TestingMachine : Machine
     {
-        public TestingMachine(string serialNumber) : base(serialNumber) { }
+        public TestingMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
 
         public override void Start()
         {
             base.Start();
-            if (Status == MachineStatus.Running)
+            if (Status == MachineStatus_t.Running)
             {
                 Console.WriteLine("Testare placi.");
             }
@@ -173,7 +184,7 @@ namespace ElectronicsFactory
 
         public override bool Inspect()
         {
-            if (Condition == "Buna")
+            if (Condition == ConditionStatus_t.Buna)
             {
                 Console.WriteLine("Toate sistemele digitale, senzorii optici și modulele de calibrare funcționează la 100%.");
             }
@@ -181,7 +192,7 @@ namespace ElectronicsFactory
             {
                 Console.WriteLine($"S-au detectat fluctuații de tensiune. Condiția raportată este {Condition}.");
             }
-            return (Condition == "Rea" || Condition == "Critica");
+            return (Condition == ConditionStatus_t.Rea || Condition == ConditionStatus_t.Critica);
         }
     }
 }

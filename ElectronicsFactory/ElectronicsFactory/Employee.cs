@@ -1,7 +1,81 @@
 ﻿using System;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ElectronicsFactory
 {
+    internal class EmployeeManagement
+    {
+        private Employee[] employees;
+        private int employeesCount = 0;
+
+        public EmployeeManagement(int maxCapacity)
+        {
+            employees = new Employee[maxCapacity];
+            employeesCount = 0;
+        }
+        public void AddEmployee(Employee employee)
+        {
+            if (employeesCount >= employees.Length)
+            {
+                Console.WriteLine("Fabrica a atins limita maxim de angajati!");
+                return;
+            }
+
+            int index = Search(employee.Id);
+
+            if (index == -1)
+            {
+                employees[employeesCount] = employee;
+                employeesCount++;
+
+                Console.WriteLine($"Angajat cu ID-ul {employee.Id} a fost adăugată.");
+            } else
+            {
+                Console.WriteLine($"Angajatul cu ID-ul {employee.Id} exista deja in firma!");
+            }
+        }
+        public void RemoveEmployee(Employee employee)
+        {
+            if (employeesCount == 0)
+            {
+                Console.WriteLine("Fabrica a ramas fara angajati!");
+                return;
+            }
+
+            int index = Search(employee.Id);
+
+            if (index == -1)
+            {
+                employeesCount--;
+
+                Console.WriteLine($"Angajat cu ID-ul {employee.Id} a fost concediat.");
+            }
+            else
+            {
+                Console.WriteLine($"Angajatul cu ID-ul {employee.Id} nu exista in firma!");
+            }
+        }
+
+        public int Search(string Id_or_Name)
+        {
+            if (employeesCount == 0)
+            {
+                Console.WriteLine("Nu exista angajati in fabrica.");
+                return -1;
+            }
+
+            for (int i = 0; i < employeesCount; i++)
+            {
+                if (employees[i].Id == Id_or_Name || employees[i].Name == Id_or_Name)
+                {
+                    employees[i].DisplayInfo();
+                    return i;
+                }
+            }
+            Console.WriteLine($"Angajatul {Id_or_Name} nu a fost găsit.");
+            return -1;
+        }
+    }
     public abstract class Employee
     {
         public string Id { get; set; } 
