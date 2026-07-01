@@ -3,6 +3,14 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace ElectronicsFactory
 {
+    public enum DepartmentStatus_t
+    {
+        Management,
+        Production,
+        Technical,
+        Sales,
+        Finance
+    }
     internal class EmployeeManagement
     {
         private Employee[] employees;
@@ -13,12 +21,12 @@ namespace ElectronicsFactory
             employees = new Employee[maxCapacity];
             employeesCount = 0;
         }
-        public void AddEmployee(Employee employee)
+        public bool AddEmployee(Employee employee)
         {
             if (employeesCount >= employees.Length)
             {
-                Console.WriteLine("Fabrica a atins limita maxim de angajati!");
-                return;
+                Logger.Error("Fabrica a atins limita maxim de angajati!");
+                return false;
             }
 
             int index = Search(employee.Id);
@@ -28,10 +36,12 @@ namespace ElectronicsFactory
                 employees[employeesCount] = employee;
                 employeesCount++;
 
-                Console.WriteLine($"Angajat cu ID-ul {employee.Id} a fost adăugată.");
+                Logger.Info($"Angajatul cu ID-ul {employee.Id} a fost adăugat.");
+                return true;
             } else
             {
-                Console.WriteLine($"Angajatul cu ID-ul {employee.Id} exista deja in firma!");
+                Logger.Warning($"Angajatul cu ID-ul {employee.Id} exista deja in firma!");
+                return false;
             }
         }
         public void RemoveEmployee(Employee employee)
@@ -60,7 +70,7 @@ namespace ElectronicsFactory
         {
             if (employeesCount == 0)
             {
-                Console.WriteLine("Nu exista angajati in fabrica.");
+                Logger.Info("Nu exista angajati in fabrica.");
                 return -1;
             }
 
@@ -72,7 +82,7 @@ namespace ElectronicsFactory
                     return i;
                 }
             }
-            Console.WriteLine($"Angajatul {Id_or_Name} nu a fost găsit.");
+            Logger.Warning($"Angajatul {Id_or_Name} nu a fost găsit.");
             return -1;
         }
     }
@@ -80,10 +90,10 @@ namespace ElectronicsFactory
     {
         public string Id { get; set; } 
         public string Name { get; set; }
-        public string Department { get; set; }
+        public DepartmentStatus_t Department { get; set; }
         public double Salary { get; set; }
 
-        public Employee(string id, string name, string department, double salary)
+        public Employee(string id, string name, DepartmentStatus_t department, double salary)
         {
             Id = id;
             Name = name;
@@ -93,7 +103,7 @@ namespace ElectronicsFactory
 
         public virtual void DisplayInfo()
         {
-            Console.WriteLine($"[{Id}] Angajat: {Name}, Departament: {Department}, Salariu: {Salary} lei");
+            Logger.Info($"[{Id}] Angajat: {Name}, Departament: {Department}, Salariu: {Salary} lei");
         }
     }
 
@@ -101,7 +111,7 @@ namespace ElectronicsFactory
     {
       
         public Director(string id, string name, double salary)
-             : base(id, name, "Management", salary)
+             : base(id, name, DepartmentStatus_t.Management, salary)
         {
            
         }
@@ -114,17 +124,15 @@ namespace ElectronicsFactory
         public override void DisplayInfo()
         {
             base.DisplayInfo(); 
-            Console.WriteLine("Directorul verifica statisticile productiei.");
+            Logger.Info("Directorul verifica statisticile productiei.");
         
         }
     }
 
     internal class ProductionManager : Employee
     {
-       
-      
         public ProductionManager(string id, string name, double salary)
-            : base(id, name, "Production", salary) { }
+            : base(id, name, DepartmentStatus_t.Production, salary) { }
 
       
         public void CreateProductionOrder(string productType, int quantity)
@@ -136,34 +144,32 @@ namespace ElectronicsFactory
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            Console.WriteLine("Managerul de productie creeaza o comanda de productie.");
+            Logger.Info("Managerul de productie creeaza o comanda de productie.");
         }
     }
 
     internal class Engineer : Employee
     {
         public Engineer(string id, string name, double salary)
-            : base(id, name, "Engineering", salary) { }
+            : base(id, name, DepartmentStatus_t.Technical, salary) { }
 
         
         public bool InspectMachine(string machineName, string condition)
         {
-
             return false;
         }
 
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            Console.WriteLine("Inginerul inspecteaza masina selectata.");
-
+            Logger.Info("Inginerul inspecteaza masina selectata.");
         }
     }
 
     internal class Technician : Employee
     {
         public Technician(string id, string name, double salary)
-            : base(id, name, "Maintenance", salary) { }
+            : base(id, name, DepartmentStatus_t.Technical, salary) { }
 
         
         public void RepairMachine(string machineName, ref string machineCondition, string machineStatus)
@@ -174,15 +180,14 @@ namespace ElectronicsFactory
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            Console.WriteLine("Tehnicianul repara masina daca este necesar");
-
+            Logger.Info("Tehnicianul repara masina daca este necesar");
         }
     }
 
     internal class SalesAgent : Employee
     {
         public SalesAgent(string id, string name, double salary)
-            : base(id, name, "Sales", salary) { }
+            : base(id, name, DepartmentStatus_t.Sales, salary) { }
 
 
         public void SellElectronics(string productType, int quantityRequested, ref int productStock)
@@ -192,15 +197,14 @@ namespace ElectronicsFactory
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            Console.WriteLine("Agentul de vanzari vinde produse");
-
+            Logger.Info("Agentul de vanzari vinde produse");
         }
     }
 
     internal class Accountant : Employee
     {
         public Accountant(string id, string name, double salary)
-            : base(id, name, "Finance", salary) { }
+            : base(id, name, DepartmentStatus_t.Finance, salary) { }
 
         public void CalculateProductionValue(int productStock, double productionCost)
         {
@@ -210,8 +214,7 @@ namespace ElectronicsFactory
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            Console.WriteLine("Contabilul calculeaza productia");
-
+            Logger.Info("Contabilul calculeaza productia");
         }
     }
 }

@@ -22,6 +22,8 @@ namespace ElectronicsFactory
 
     internal class MachineManagement
     {
+        //de facut pe mai tarziu o metoda de vandut Masinaria in caz de nu ne mai trebuie sau e inutila sau e defecta de tot (suplimentar)
+        //de facut o metoda de cautat masina in registru fabricii (suplimentar)
         private Machine[] machines;
         private int machineCount = 0;
 
@@ -30,34 +32,35 @@ namespace ElectronicsFactory
             machines = new Machine[maxCapacity];
             machineCount = 0;
         }
-        public void AddMachine(Machine machine)
+        public bool AddMachine(Machine machine)
         {
             if (machineCount >= machines.Length)
             {
-                Console.WriteLine("Fabrica a atins limita maximă de mașini!");
-                return;
+                Logger.Error("Fabrica a atins limita maximă de mașini!");
+                return false;
             }
 
             for (int i = 0; i < machineCount; i++)
             {
                 if (machines[i].SerialNumber == machine.SerialNumber)
                 {
-                    Console.WriteLine($"O mașină cu seria {machine.SerialNumber} există deja!");
-                    return;
+                    Logger.Warning($"O mașină cu seria {machine.SerialNumber} există deja!");
+                    return false;
                 }
             }
 
             machines[machineCount] = machine;
             machineCount++;
 
-            Console.WriteLine($"Mașina cu seria {machine.SerialNumber} a fost adăugată.");
+            Logger.Info($"Mașina cu seria {machine.SerialNumber} a fost adăugată.");
+            return true;
         }
 
         public void DisplayMachinesStatus( string serialNumber )
         {
             if (machineCount == 0)
             {
-                Console.WriteLine("Nu există mașini în fabrică.");
+                Logger.Warning("Nu există mașini în fabrică.");
                 return;
             }
 
@@ -65,11 +68,11 @@ namespace ElectronicsFactory
             {
                 if (machines[i].SerialNumber == serialNumber)
                 {
-                    machines[i].Start();
+                    machines[i].Inspect();
                     return;
                 }
             }
-            Console.WriteLine($"Mașina cu seria {serialNumber} nu a fost găsită.");
+            Logger.Info($"Mașina cu seria {serialNumber} nu a fost găsită.");
         }
     }
     abstract public class Machine
@@ -79,7 +82,6 @@ namespace ElectronicsFactory
         public string SerialNumber { get; set; }
         public MachineStatus_t Status { get; set; }
         public ConditionStatus_t Condition { get; set; }
-
         public Machine(string serialNumber, int maxCapacity)
         {
             SerialNumber = serialNumber;
@@ -89,10 +91,17 @@ namespace ElectronicsFactory
             nrOfComponents = 0;
         }
 
-        public void Stop()
+        public bool Stop()
         {
+            if (Status == MachineStatus_t.Maintenance)
+            {
+                Logger.Warning($"Masina {SerialNumber} este in mentenanta si nu poate fi oprita!");
+                return false;
+            }
+
             Status = MachineStatus_t.Stopped;
-            Console.WriteLine($"Masina cu serialNumber {SerialNumber} a fost oprita.");
+            Logger.Info($"Masina cu serial number: {SerialNumber} a fost oprita.");
+            return true;
         }
 
         public virtual bool Inspect()
@@ -100,29 +109,53 @@ namespace ElectronicsFactory
             return (Condition == ConditionStatus_t.Bad || Condition == ConditionStatus_t.Critical);
         }
 
-        public virtual void Start()
+        public virtual bool Start()
         {
             if (Condition == ConditionStatus_t.Critical || Condition == ConditionStatus_t.Bad)
             {
+                Logger.Warning($"Masina cu serial number: {SerialNumber} este defecta si nu poate porni!");
                 Status = MachineStatus_t.Broken;
-                return;
+                return false;
             }
 
+            Logger.Info($"Masina cu serial number {SerialNumber} a pornit cu succes!");
             Status = MachineStatus_t.Running;
+            return true;
         }
 
-        public virtual void Repair()
+        public virtual bool Repair()
         {
             if (Status == MachineStatus_t.Running)
             {
-                Console.WriteLine($"Nu se poate efectua reparatia masinii {SerialNumber} in timp ce este in functiune");
-                return;
+                Logger.Warning($"Nu se poate efectua reparatia masinii {SerialNumber} in timp ce este in functiune");
+                return false;
             }
 
             Status = MachineStatus_t.Maintenance;
-           
+            //trebuie facut ceva care sa lege cu mentenanta si tehnicianul
             Condition = ConditionStatus_t.Good; 
             Status = MachineStatus_t.Stopped;
+            return true;
+        }
+
+        public virtual bool Process(Product product)
+        {
+            switch(Status)
+            {
+                case MachineStatus_t.Stopped:
+                    Logger.Warning($"Masina cu serial number {SerialNumber} este oprita si nu poate procesa produse!");
+                    return false;
+                case MachineStatus_t.Running:
+                    Logger.Info("Masina este in procesarea produselor");
+                    return true;
+                case MachineStatus_t.Maintenance:
+                    Logger.Warning($"Masina cu serial number {SerialNumber} este in mentenanta si nu poate procesa produse");
+                    return false;
+                case MachineStatus_t.Broken:
+                    Logger.Error($"Masina este stricata si nu poate procesa produse!");
+                    return false;
+                default: return false;
+            }
         }
     }
 
@@ -130,12 +163,38 @@ namespace ElectronicsFactory
     {
         public PackagingMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
 
-        public override void Start()
+        public override bool Start()
         {
-            base.Start();
-            if (Status == MachineStatus_t.Running)
+            if (base.Start())
             {
-                Console.WriteLine("Masina de ambalare impacheteaza cutiile cu produse.");
+                Logger.Info("Masina de ambalare impacheteaza cutiile cu produse.");
+                return true;
+            }
+            return false;
+        }
+        public override bool Process(Product product)
+        {
+            switch (Status)
+            {
+                case MachineStatus_t.Stopped:
+                    base.Process(product);
+                    Logger.Warning($"PackagingMachine nu poate impacheta produsul!");
+                    return false;
+                case MachineStatus_t.Running:
+                    base.Process(product);
+                    product.TestProduct();
+                    Logger.Info("Masina este in procesarea produsului!");
+                    Logger.Info($"Calitatea sa este: {product.Quality}");
+                    return true;
+                case MachineStatus_t.Maintenance:
+                    base.Process(product);
+                    Logger.Warning($"Masina cu serial number {SerialNumber} este in mentenanta si nu poate procesa produse");
+                    return false;
+                case MachineStatus_t.Broken:
+                    base.Process(product);
+                    Logger.Error($"Masina este stricata si nu poate procesa produse!");
+                    return false;
+                default: return false;
             }
         }
     }
@@ -144,12 +203,39 @@ namespace ElectronicsFactory
     {
         public PcbFabricationMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
 
-        public override void Start()
+        public override bool Start()
         {
-            base.Start();
-            if (Status == MachineStatus_t.Running)
+            if (base.Start())
             {
-                Console.WriteLine("PCB pt lipirea circuitelor");
+                Logger.Info("PCB pt lipirea circuitelor");
+                return true;
+            }
+            return false;
+        }
+
+        public override bool Process(Product product)
+        {
+            switch (Status)
+            {
+                case MachineStatus_t.Stopped:
+                    base.Process(product);
+                    Logger.Warning($"PackagingMachine nu poate impacheta produsul!");
+                    return false;
+                case MachineStatus_t.Running:
+                    base.Process(product);
+                    product.TestProduct();
+                    Logger.Info("Masina este in procesarea produsului!");
+                    Logger.Info($"Calitatea sa este: {product.Quality}");
+                    return true;
+                case MachineStatus_t.Maintenance:
+                    base.Process(product);
+                    Logger.Warning($"Masina cu serial number {SerialNumber} este in mentenanta si nu poate procesa produse");
+                    return false;
+                case MachineStatus_t.Broken:
+                    base.Process(product);
+                    Logger.Error($"Masina este stricata si nu poate procesa produse!");
+                    return false;
+                default: return false;
             }
         }
     }
@@ -158,12 +244,39 @@ namespace ElectronicsFactory
     {
         public AssemblyMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
 
-        public override void Start()
+        public override bool Start()
         {
-            base.Start();
-            if (Status == MachineStatus_t.Running)
+            if (base.Start())
             {
-                Console.WriteLine("Se monteaza componentele masinii");
+                Logger.Info("Se monteaza componentele masinii");
+                return true;
+            }
+            return false;
+        }
+
+        public override bool Process(Product product)
+        {
+            switch (Status)
+            {
+                case MachineStatus_t.Stopped:
+                    base.Process(product);
+                    Logger.Warning($"PackagingMachine nu poate impacheta produsul!");
+                    return false;
+                case MachineStatus_t.Running:
+                    base.Process(product);
+                    product.TestProduct();
+                    Logger.Info("Masina este in procesarea produsului!");
+                    Logger.Info($"Calitatea sa este: {product.Quality}");
+                    return true;
+                case MachineStatus_t.Maintenance:
+                    base.Process(product);
+                    Logger.Warning($"Masina cu serial number {SerialNumber} este in mentenanta si nu poate procesa produse");
+                    return false;
+                case MachineStatus_t.Broken:
+                    base.Process(product);
+                    Logger.Error($"Masina este stricata si nu poate procesa produse!");
+                    return false;
+                default: return false;
             }
         }
     }
@@ -172,13 +285,14 @@ namespace ElectronicsFactory
     {
         public TestingMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
 
-        public override void Start()
+        public override bool Start()
         {
-            base.Start();
-            if (Status == MachineStatus_t.Running)
+            if (base.Start())
             {
-                Console.WriteLine("Testare placi.");
+                Logger.Info("Testare placi.");
+                return true;
             }
+            return false;
         }
 
 
@@ -186,13 +300,39 @@ namespace ElectronicsFactory
         {
             if (Condition == ConditionStatus_t.Good)
             {
-                Console.WriteLine("Toate sistemele digitale, senzorii optici și modulele de calibrare funcționează la 100%.");
+                Logger.Info("Toate sistemele digitale, senzorii optici și modulele de calibrare funcționează la 100%.");
             }
             else
             {
-                Console.WriteLine($"S-au detectat fluctuații de tensiune. Condiția raportată este {Condition}.");
+                Logger.Warning($"S-au detectat fluctuații de tensiune. Condiția raportată este {Condition}.");
             }
             return (Condition == ConditionStatus_t.Bad || Condition == ConditionStatus_t.Critical);
+        }
+
+        public override bool Process(Product product)
+        {
+            switch (Status)
+            {
+                case MachineStatus_t.Stopped:
+                    base.Process(product);
+                    Logger.Warning($"PackagingMachine nu poate impacheta produsul!");
+                    return false;
+                case MachineStatus_t.Running:
+                    base.Process(product);
+                    product.TestProduct();
+                    Logger.Info("Masina este in procesarea produsului!");
+                    Logger.Info($"Calitatea sa este: {product.Quality}");
+                    return true;
+                case MachineStatus_t.Maintenance:
+                    base.Process(product);
+                    Logger.Warning($"Masina cu serial number {SerialNumber} este in mentenanta si nu poate procesa produse");
+                    return false;
+                case MachineStatus_t.Broken:
+                    base.Process(product);
+                    Logger.Error($"Masina este stricata si nu poate procesa produse!");
+                    return false;
+                default: return false;
+            }
         }
     }
 }

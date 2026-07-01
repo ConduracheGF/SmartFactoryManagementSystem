@@ -22,25 +22,25 @@ namespace ElectronicsFactory
 
         public virtual float Expense(float income)
         {
-            return income - currency;
+            return (income - currency);
         }
     }
 
     internal class Motor : MachineParts
     {
-        private float power;
+        private float powerEnergy;
         private int horsePower;
-        public float Power { get { return power; } set { power = value; } }
+        public float PowerEnergy { get { return powerEnergy; } set { powerEnergy = value; } }
         public int HorsePower { get { return horsePower; } set { horsePower = value; } }
 
-        public Motor(int currency = 0, string? brand = null, int energyClass = 0, float power = 0.0f, int horsePower = 0) : base(currency, brand, energyClass)
+        public Motor(int currency = 0, string? brand = null, int energyClass = 0, float powerEnergy = 0.0f, int horsePower = 0) : base(currency, brand, energyClass)
         {
-            this.power = power;
+            this.powerEnergy = powerEnergy;
             this.horsePower = horsePower;
         }
         public override float Expense(float income)
         {
-            return income - ((Currency * EnergyClass) - (Power / EnergyClass));
+            return (income - ((Currency * EnergyClass) - (PowerEnergy / EnergyClass)));
         }
     }
 
@@ -59,7 +59,7 @@ namespace ElectronicsFactory
 
         public override float Expense(float income)
         {
-            return ((income - (percentAccuracy * Currency * EnergyClass));
+            return (income - (percentAccuracy * Currency * EnergyClass));
         }
     }
 

@@ -148,12 +148,12 @@ namespace ElectronicsFactory
                 Quality = "A";
             }
 
-            Console.WriteLine($"Tableta este de quality de tipul: {Quality}");
+            Logger.Info($"Tableta este de quality de tipul: {Quality}");
         }
 
         public void DisplayFunctionality()
         {
-            Console.WriteLine("Tableta poate efectua orice task dorit, atata timp cat descarci aplicatia!");
+            Logger.Info("Tableta poate efectua orice task dorit, atata timp cat descarci aplicatia!");
         }
     }
 
@@ -163,13 +163,11 @@ namespace ElectronicsFactory
         private int weight;
         private string? processor;
 
-        public int YearOfProduction { get { return yearOfProduction; } set { yearOfProduction = value; } }
         public int Weight { get { return weight; } set { weight = value; } }
         public string? Processor { get { return processor; } set { processor = value; } }
 
-        public Computers(float currency, float consumption, float battery, string? brand, string? quality, int yearOfProduction, string? processor, int weight) : base(currency, consumption, battery, brand, quality)
+        public Computers(float currency, float consumption, float battery, string? brand, string? quality, string? processor, int weight) : base(currency, consumption, battery, brand, quality)
         {
-            this.yearOfProduction = yearOfProduction;
             this.processor = processor;
             this.weight = weight;
         }
@@ -199,12 +197,12 @@ namespace ElectronicsFactory
                 Quality = "A";
             }
 
-            Console.WriteLine($"Computerul este de quality de tipul: {Quality}");
+            Logger.Info($"Computerul este de quality de tipul: {Quality}");
         }
 
         public void WifiConectionDescription()
         {
-            Console.WriteLine("Computerul poate efectua cautari si orice conectare la Wifi!");
+            Logger.Info("Computerul poate efectua cautari si orice conectare la Wifi!");
         }
     }
 
@@ -224,7 +222,7 @@ namespace ElectronicsFactory
 
         public override void TestProduct()
         {
-            float sunet = QualitySunet();
+            float sunet = QualitySound();
             float ratio = (Battery / Consumption) - sunet;
 
             if (ratio > 0 && ratio <= 5)
@@ -248,10 +246,10 @@ namespace ElectronicsFactory
                 Quality = "A";
             }
 
-            Console.WriteLine($"Telefonul este de quality de tipul: {Quality}");
+            Logger.Info($"Telefonul este de quality de tipul: {Quality}");
         }
 
-        public float QualitySunet()
+        public float QualitySound()
         {
             return Power / Consumption;
         }
