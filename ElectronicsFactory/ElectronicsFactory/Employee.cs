@@ -54,7 +54,7 @@ namespace ElectronicsFactory
 
             int index = Search(employee.Id);
 
-            if (index == -1)
+            if (index != -1)
             {
                 employeesCount--;
 
@@ -116,16 +116,20 @@ namespace ElectronicsFactory
            
         }
 
-        
-        public void ReviewProductionStatistics()
+
+        public void ReviewProductionStatistics(int totalEmployees, int totalMachines, int totalStock)
         {
+            Logger.Info($"Directorul {Name} revizuiește raportul fabricii:");
+            Console.WriteLine($" -> Total Angajați activi: {totalEmployees}");
+            Console.WriteLine($" -> Total Utilaje înregistrate: {totalMachines}");
+            Console.WriteLine($" -> Total Produse în depozit: {totalStock}");
+          
         }
 
         public override void DisplayInfo()
         {
             base.DisplayInfo(); 
-            Logger.Info("Directorul verifica statisticile productiei.");
-        
+     
         }
     }
 
@@ -134,17 +138,23 @@ namespace ElectronicsFactory
         public ProductionManager(string id, string name, double salary)
             : base(id, name, DepartmentStatus_t.Production, salary) { }
 
-      
-        public void CreateProductionOrder(string productType, int quantity)
+        public int CreateProductionOrder(string productType, int quantity)
         {
+            if (quantity <= 0)
+            {
+                Logger.Warning($"Managerul {Name} a refuzat comanda: Cantitatea solicitată ({quantity}) trebuie să fie mai mare decât 0!");
+                return 0;
+            }
 
+            
+            Logger.Info($"Managerul de producție {Name} a generat și aprobat comanda pentru {quantity}x unități de tip {productType}.");
 
+            return quantity;
         }
-
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            Logger.Info("Managerul de productie creeaza o comanda de productie.");
+            
         }
     }
 
@@ -153,16 +163,29 @@ namespace ElectronicsFactory
         public Engineer(string id, string name, double salary)
             : base(id, name, DepartmentStatus_t.Technical, salary) { }
 
-        
-        public bool InspectMachine(string machineName, string condition)
+
+        public bool InspectMachine(Machine machine)
         {
-            return false;
+            Logger.Info($"Inginerul {Name} inspectează mașina cu seria {machine.SerialNumber}.");
+
+            bool needsRepair = machine.Inspect();
+
+            if (needsRepair)
+            {
+                Logger.Warning($"Mașina {machine.SerialNumber} are probleme (Stare: {machine.Condition}) și necesită reparații!");
+            }
+            else
+            {
+                Logger.Info($"Mașina {machine.SerialNumber} este în stare bună de funcționare.");
+            }
+
+            return needsRepair; 
         }
 
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            Logger.Info("Inginerul inspecteaza masina selectata.");
+            
         }
     }
 
@@ -171,16 +194,29 @@ namespace ElectronicsFactory
         public Technician(string id, string name, double salary)
             : base(id, name, DepartmentStatus_t.Technical, salary) { }
 
-        
-        public void RepairMachine(string machineName, ref string machineCondition, string machineStatus)
-        {
 
+        public void RepairMachine(Machine machine)
+        {
+            Logger.Info($"Tehnicianul {Name} încearcă să repare mașina {machine.SerialNumber}.");
+
+          
+            if (machine.Status == MachineStatus_t.Running)
+            {
+                Logger.Error($"Tehnicianul {Name} NU poate repara o mașină care funcționează!");
+                return;
+            }
+
+            bool success = machine.Repair();
+            if (success)
+            {
+                Logger.Info($"Tehnicianul {Name} a finalizat cu succes reparația mașinii {machine.SerialNumber}.");
+            }
         }
 
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            Logger.Info("Tehnicianul repara masina daca este necesar");
+           
         }
     }
 
@@ -190,14 +226,29 @@ namespace ElectronicsFactory
             : base(id, name, DepartmentStatus_t.Sales, salary) { }
 
 
-        public void SellElectronics(string productType, int quantityRequested, ref int productStock)
+       
+         public void SellElectronics(Product product, int quantityRequested, ref int productStock)
         {
+            Logger.Info($"Agentul de vânzări {Name} încearcă să vândă {quantityRequested} bucăți din produsul de brand {product.Brand}.");
+
+            if (productStock < quantityRequested)
+            {
+                Logger.Error($"Stoc insuficient! Disponibil: {productStock}, Cerut: {quantityRequested}");
+                return;
+            }
+
+           
+            productStock -= quantityRequested;
+            float totalIncome = quantityRequested * product.Currency; 
+
+            Logger.Info($"S-au vândut {quantityRequested} bucăți. Venit generat: {totalIncome} lei. Stoc rămas: {productStock}");
         }
+        
 
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            Logger.Info("Agentul de vanzari vinde produse");
+            
         }
     }
 
@@ -208,13 +259,52 @@ namespace ElectronicsFactory
 
         public void CalculateProductionValue(int productStock, double productionCost)
         {
+            Logger.Info($"Contabilul {Name} calculează valoarea producției actuale...");
+       
+            double estimatedPricePerUnit = 1500.0;
+            double totalStockValue = productStock * estimatedPricePerUnit;
+            double financialBalance = totalStockValue - productionCost;
 
+  
+            Console.WriteLine($"[RAPORT FINANCIAR] Generat de {Name}:");
+            Console.WriteLine($"Unități în stoc: {productStock} buc.");
+            Console.WriteLine($"Valoarea totală a stocului: {totalStockValue} lei");
+            Console.WriteLine($"Costuri totale de producție: {productionCost} lei");
+
+            if (financialBalance >= 0)
+            {
+                Logger.Info($" Fabrica înregistrează PROFIT potențial: +{financialBalance} lei");
+            }
+            else
+            {
+                Logger.Warning($" Fabrica înregistrează PIERDERE temporară: {financialBalance} lei");
+            }
+       
         }
 
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            Logger.Info("Contabilul calculeaza productia");
+            
+        }
+
+    }
+    internal class MachineOperator : Employee
+    {
+        public MachineOperator(string id, string name, double salary)
+            : base(id, name, DepartmentStatus_t.Production, salary) { }
+
+       
+        public bool StartMachine(Machine machine)
+        {
+            Logger.Info($"Operatorul {Name} încearcă să pornească mașina {machine.SerialNumber}.");
+            return machine.Start(); 
+        }
+
+        public override void DisplayInfo()
+        {
+            base.DisplayInfo();
+            
         }
     }
 }

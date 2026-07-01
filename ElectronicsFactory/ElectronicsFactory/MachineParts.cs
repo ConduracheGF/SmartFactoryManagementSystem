@@ -16,7 +16,7 @@ namespace ElectronicsFactory
         public MachineParts(float currency = 0, string? brand = null, int energyClass = 0)
         {
             this.currency = currency;
-            this.brand = brand;
+            this.Brand = brand;
             this.energyClass = energyClass;
         }
 

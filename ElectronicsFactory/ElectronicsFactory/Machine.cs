@@ -146,6 +146,7 @@ namespace ElectronicsFactory
                     Logger.Warning($"Masina cu serial number {SerialNumber} este oprita si nu poate procesa produse!");
                     return false;
                 case MachineStatus_t.Running:
+                    if (nrOfComponents == 0)
                     Logger.Info("Masina este in procesarea produselor");
                     return true;
                 case MachineStatus_t.Maintenance:
