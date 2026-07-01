@@ -120,9 +120,9 @@ namespace ElectronicsFactory
         public void ReviewProductionStatistics(int totalEmployees, int totalMachines, int totalStock)
         {
             Logger.Info($"Director {Name} reviews the factory report:");
-            Console.WriteLine($" -> Total Active Employees: {totalEmployees}");
-            Console.WriteLine($" -> Total Machines registered: {totalMachines}");
-            Console.WriteLine($" -> Total Products in stock: {totalStock}");
+            Logger.Info(" -> Total Active Employees: {totalEmployees}");
+            Logger.Info($" -> Total Machines registered: {totalMachines}");
+            Logger.Info($" -> Total Products in stock: {totalStock}");
           
         }
 
