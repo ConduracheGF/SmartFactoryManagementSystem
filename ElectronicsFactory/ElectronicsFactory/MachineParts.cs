@@ -20,7 +20,7 @@ namespace ElectronicsFactory
             this.energyClass = energyClass;
         }
 
-        public virtual float Expense(float income)
+        public virtual float Replacement(float income)
         {
             return (income - currency);
         }
@@ -38,7 +38,7 @@ namespace ElectronicsFactory
             this.powerEnergy = powerEnergy;
             this.horsePower = horsePower;
         }
-        public override float Expense(float income)
+        public override float Replacement(float income)
         {
             return (income - ((Currency * EnergyClass) - (PowerEnergy / EnergyClass)));
         }
@@ -57,7 +57,7 @@ namespace ElectronicsFactory
             this.percentAccuracy = percentAccuracy;
         }
 
-        public override float Expense(float income)
+        public override float Replacement(float income)
         {
             return (income - (percentAccuracy * Currency * EnergyClass));
         }
@@ -73,9 +73,9 @@ namespace ElectronicsFactory
             this.frequency = frequency;
         }
 
-        public override float Expense(float income)
+        public override float Replacement(float income)
         {
-            return base.Expense(income);
+            return base.Replacement(income);
         }
     }
 
@@ -89,9 +89,9 @@ namespace ElectronicsFactory
             this.rezolution = rezolution;
         }
 
-        public override float Expense(float income)
+        public override float Replacement(float income)
         {
-            return base.Expense(income);
+            return base.Replacement(income);
         }
     }
     internal class CoolingFan : MachineParts
@@ -105,9 +105,9 @@ namespace ElectronicsFactory
             this.speed = speed;
         }
 
-        public override float Expense(float income)
+        public override float Replacement(float income)
         {
-            return base.Expense(income);
+            return base.Replacement(income);
         }
     }
 }

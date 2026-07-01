@@ -133,6 +133,7 @@ namespace ElectronicsFactory
 
             Status = MachineStatus_t.Maintenance;
             //trebuie facut ceva care sa lege cu mentenanta si tehnicianul
+            //se muta mentenanta catre cel care repara, iar dupa reparare sa ramana masina oprita
             Condition = ConditionStatus_t.Good; 
             Status = MachineStatus_t.Stopped;
             return true;

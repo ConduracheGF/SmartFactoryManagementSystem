@@ -22,7 +22,7 @@ namespace ElectronicsFactory
             employees = new Employee[maxCapacity];
             employeesCount = 0;
         }
-        public bool AddEmployee(Employee employee)
+        public bool HiredEmployee(Employee employee)
         {
             if (employeesCount >= employees.Length)
             {
@@ -30,7 +30,7 @@ namespace ElectronicsFactory
                 return false;
             }
 
-            int index = Search(employee.Id);
+            int index = SearchEmployee(employee.Id);
 
             if (index == -1)
             {
@@ -45,7 +45,7 @@ namespace ElectronicsFactory
                 return false;
             }
         }
-        public void RemoveEmployee(Employee employee)
+        public void FiredEmployee(Employee employee)
         {
             if (employeesCount == 0)
             {
@@ -53,7 +53,7 @@ namespace ElectronicsFactory
                 return;
             }
 
-            int index = Search(employee.Id);
+            int index = SearchEmployee(employee.Id);
 
             if (index != -1)
             {
@@ -70,7 +70,7 @@ namespace ElectronicsFactory
             }
         }
 
-        public int Search(string Id_or_Name)
+        public int SearchEmployee(string Id_or_Name)
         {
             if (employeesCount == 0)
             {
