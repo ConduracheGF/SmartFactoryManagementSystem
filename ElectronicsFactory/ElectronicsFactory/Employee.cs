@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection.Metadata.Ecma335;
+using System.Reflection.PortableExecutable;
 
 namespace ElectronicsFactory
 {
@@ -25,7 +26,7 @@ namespace ElectronicsFactory
         {
             if (employeesCount >= employees.Length)
             {
-                Logger.Error("Fabrica a atins limita maxim de angajati!");
+                Logger.Error("The factory has reached its maximum employee limit!");
                 return false;
             }
 
@@ -36,11 +37,11 @@ namespace ElectronicsFactory
                 employees[employeesCount] = employee;
                 employeesCount++;
 
-                Logger.Info($"Angajatul cu ID-ul {employee.Id} a fost adăugat.");
+                Logger.Info($"The employee with ID {employee.Id} has been added.");
                 return true;
             } else
             {
-                Logger.Warning($"Angajatul cu ID-ul {employee.Id} exista deja in firma!");
+                Logger.Warning($"The employee with the ID {employee.Id} already exists in the company!");
                 return false;
             }
         }
@@ -48,7 +49,7 @@ namespace ElectronicsFactory
         {
             if (employeesCount == 0)
             {
-                Console.WriteLine("Fabrica a ramas fara angajati!");
+                Logger.Error("The factory was left without employees!");
                 return;
             }
 
@@ -56,13 +57,16 @@ namespace ElectronicsFactory
 
             if (index != -1)
             {
-                employeesCount--;
+                for(int i = index; i < employees.Length - 1; i++)
+                {
+                    employees[i] = employees[i + 1];
+                }
 
-                Console.WriteLine($"Angajat cu ID-ul {employee.Id} a fost concediat.");
+                Logger.Info($"Employee with ID {employee.Id} has been fired.");
             }
             else
             {
-                Console.WriteLine($"Angajatul cu ID-ul {employee.Id} nu exista in firma!");
+                Logger.Info($"The employee with the ID {employee.Id} does not exist in the company!");
             }
         }
 
@@ -70,7 +74,7 @@ namespace ElectronicsFactory
         {
             if (employeesCount == 0)
             {
-                Logger.Info("Nu exista angajati in fabrica.");
+                Logger.Info("There are no employees in the factory.");
                 return -1;
             }
 
@@ -82,7 +86,7 @@ namespace ElectronicsFactory
                     return i;
                 }
             }
-            Logger.Warning($"Angajatul {Id_or_Name} nu a fost găsit.");
+            Logger.Warning($"Employee {Id_or_Name} was not found.");
             return -1;
         }
     }
@@ -103,33 +107,29 @@ namespace ElectronicsFactory
 
         public virtual void DisplayInfo()
         {
-            Logger.Info($"[{Id}] Angajat: {Name}, Departament: {Department}, Salariu: {Salary} lei");
+            Logger.Info($"[{Id}] Employee: {Name}, Department: {Department}, Salary: {Salary} RON");
         }
     }
 
     internal class Director : Employee
     {
       
-        public Director(string id, string name, double salary)
-             : base(id, name, DepartmentStatus_t.Management, salary)
-        {
-           
-        }
+        public Director(string id, string name, double salary): base(id, name, DepartmentStatus_t.Management, salary){}
 
 
         public void ReviewProductionStatistics(int totalEmployees, int totalMachines, int totalStock)
         {
-            Logger.Info($"Directorul {Name} revizuiește raportul fabricii:");
-            Console.WriteLine($" -> Total Angajați activi: {totalEmployees}");
-            Console.WriteLine($" -> Total Utilaje înregistrate: {totalMachines}");
-            Console.WriteLine($" -> Total Produse în depozit: {totalStock}");
+            Logger.Info($"Director {Name} reviews the factory report:");
+            Console.WriteLine($" -> Total Active Employees: {totalEmployees}");
+            Console.WriteLine($" -> Total Machines registered: {totalMachines}");
+            Console.WriteLine($" -> Total Products in stock: {totalStock}");
           
         }
 
         public override void DisplayInfo()
         {
-            base.DisplayInfo(); 
-     
+            base.DisplayInfo();
+            Logger.Info($"Director reviews the factory report.");
         }
     }
 
@@ -142,19 +142,17 @@ namespace ElectronicsFactory
         {
             if (quantity <= 0)
             {
-                Logger.Warning($"Managerul {Name} a refuzat comanda: Cantitatea solicitată ({quantity}) trebuie să fie mai mare decât 0!");
+                Logger.Warning($"Manager {Name} refused the order: The requested quantity ({quantity}) must be greater than 0!");
                 return 0;
             }
-
             
-            Logger.Info($"Managerul de producție {Name} a generat și aprobat comanda pentru {quantity}x unități de tip {productType}.");
-
+            Logger.Info($"Production Manager {Name} generated and approved the order for {quantity}x units of type {productType}.");
             return quantity;
         }
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            
+            Logger.Info($"Production Manager {Name} generated and approved the orders.");
         }
     }
 
@@ -163,20 +161,18 @@ namespace ElectronicsFactory
         public Engineer(string id, string name, double salary)
             : base(id, name, DepartmentStatus_t.Technical, salary) { }
 
-
         public bool InspectMachine(Machine machine)
         {
-            Logger.Info($"Inginerul {Name} inspectează mașina cu seria {machine.SerialNumber}.");
-
+            Logger.Info($"Engineer {Name} is inspecting the machine with serial number {machine.SerialNumber}.");
             bool needsRepair = machine.Inspect();
 
             if (needsRepair)
             {
-                Logger.Warning($"Mașina {machine.SerialNumber} are probleme (Stare: {machine.Condition}) și necesită reparații!");
+                Logger.Warning($"Machine {machine.SerialNumber} has problems [Status: {machine.Condition}] and requires repair!");
             }
             else
             {
-                Logger.Info($"Mașina {machine.SerialNumber} este în stare bună de funcționare.");
+                Logger.Info($"Machine {machine.SerialNumber} is in good working order.");
             }
 
             return needsRepair; 
@@ -185,7 +181,7 @@ namespace ElectronicsFactory
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            
+            Logger.Info($"Engineer {Name} inspects the machines.");
         }
     }
 
@@ -197,26 +193,24 @@ namespace ElectronicsFactory
 
         public void RepairMachine(Machine machine)
         {
-            Logger.Info($"Tehnicianul {Name} încearcă să repare mașina {machine.SerialNumber}.");
+            Logger.Info($"Technician {Name} is attempting to repair machine {machine.SerialNumber}.");
 
-          
             if (machine.Status == MachineStatus_t.Running)
             {
-                Logger.Error($"Tehnicianul {Name} NU poate repara o mașină care funcționează!");
-                return;
+                Logger.Error($"Technician {Name} CANNOT repair a working machine!"); return;
             }
 
             bool success = machine.Repair();
             if (success)
             {
-                Logger.Info($"Tehnicianul {Name} a finalizat cu succes reparația mașinii {machine.SerialNumber}.");
+                Logger.Info($"Technician {Name} successfully completed the repair of machine {machine.SerialNumber}.");
             }
         }
 
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-           
+            Logger.Info($"Technician {Name} is attempting to repair machines.");
         }
     }
 
@@ -229,19 +223,17 @@ namespace ElectronicsFactory
        
          public void SellElectronics(Product product, int quantityRequested, ref int productStock)
         {
-            Logger.Info($"Agentul de vânzări {Name} încearcă să vândă {quantityRequested} bucăți din produsul de brand {product.Brand}.");
-
+            Logger.Info($"Salesperson {Name} is attempting to sell {quantityRequested} units.");
             if (productStock < quantityRequested)
             {
-                Logger.Error($"Stoc insuficient! Disponibil: {productStock}, Cerut: {quantityRequested}");
-                return;
+                Logger.Error($"Insufficient stock! Available: {productStock}, Requested: {quantityRequested}"); return;
             }
 
            
             productStock -= quantityRequested;
-            float totalIncome = quantityRequested * product.Currency; 
+            float totalIncome = quantityRequested * product.Currency;
 
-            Logger.Info($"S-au vândut {quantityRequested} bucăți. Venit generat: {totalIncome} lei. Stoc rămas: {productStock}");
+            Logger.Info($"{quantityRequested} pieces sold. Revenue generated: {totalIncome} lei. Remaining stock: {productStock}");
         }
         
 
@@ -259,25 +251,24 @@ namespace ElectronicsFactory
 
         public void CalculateProductionValue(int productStock, double productionCost)
         {
-            Logger.Info($"Contabilul {Name} calculează valoarea producției actuale...");
-       
+            Logger.Info($"Accountant {Name} is calculating the value of current production...");
+
             double estimatedPricePerUnit = 1500.0;
             double totalStockValue = productStock * estimatedPricePerUnit;
             double financialBalance = totalStockValue - productionCost;
 
-  
-            Console.WriteLine($"[RAPORT FINANCIAR] Generat de {Name}:");
-            Console.WriteLine($"Unități în stoc: {productStock} buc.");
-            Console.WriteLine($"Valoarea totală a stocului: {totalStockValue} lei");
-            Console.WriteLine($"Costuri totale de producție: {productionCost} lei");
 
+            Logger.Info($"[FINANCIAL REPORT] Generated by {Name}:");
+            Logger.Info($"Units in stock: {productStock} pcs.");
+            Logger.Info($"Total stock value: {totalStockValue} RON");
+            Logger.Info($"Total production costs: {productionCost} RON");
             if (financialBalance >= 0)
             {
-                Logger.Info($" Fabrica înregistrează PROFIT potențial: +{financialBalance} lei");
+                Logger.Info($" The factory is recording a potential PROFIT: +{financialBalance} lei");
             }
             else
             {
-                Logger.Warning($" Fabrica înregistrează PIERDERE temporară: {financialBalance} lei");
+                Logger.Warning($" Factory records temporary LOSS: {financialBalance} lei");
             }
        
         }
@@ -285,7 +276,7 @@ namespace ElectronicsFactory
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            
+            Logger.Info($"Accountant {Name} is calculating the value of current production.");
         }
 
     }
@@ -297,14 +288,14 @@ namespace ElectronicsFactory
        
         public bool StartMachine(Machine machine)
         {
-            Logger.Info($"Operatorul {Name} încearcă să pornească mașina {machine.SerialNumber}.");
+            Logger.Info($"Operator {Name} is attempting to start machine {machine.SerialNumber}.");
             return machine.Start(); 
         }
 
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            
+            Logger.Info($"Operator {Name} is attempting to start machines.");
         }
     }
 }

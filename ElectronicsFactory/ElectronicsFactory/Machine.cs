@@ -36,7 +36,7 @@ namespace ElectronicsFactory
         {
             if (machineCount >= machines.Length)
             {
-                Logger.Error("Fabrica a atins limita maximă de mașini!");
+                Logger.Error("The factory has reached the maximum limit of machines!");
                 return false;
             }
 
@@ -44,7 +44,7 @@ namespace ElectronicsFactory
             {
                 if (machines[i].SerialNumber == machine.SerialNumber)
                 {
-                    Logger.Warning($"O mașină cu seria {machine.SerialNumber} există deja!");
+                    Logger.Warning($"A machine with serial number {machine.SerialNumber} already exists!");
                     return false;
                 }
             }
@@ -52,7 +52,7 @@ namespace ElectronicsFactory
             machines[machineCount] = machine;
             machineCount++;
 
-            Logger.Info($"Mașina cu seria {machine.SerialNumber} a fost adăugată.");
+            Logger.Info($"Machine with serial number {machine.SerialNumber} has been added.");
             return true;
         }
 
@@ -60,7 +60,7 @@ namespace ElectronicsFactory
         {
             if (machineCount == 0)
             {
-                Logger.Warning("Nu există mașini în fabrică.");
+                Logger.Warning("There are no machines in the factory.");
                 return;
             }
 
@@ -72,7 +72,7 @@ namespace ElectronicsFactory
                     return;
                 }
             }
-            Logger.Info($"Mașina cu seria {serialNumber} nu a fost găsită.");
+            Logger.Info($"Machine with serial number {serialNumber} not found.");
         }
     }
     abstract public class Machine
@@ -95,12 +95,12 @@ namespace ElectronicsFactory
         {
             if (Status == MachineStatus_t.Maintenance)
             {
-                Logger.Warning($"Masina {SerialNumber} este in mentenanta si nu poate fi oprita!");
+                Logger.Warning($"Machine {SerialNumber} is undergoing maintenance and cannot be stopped!"); 
                 return false;
             }
 
             Status = MachineStatus_t.Stopped;
-            Logger.Info($"Masina cu serial number: {SerialNumber} a fost oprita.");
+            Logger.Info($"The machine with serial number: {SerialNumber} has been stopped.");
             return true;
         }
 
@@ -113,12 +113,12 @@ namespace ElectronicsFactory
         {
             if (Condition == ConditionStatus_t.Critical || Condition == ConditionStatus_t.Bad)
             {
-                Logger.Warning($"Masina cu serial number: {SerialNumber} este defecta si nu poate porni!");
+                Logger.Warning($"The machine with serial number: {SerialNumber} is defective and cannot start!"); 
                 Status = MachineStatus_t.Broken;
                 return false;
             }
 
-            Logger.Info($"Masina cu serial number {SerialNumber} a pornit cu succes!");
+            Logger.Info($"The machine with serial number {SerialNumber} started successfully!");
             Status = MachineStatus_t.Running;
             return true;
         }
@@ -127,7 +127,7 @@ namespace ElectronicsFactory
         {
             if (Status == MachineStatus_t.Running)
             {
-                Logger.Warning($"Nu se poate efectua reparatia masinii {SerialNumber} in timp ce este in functiune");
+                Logger.Warning($"Cannot perform repair on machine {SerialNumber} while it is running");
                 return false;
             }
 
@@ -143,17 +143,17 @@ namespace ElectronicsFactory
             switch(Status)
             {
                 case MachineStatus_t.Stopped:
-                    Logger.Warning($"Masina cu serial number {SerialNumber} este oprita si nu poate procesa produse!");
+                    Logger.Warning($"The machine with serial number {SerialNumber} is stopped and cannot process products!"); 
                     return false;
                 case MachineStatus_t.Running:
                     if (nrOfComponents == 0)
-                    Logger.Info("Masina este in procesarea produselor");
+                        Logger.Info("The machine is processing products");
                     return true;
                 case MachineStatus_t.Maintenance:
-                    Logger.Warning($"Masina cu serial number {SerialNumber} este in mentenanta si nu poate procesa produse");
+                    Logger.Warning($"The machine with serial number {SerialNumber} is under maintenance and cannot process products");
                     return false;
                 case MachineStatus_t.Broken:
-                    Logger.Error($"Masina este stricata si nu poate procesa produse!");
+                    Logger.Error($"The machine is broken and cannot process products!");
                     return false;
                 default: return false;
             }
@@ -168,7 +168,7 @@ namespace ElectronicsFactory
         {
             if (base.Start())
             {
-                Logger.Info("Masina de ambalare impacheteaza cutiile cu produse.");
+                Logger.Info("The packaging machine is packaging the product boxes.");
                 return true;
             }
             return false;
@@ -183,17 +183,17 @@ namespace ElectronicsFactory
                     return false;
                 case MachineStatus_t.Running:
                     base.Process(product);
-                    product.TestProduct();
-                    Logger.Info("Masina este in procesarea produsului!");
-                    Logger.Info($"Calitatea sa este: {product.Quality}");
+                    product.TestProduct(); 
+                    Logger.Info("The packaging machine is in the process of packaging the product!");
+                    Logger.Info($"Its quality is: {product.Quality}");
                     return true;
                 case MachineStatus_t.Maintenance:
                     base.Process(product);
-                    Logger.Warning($"Masina cu serial number {SerialNumber} este in mentenanta si nu poate procesa produse");
+                    Logger.Warning($"The packaging machine is under maintenance and cannot process products"); 
                     return false;
                 case MachineStatus_t.Broken:
                     base.Process(product);
-                    Logger.Error($"Masina este stricata si nu poate procesa produse!");
+                    Logger.Error($"The packaging machine is broken and cannot process products!");
                     return false;
                 default: return false;
             }
@@ -208,7 +208,7 @@ namespace ElectronicsFactory
         {
             if (base.Start())
             {
-                Logger.Info("PCB pt lipirea circuitelor");
+                Logger.Info("PCB for soldering circuits is starting...");
                 return true;
             }
             return false;
@@ -220,21 +220,20 @@ namespace ElectronicsFactory
             {
                 case MachineStatus_t.Stopped:
                     base.Process(product);
-                    Logger.Warning($"PackagingMachine nu poate impacheta produsul!");
+                    Logger.Warning($"PCB Fabrication Machine cannot solder PCBs for our product!");
                     return false;
                 case MachineStatus_t.Running:
                     base.Process(product);
-                    product.TestProduct();
-                    Logger.Info("Masina este in procesarea produsului!");
-                    Logger.Info($"Calitatea sa este: {product.Quality}");
+                    product.TestProduct(); 
+                    Logger.Info("The PCB manufacturing machine is in the soldering process for our product!");
+                    Logger.Info($"Its quality is: {product.Quality}");
                     return true;
                 case MachineStatus_t.Maintenance:
                     base.Process(product);
-                    Logger.Warning($"Masina cu serial number {SerialNumber} este in mentenanta si nu poate procesa produse");
-                    return false;
+                    Logger.Warning($"The PCB machine with serial number {SerialNumber} is under maintenance and cannot process tasks!"); return false;
                 case MachineStatus_t.Broken:
                     base.Process(product);
-                    Logger.Error($"Masina este stricata si nu poate procesa produse!");
+                    Logger.Error($"The machine is broken and cannot process commands!");
                     return false;
                 default: return false;
             }
@@ -249,7 +248,7 @@ namespace ElectronicsFactory
         {
             if (base.Start())
             {
-                Logger.Info("Se monteaza componentele masinii");
+                Logger.Info("Assembling the machine components"); 
                 return true;
             }
             return false;
@@ -261,21 +260,21 @@ namespace ElectronicsFactory
             {
                 case MachineStatus_t.Stopped:
                     base.Process(product);
-                    Logger.Warning($"PackagingMachine nu poate impacheta produsul!");
+                    Logger.Warning($"Assembly machine cannot assemble the product!");
                     return false;
                 case MachineStatus_t.Running:
                     base.Process(product);
-                    product.TestProduct();
-                    Logger.Info("Masina este in procesarea produsului!");
-                    Logger.Info($"Calitatea sa este: {product.Quality}");
+                    product.TestProduct(); 
+                    Logger.Info("The machine is in assembly processing!");
+                    Logger.Info($"Its quality is: {product.Quality}");
                     return true;
                 case MachineStatus_t.Maintenance:
                     base.Process(product);
-                    Logger.Warning($"Masina cu serial number {SerialNumber} este in mentenanta si nu poate procesa produse");
+                    Logger.Warning($"Assembly machine {SerialNumber} is under maintenance and cannot process products");
                     return false;
                 case MachineStatus_t.Broken:
                     base.Process(product);
-                    Logger.Error($"Masina este stricata si nu poate procesa produse!");
+                    Logger.Error($"The machine is broken and cannot assemble products!");
                     return false;
                 default: return false;
             }
@@ -290,7 +289,7 @@ namespace ElectronicsFactory
         {
             if (base.Start())
             {
-                Logger.Info("Testare placi.");
+                Logger.Info("Testing boards.");
                 return true;
             }
             return false;
@@ -301,11 +300,11 @@ namespace ElectronicsFactory
         {
             if (Condition == ConditionStatus_t.Good)
             {
-                Logger.Info("Toate sistemele digitale, senzorii optici și modulele de calibrare funcționează la 100%.");
+                Logger.Info("All digital systems, optical sensors and calibration modules are working at 100%.");
             }
             else
             {
-                Logger.Warning($"S-au detectat fluctuații de tensiune. Condiția raportată este {Condition}.");
+                Logger.Warning($"Voltage fluctuations detected. The reported condition is {Condition}.");
             }
             return (Condition == ConditionStatus_t.Bad || Condition == ConditionStatus_t.Critical);
         }
@@ -316,21 +315,21 @@ namespace ElectronicsFactory
             {
                 case MachineStatus_t.Stopped:
                     base.Process(product);
-                    Logger.Warning($"PackagingMachine nu poate impacheta produsul!");
+                    Logger.Warning($"Testing Machine cannot test the product!");
                     return false;
                 case MachineStatus_t.Running:
                     base.Process(product);
-                    product.TestProduct();
-                    Logger.Info("Masina este in procesarea produsului!");
-                    Logger.Info($"Calitatea sa este: {product.Quality}");
+                    product.TestProduct(); 
+                    Logger.Info("The machine is undergoing product testing!");
+                    Logger.Info($"Its quality is: {product.Quality}");
                     return true;
                 case MachineStatus_t.Maintenance:
                     base.Process(product);
-                    Logger.Warning($"Masina cu serial number {SerialNumber} este in mentenanta si nu poate procesa produse");
+                    Logger.Warning($"Test machine {SerialNumber} is under maintenance and cannot process products"); 
                     return false;
                 case MachineStatus_t.Broken:
                     base.Process(product);
-                    Logger.Error($"Masina este stricata si nu poate procesa produse!");
+                    Logger.Error($"The machine is broken and cannot test the product!");
                     return false;
                 default: return false;
             }

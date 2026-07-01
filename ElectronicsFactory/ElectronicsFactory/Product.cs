@@ -6,26 +6,115 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
+    internal class ProductManagement
+    {
+        private Product[] storage;
+        private int productsCount = 0;
+
+        public ProductManagement(int maxCapacity)
+        {
+            storage = new Product[maxCapacity];
+            productsCount = 0;
+        }
+        public bool AddProduct(Product product)
+        {
+            if (productsCount >= storage.Length)
+            {
+                Logger.Error("The storage has reached its maximum products limit!");
+                return false;
+            }
+
+            int index = Search(product.Id);
+
+            if (index == -1)
+            {
+                storage[productsCount] = product;
+                productsCount++;
+
+                Logger.Info($"The product with ID {product.Id} has been added.");
+                return true;
+            }
+            else
+            {
+                Logger.Warning($"The employee with the ID {product.Id} already exists in the company!");
+                return false;
+            }
+        }
+        public float SoldProduct(Product product, float income)
+        {
+            if (productsCount == 0)
+            {
+                Logger.Error("The factory was left without employees!");
+                return income;
+            }
+
+            int index = Search(product.Id);
+
+            if (index != -1)
+            {
+                for (int i = index; i < storage.Length - 1; i++)
+                {
+                    storage[i] = storage[i + 1];
+                }
+
+                income = product.SellProduct(income);
+                Logger.Info($"Product with ID {product.Id} has been sold with {product.Currency}.");
+                return income;
+            }
+            else
+            {
+                Logger.Info($"The product with the ID {product.Id} does not exist in the storage's company!");
+                return income;
+            }
+        }
+
+        public int Search(int id)
+        {
+            if (productsCount == 0)
+            {
+                Logger.Info("There are no products in the storage's factory.");
+                return -1;
+            }
+
+            for (int i = 0; i < productsCount; i++)
+            {
+                if (storage[i].Id == id)
+                {
+                    storage[i].TestProduct();
+                    Logger.Info($"The product {id} was found and it is functional!");
+                    return i;
+                }
+            }
+            Logger.Warning($"Product {id} was not found.");
+            return -1;
+        }
+
+        public float CalculateValue()
+        {
+            float value = 0;
+            foreach(Product product in storage)
+            {
+                value += product.Currency;
+            }
+            return value;
+        }
+    }
     public abstract class Product
     {
+        private int id;
         private float currency;
         private float consumption;
-        private float battery;
-        private string? brand;
         private string? quality;
 
+        public int Id { get { return id; } set { id= value; } }
         public float Currency { get { return currency; } set { currency = value; } }
         public float Consumption { get { return consumption; } set { consumption = value; } }
-        public float Battery { get { return battery; } set { battery = value; } }
-        public string? Brand { get { return brand; } set { brand = value; } }
         public string? Quality { get { return quality; } set { quality = value; } }
 
         public Product(float currency, float consumption, float battery, string? brand, string? quality)
         {
             this.currency = currency;
             this.consumption = consumption;
-            this.battery = battery;
-            this.brand = brand;
             this.quality = quality;
         }
 
@@ -36,7 +125,7 @@ namespace ElectronicsFactory
 
         public virtual void TestProduct()
         {
-            float ratio = battery / consumption;
+            float ratio = consumption;
 
             if (ratio > 0 && ratio <= 5)
             {
@@ -77,7 +166,7 @@ namespace ElectronicsFactory
 
         public override void TestProduct()
         {
-            float ratio = Battery / Consumption;
+            float ratio = Consumption;
 
             if (ratio > 0 && ratio <= 5)
             {
@@ -100,12 +189,12 @@ namespace ElectronicsFactory
                 Quality = "A";
             }
 
-            Console.WriteLine($"Telefonul este de quality de tipul: {Quality}");
+            Logger.Info($"The phone is of quality type: {Quality}");
         }
 
         public void DisplayFunctionality()
         {
-            Console.WriteLine("Telefonul poate efectua apeluri si realiza diverse taskuri!");
+            Logger.Info("The phone can make calls and perform various tasks!");
         }
     }
 
@@ -125,7 +214,7 @@ namespace ElectronicsFactory
 
         public override void TestProduct()
         {
-            float ratio = Battery / Consumption;
+            float ratio = Consumption;
 
             if (ratio > 0 && ratio <= 6)
             {
@@ -148,12 +237,12 @@ namespace ElectronicsFactory
                 Quality = "A";
             }
 
-            Logger.Info($"Tableta este de quality de tipul: {Quality}");
+            Logger.Info($"The tablet is of quality type: {Quality}");
         }
 
         public void DisplayFunctionality()
         {
-            Logger.Info("Tableta poate efectua orice task dorit, atata timp cat descarci aplicatia!");
+            Logger.Info("The tablet can perform any task you want, as long as you download the application!");
         }
     }
 
@@ -174,7 +263,7 @@ namespace ElectronicsFactory
 
         public override void TestProduct()
         {
-            float ratio = Battery / Consumption;
+            float ratio = Consumption;
 
             if (ratio > 0 && ratio <= 7)
             {
@@ -197,12 +286,12 @@ namespace ElectronicsFactory
                 Quality = "A";
             }
 
-            Logger.Info($"Computerul este de quality de tipul: {Quality}");
+            Logger.Info($"The computer is of quality type: {Quality}");
         }
 
         public void WifiConectionDescription()
         {
-            Logger.Info("Computerul poate efectua cautari si orice conectare la Wifi!");
+            Logger.Info("The computer can perform searches and any connection to Wifi!");
         }
     }
 
@@ -223,7 +312,7 @@ namespace ElectronicsFactory
         public override void TestProduct()
         {
             float sunet = QualitySound();
-            float ratio = (Battery / Consumption) - sunet;
+            float ratio = (Consumption - sunet);
 
             if (ratio > 0 && ratio <= 5)
             {
@@ -246,7 +335,7 @@ namespace ElectronicsFactory
                 Quality = "A";
             }
 
-            Logger.Info($"Telefonul este de quality de tipul: {Quality}");
+            Logger.Info($"The phone is of quality type: {Quality}");
         }
 
         public float QualitySound()
