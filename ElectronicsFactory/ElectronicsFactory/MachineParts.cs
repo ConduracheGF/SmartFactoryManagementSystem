@@ -6,41 +6,41 @@ namespace ElectronicsFactory
 {
     public abstract class MachineParts
     {
-        private float valoare;
+        private float currency;
         private string? brand;
-        private int clasaConsum;
+        private int energyClass;
 
-        public float Valoare { get { return valoare; } set { valoare = value; } }
+        public float Currency { get { return currency; } set { currency = value; } }
         public string? Brand { get { return brand; } private set { brand = value; } }
-        public int ClasaConsum { get { return clasaConsum; } private set { clasaConsum = value; } }
-        public MachineParts(float valoare = 0, string? brand = null, int clasaConsum = 0)
+        public int EnergyClass { get { return energyClass; } private set { energyClass = value; } }
+        public MachineParts(float currency = 0, string? brand = null, int energyClass = 0)
         {
-            this.valoare = valoare;
+            this.currency = currency;
             this.brand = brand;
-            this.clasaConsum = clasaConsum;
+            this.energyClass = energyClass;
         }
 
-        public virtual float Cheltuiala()
+        public virtual float Expense(float income)
         {
-            return valoare;
+            return income - currency;
         }
     }
 
     internal class Motor : MachineParts
     {
         private float power;
-        private int caiPutere;
+        private int horsePower;
         public float Power { get { return power; } set { power = value; } }
-        public int CaiPutere { get { return caiPutere; } set { caiPutere = value; } }
+        public int HorsePower { get { return horsePower; } set { horsePower = value; } }
 
-        public Motor(int valoare = 0, string? brand = null, int clasaConsum = 0, float power = 0.0f, int caiPutere = 0) : base(valoare, brand, clasaConsum)
+        public Motor(int currency = 0, string? brand = null, int energyClass = 0, float power = 0.0f, int horsePower = 0) : base(currency, brand, energyClass)
         {
             this.power = power;
-            this.caiPutere = caiPutere;
+            this.horsePower = horsePower;
         }
-        public override float Cheltuiala()
+        public override float Expense(float income)
         {
-            return ((Valoare * ClasaConsum) - (Power / ClasaConsum));
+            return income - ((Currency * EnergyClass) - (Power / EnergyClass));
         }
     }
 
@@ -51,15 +51,15 @@ namespace ElectronicsFactory
         public float PercentAccuracy { get { return percentAccuracy; } set { percentAccuracy = value; } }
         public int Frequency { get { return frequency; } set { frequency = value; } }
 
-        public Senzor(int valoare = 0, string? brand = null, int clasaConsum = 0, float percentAccuracy = 0.0f, int frequency = 0) : base(valoare, brand, clasaConsum)
+        public Senzor(int currency = 0, string? brand = null, int energyClass = 0, float percentAccuracy = 0.0f, int frequency = 0) : base(currency, brand, energyClass)
         {
             this.frequency = frequency;
             this.percentAccuracy = percentAccuracy;
         }
 
-        public override float Cheltuiala()
+        public override float Expense(float income)
         {
-            return ((base.Cheltuiala() / ClasaConsum) - (percentAccuracy * frequency * ClasaConsum));
+            return ((income - (percentAccuracy * Currency * EnergyClass));
         }
     }
 
@@ -68,46 +68,46 @@ namespace ElectronicsFactory
         private int frequency;
         public int Frequency { get { return frequency; } set { frequency = value; } }
 
-        public Controler(int valoare = 0, string? brand = null, int clasaConsum = 0, int frequency = 0) : base(valoare, brand, clasaConsum)
+        public Controler(int currency = 0, string? brand = null, int energyClass = 0, int frequency = 0) : base(currency, brand, energyClass)
         {
             this.frequency = frequency;
         }
 
-        public override float Cheltuiala()
+        public override float Expense(float income)
         {
-            return base.Cheltuiala();
+            return base.Expense(income);
         }
     }
 
     internal class Display : MachineParts
     {
-        private float rezolutie;
-        public float Rezolutie { get { return rezolutie; } private set { rezolutie = value; } }
+        private float rezolution;
+        public float Rezolution { get { return rezolution; } private set { rezolution = value; } }
 
-        public Display(int valoare = 0, string? brand = null, int clasaConsum = 0, float rezolutie = 0.0f) : base(valoare, brand, clasaConsum)
+        public Display(int currency = 0, string? brand = null, int energyClass = 0, float rezolution = 0.0f) : base(currency, brand, energyClass)
         {
-            this.rezolutie = rezolutie;
+            this.rezolution = rezolution;
         }
 
-        public override float Cheltuiala()
+        public override float Expense(float income)
         {
-            return base.Cheltuiala();
+            return base.Expense(income);
         }
     }
     internal class CoolingFan : MachineParts
     {
-        private int viteza;
+        private int speed;
 
-        public int Viteza { get { return viteza; } private set { viteza = value; } }
+        public int Speed { get { return speed; } private set { speed = value; } }
 
-        public CoolingFan(int valoare = 0, string? brand = null, int clasaConsum = 0, int viteza = 0) : base(valoare, brand, clasaConsum)
+        public CoolingFan(int currency = 0, string? brand = null, int energyClass = 0, int speed = 0) : base(currency, brand, energyClass)
         {
-            this.viteza = viteza;
+            this.speed = speed;
         }
 
-        public override float Cheltuiala()
+        public override float Expense(float income)
         {
-            return base.Cheltuiala();
+            return base.Expense(income);
         }
     }
 }

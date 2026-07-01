@@ -8,272 +8,252 @@ namespace ElectronicsFactory
 {
     public abstract class Product
     {
-        private float valoare;
-        private float consum;
-        private float baterie;
+        private float currency;
+        private float consumption;
+        private float battery;
         private string? brand;
-        private string? calitate;
+        private string? quality;
 
-        public float Value { get { return valoare; } set { valoare = value; } }
-        public float Consum { get { return consum; } set { consum = value; } }
-        public float Baterie { get { return baterie; } set { baterie = value; } }
+        public float Currency { get { return currency; } set { currency = value; } }
+        public float Consumption { get { return consumption; } set { consumption = value; } }
+        public float Battery { get { return battery; } set { battery = value; } }
         public string? Brand { get { return brand; } set { brand = value; } }
-        public string? Calitate { get { return calitate; } set { calitate = value; } }
+        public string? Quality { get { return quality; } set { quality = value; } }
 
-        public Product(float valoare, float consum, float baterie, string? brand, string? calitate)
+        public Product(float currency, float consumption, float battery, string? brand, string? quality)
         {
-            this.valoare = valoare;
-            this.consum = consum;
-            this.baterie = baterie;
+            this.currency = currency;
+            this.consumption = consumption;
+            this.battery = battery;
             this.brand = brand;
-            this.calitate = calitate;
+            this.quality = quality;
         }
 
-        public float VandProdus()
+        public float SellProduct(float income)
         {
-            return valoare;
+            return currency + income;
         }
 
-        public virtual void TestezProdus()
+        public virtual void TestProduct()
         {
-            float raport = baterie / consum;
+            float ratio = battery / consumption;
 
-            if (raport > 0 && raport <= 5)
+            if (ratio > 0 && ratio <= 5)
             {
-                calitate = "E";
+                quality = "E";
             }
-            else if (raport > 5 && raport <= 8)
+            else if (ratio > 5 && ratio <= 8)
             {
-                calitate = "D";
+                quality = "D";
             }
-            else if (raport > 8 && raport <= 10)
+            else if (ratio > 8 && ratio <= 10)
             {
-                calitate = "C";
+                quality = "C";
             }
-            else if (raport > 10 && raport <= 12)
+            else if (ratio > 10 && ratio <= 12)
             {
-                calitate = "B";
+                quality = "B";
             }
-            else if ( raport > 12 && raport < 15)
+            else if ( ratio > 12 && ratio < 15)
             {
-                calitate = "A";
+                quality = "A";
             }
         }
     }
 
     internal class Phones : Product
     {
-        private int anProductie;
-        private string? procesor;
+        private int yearOfProduction;
+        private string? processor;
 
-        public int AnProductie { get { return anProductie; } set { anProductie = value; } }
-        public string? Procesor { get { return procesor; } set { procesor = value; } }
+        public int YearOfProduction { get { return yearOfProduction; } set { yearOfProduction = value; } }
+        public string? Processor { get { return processor; } set { processor = value; } }
 
-        public Phones(float valoare, float consum, float baterie, string? brand, string? calitate, int anProductie, string? procesor) : base(valoare, consum, baterie, brand, calitate)
+        public Phones(float currency, float consumption, float battery, string? brand, string? quality, int yearOfProduction, string? processor) : base(currency, consumption, battery, brand, quality)
         {
-            this.anProductie = anProductie;
-            this.procesor = procesor;
+            this.yearOfProduction = yearOfProduction;
+            this.processor = processor;
         }
 
-        public override void TestezProdus()
+        public override void TestProduct()
         {
-            float raport = Baterie / Consum;
+            float ratio = Battery / Consumption;
 
-            if (raport > 0 && raport <= 5)
+            if (ratio > 0 && ratio <= 5)
             {
-                Calitate = "E";
+                Quality = "E";
             }
-            else if (raport > 5 && raport <= 8)
+            else if (ratio > 5 && ratio <= 8)
             {
-                Calitate = "D";
+                Quality = "D";
             }
-            else if (raport > 8 && raport <= 10)
+            else if (ratio > 8 && ratio <= 10)
             {
-                Calitate = "C";
+                Quality = "C";
             }
-            else if (raport > 10 && raport <= 12)
+            else if (ratio > 10 && ratio <= 12)
             {
-                Calitate = "B";
+                Quality = "B";
             }
-            else if (raport > 12 && raport < 15)
+            else if (ratio > 12 && ratio < 15)
             {
-                Calitate = "A";
+                Quality = "A";
             }
 
-            Console.WriteLine($"Telefonul este de calitate de tipul: {Calitate}");
+            Console.WriteLine($"Telefonul este de quality de tipul: {Quality}");
         }
 
-        public void Start()
+        public void DisplayFunctionality()
         {
-            Console.WriteLine("Telefonul a pornit si poate efectua apeluri!");
-        }
-
-        public void Stop()
-        {
-            Console.WriteLine("Telefonul s-a oprit si orice contact este oprit!");
+            Console.WriteLine("Telefonul poate efectua apeluri si realiza diverse taskuri!");
         }
     }
 
     internal class Tablets : Product
     {
-        private int anProductie;
-        private string? procesor;
+        private int yearOfProduction;
+        private string? processor;
 
-        public int AnProductie { get { return anProductie; } set { anProductie = value; } }
-        public string? Procesor { get { return procesor; } set { procesor = value; } }
+        public int YearOfProduction { get { return yearOfProduction; } set { yearOfProduction = value; } }
+        public string? Processor { get { return processor; } set { processor = value; } }
 
-        public Tablets(float valoare, float consum, float baterie, string? brand, string? calitate, int anProductie, string? procesor) : base(valoare, consum, baterie, brand, calitate)
+        public Tablets(float currency, float consumption, float battery, string? brand, string? quality, int yearOfProduction, string? processor) : base(currency, consumption, battery, brand, quality)
         {
-            this.anProductie = anProductie;
-            this.procesor = procesor;
+            this.yearOfProduction = yearOfProduction;
+            this.processor = processor;
         }
 
-        public override void TestezProdus()
+        public override void TestProduct()
         {
-            float raport = Baterie / Consum;
+            float ratio = Battery / Consumption;
 
-            if (raport > 0 && raport <= 6)
+            if (ratio > 0 && ratio <= 6)
             {
-                Calitate = "E";
+                Quality = "E";
             }
-            else if (raport > 6 && raport <= 9)
+            else if (ratio > 6 && ratio <= 9)
             {
-                Calitate = "D";
+                Quality = "D";
             }
-            else if (raport > 9 && raport <= 12)
+            else if (ratio > 9 && ratio <= 12)
             {
-                Calitate = "C";
+                Quality = "C";
             }
-            else if (raport > 12 && raport <= 15)
+            else if (ratio > 12 && ratio <= 15)
             {
-                Calitate = "B";
+                Quality = "B";
             }
-            else if (raport > 15 && raport < 24)
+            else if (ratio > 15 && ratio < 24)
             {
-                Calitate = "A";
+                Quality = "A";
             }
 
-            Console.WriteLine($"Tableta este de calitate de tipul: {Calitate}");
+            Console.WriteLine($"Tableta este de quality de tipul: {Quality}");
         }
 
-        public void Start()
+        public void DisplayFunctionality()
         {
-            Console.WriteLine("Tableta a pornit si poate efectua sarcini!");
-        }
-
-        public void Stop()
-        {
-            Console.WriteLine("Tableta a fost oprita si orice sarcina este nefunctionala!");
+            Console.WriteLine("Tableta poate efectua orice task dorit, atata timp cat descarci aplicatia!");
         }
     }
 
     internal class Computers : Product
     {
-        private int anProductie;
-        private int greutate;
-        private string? procesor;
+        private int yearOfProduction;
+        private int weight;
+        private string? processor;
 
-        public int AnProductie { get { return anProductie; } set { anProductie = value; } }
-        public int Greutate { get { return greutate; } set { greutate = value; } }
-        public string? Procesor { get { return procesor; } set { procesor = value; } }
+        public int YearOfProduction { get { return yearOfProduction; } set { yearOfProduction = value; } }
+        public int Weight { get { return weight; } set { weight = value; } }
+        public string? Processor { get { return processor; } set { processor = value; } }
 
-        public Computers(float valoare, float consum, float baterie, string? brand, string? calitate, int anProductie, string? procesor, int greutate) : base(valoare, consum, baterie, brand, calitate)
+        public Computers(float currency, float consumption, float battery, string? brand, string? quality, int yearOfProduction, string? processor, int weight) : base(currency, consumption, battery, brand, quality)
         {
-            this.anProductie = anProductie;
-            this.procesor = procesor;
-            this.greutate = greutate;
+            this.yearOfProduction = yearOfProduction;
+            this.processor = processor;
+            this.weight = weight;
         }
 
-        public override void TestezProdus()
+        public override void TestProduct()
         {
-            float raport = Baterie / Consum;
+            float ratio = Battery / Consumption;
 
-            if (raport > 0 && raport <= 7)
+            if (ratio > 0 && ratio <= 7)
             {
-                Calitate = "E";
+                Quality = "E";
             }
-            else if (raport > 7 && raport <= 10)
+            else if (ratio > 7 && ratio <= 10)
             {
-                Calitate = "D";
+                Quality = "D";
             }
-            else if (raport > 10 && raport <= 14)
+            else if (ratio > 10 && ratio <= 14)
             {
-                Calitate = "C";
+                Quality = "C";
             }
-            else if (raport > 14 && raport <= 20)
+            else if (ratio > 14 && ratio <= 20)
             {
-                Calitate = "B";
+                Quality = "B";
             }
-            else if (raport > 20 && raport < 36)
+            else if (ratio > 20 && ratio < 36)
             {
-                Calitate = "A";
+                Quality = "A";
             }
 
-            Console.WriteLine($"Computerul este de calitate de tipul: {Calitate}");
+            Console.WriteLine($"Computerul este de quality de tipul: {Quality}");
         }
 
-        public void Start()
+        public void WifiConectionDescription()
         {
-            Console.WriteLine("Computerul a pornit si poate efectua taskuri!");
-        }
-
-        public void Stop()
-        {
-            Console.WriteLine("Computerul s-a oprit si orice task este oprit!");
-        }
-
-        public void Search()
-        {
-            Console.WriteLine("Computerul poate efectua cautari!");
+            Console.WriteLine("Computerul poate efectua cautari si orice conectare la Wifi!");
         }
     }
 
     internal class Headphones : Product
     {
-        private int anProductie;
-        private int putere;
+        private int yearOfProduction;
+        private int power;
 
-        public int AnProductie { get { return anProductie; } set { anProductie = value; } }
-        public int Putere { get { return putere; } set { putere = value; } }
+        public int YearOfProduction { get { return yearOfProduction; } set { yearOfProduction = value; } }
+        public int Power { get { return power; } set { power = value; } }
 
-        public Headphones(float valoare, float consum, float baterie, string? brand, string? calitate, int anProductie, int putere) : base(valoare, consum, baterie, brand, calitate)
+        public Headphones(float currency, float consumption, float battery, string? brand, string? quality, int yearOfProduction, int power) : base(currency, consumption, battery, brand, quality)
         {
-            this.anProductie = anProductie;
-            this.putere = putere;
+            this.yearOfProduction = yearOfProduction;
+            this.power = power;
         }
 
-        public override void TestezProdus()
+        public override void TestProduct()
         {
-            float sunet = CalitateSunet();
-            float raport = (Baterie / Consum) - sunet;
+            float sunet = QualitySunet();
+            float ratio = (Battery / Consumption) - sunet;
 
-            if (raport > 0 && raport <= 5)
+            if (ratio > 0 && ratio <= 5)
             {
-                Calitate = "E";
+                Quality = "E";
             }
-            else if (raport > 5 && raport <= 8)
+            else if (ratio > 5 && ratio <= 8)
             {
-                Calitate = "D";
+                Quality = "D";
             }
-            else if (raport > 8 && raport <= 10)
+            else if (ratio > 8 && ratio <= 10)
             {
-                Calitate = "C";
+                Quality = "C";
             }
-            else if (raport > 10 && raport <= 12)
+            else if (ratio > 10 && ratio <= 12)
             {
-                Calitate = "B";
+                Quality = "B";
             }
-            else if (raport > 12 && raport < 15)
+            else if (ratio > 12 && ratio < 15)
             {
-                Calitate = "A";
+                Quality = "A";
             }
 
-            Console.WriteLine($"Telefonul este de calitate de tipul: {Calitate}");
+            Console.WriteLine($"Telefonul este de quality de tipul: {Quality}");
         }
 
-        public float CalitateSunet()
+        public float QualitySunet()
         {
-            return Putere / Consum;
+            return Power / Consumption;
         }
     }
 }

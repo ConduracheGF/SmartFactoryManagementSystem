@@ -15,9 +15,9 @@ namespace ElectronicsFactory
 
     public enum ConditionStatus_t
     {
-        Buna,
-        Rea,
-        Critica
+        Good,
+        Bad,
+        Critical
     }
 
     internal class MachineManagement
@@ -84,7 +84,7 @@ namespace ElectronicsFactory
         {
             SerialNumber = serialNumber;
             Status = MachineStatus_t.Stopped;
-            Condition = ConditionStatus_t.Buna;
+            Condition = ConditionStatus_t.Good;
             components = new MachineParts[maxCapacity];
             nrOfComponents = 0;
         }
@@ -97,12 +97,12 @@ namespace ElectronicsFactory
 
         public virtual bool Inspect()
         {
-            return (Condition == ConditionStatus_t.Rea || Condition == ConditionStatus_t.Critica);
+            return (Condition == ConditionStatus_t.Bad || Condition == ConditionStatus_t.Critical);
         }
 
         public virtual void Start()
         {
-            if (Condition == ConditionStatus_t.Critica || Condition == ConditionStatus_t.Rea)
+            if (Condition == ConditionStatus_t.Critical || Condition == ConditionStatus_t.Bad)
             {
                 Status = MachineStatus_t.Broken;
                 return;
@@ -121,7 +121,7 @@ namespace ElectronicsFactory
 
             Status = MachineStatus_t.Maintenance;
            
-            Condition = ConditionStatus_t.Buna; 
+            Condition = ConditionStatus_t.Good; 
             Status = MachineStatus_t.Stopped;
         }
     }
@@ -184,7 +184,7 @@ namespace ElectronicsFactory
 
         public override bool Inspect()
         {
-            if (Condition == ConditionStatus_t.Buna)
+            if (Condition == ConditionStatus_t.Good)
             {
                 Console.WriteLine("Toate sistemele digitale, senzorii optici și modulele de calibrare funcționează la 100%.");
             }
@@ -192,7 +192,7 @@ namespace ElectronicsFactory
             {
                 Console.WriteLine($"S-au detectat fluctuații de tensiune. Condiția raportată este {Condition}.");
             }
-            return (Condition == ConditionStatus_t.Rea || Condition == ConditionStatus_t.Critica);
+            return (Condition == ConditionStatus_t.Bad || Condition == ConditionStatus_t.Critical);
         }
     }
 }
