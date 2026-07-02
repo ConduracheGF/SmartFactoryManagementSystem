@@ -26,5 +26,20 @@ namespace ElectronicsFactory
             Console.WriteLine($"[{DateTime.Now: HH:mm:ss}] [ERROR] {message}");
             Console.ResetColor();
         }
+
+        public static void Clear()
+        {
+            Console.Clear();
+        }
+
+        public static void ResetColor()
+        {
+            Console.ResetColor();
+        }
+
+        public static void Read()
+        {
+            Console.ReadLine();
+        }
     }
 }

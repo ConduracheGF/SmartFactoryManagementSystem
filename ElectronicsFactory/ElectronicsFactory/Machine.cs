@@ -56,6 +56,16 @@ namespace ElectronicsFactory
             return true;
         }
 
+        public Machine? FindMachine(string serialNumber)
+        {
+            for (int i = 0; i < machineCount; i++)
+            {
+                if (machines[i] != null && machines[i].SerialNumber == serialNumber)
+                    return machines[i];
+            }
+            Logger.Warning($"Machine with serial {serialNumber} not found.");
+            return null;
+        }
         public void DisplayMachinesStatus( string serialNumber )
         {
             if (machineCount == 0)
@@ -90,6 +100,15 @@ namespace ElectronicsFactory
             Condition = ConditionStatus_t.Good;
             components = new MachineParts[maxCapacity];
             nrOfComponents = 0;
+
+            components = new MachineParts[5];
+
+            
+            components[0] = new Motor(500, "Bosch", 1, ComponentsType_t.Motor, 200, 5);
+            components[1] = new Senzor(120, "Samsung", 1, ComponentsType_t.Senzor, 0.5f, 500);
+            components[2] = new Controler(350, "Intel", 1, ComponentsType_t.Controler, 3200);
+            components[3] = new Display(600, "LG", 1, ComponentsType_t.Display, 4000f);
+            components[4] = new CoolingFan(80, "Noctua", 1, ComponentsType_t.CoolingFan, 2500);
         }
 
         public bool Stop()
@@ -131,12 +150,23 @@ namespace ElectronicsFactory
                 Logger.Warning($"Cannot perform repair on machine {SerialNumber} while it is running");
                 return false;
             }
-
             Logger.Info("Tehnician has found a piece of machine which it has a bad functionality!");
+
+            
+            if (components == null || components.Length == 0)
+            {
+                Logger.Error("This machine does not have any components configured to be repaired!");
+                return false;
+            }
+
+
             int indexRandom = Random.Shared.Next(components.Length);
+     
             income = components[indexRandom].Replacement(income);
+
             ComponentsType_t swapComponents = (ComponentsType_t)indexRandom;
             Logger.Warning($"The component with bad behavior is {swapComponents} and it will be replaced!");
+
             Condition = ConditionStatus_t.Good;
             Status = MachineStatus_t.Stopped;
             return true;

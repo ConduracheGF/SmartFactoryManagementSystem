@@ -125,7 +125,7 @@ namespace ElectronicsFactory
 
         public virtual void DisplayInfo()
         {
-            Logger.Info($"[{Id}] Employee: {Name}, Department: {Department}, Salary: {Salary} RON");
+            Logger.Info($"[{Id}] Employee: {Name}, Department: {Department}, Job: {JobStatus}, Salary: {Salary} RON");
         }
     }
 
