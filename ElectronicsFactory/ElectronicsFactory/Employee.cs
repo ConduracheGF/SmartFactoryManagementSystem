@@ -257,7 +257,6 @@ namespace ElectronicsFactory
             income = productManagement.SoldProduct(product, income);
             return income;
         }
-        
 
         public override void DisplayInfo()
         {

@@ -58,15 +58,15 @@
             Logger.Info("2. Fire Employee");
             Logger.Info("3. Display All Employees");
             Logger.Info("Choice: ");
-            string? sub = Console.ReadLine();
+            string? sub = Console.ReadLine()!;
 
             if (sub == "1")
             {
-                Logger.Info("Enter Unique ID: "); string? id = Console.ReadLine();
-                Logger.Info("Name: "); string? name = Console.ReadLine();
+                Logger.Info("Enter Unique ID: "); string? id = Console.ReadLine()!;
+                Logger.Info("Name: "); string? name = Console.ReadLine()!;
                 Logger.Info("Salary: "); double salary = double.Parse(Console.ReadLine()!);
                 Logger.Info("Type: 1. Production Manager, 2. Machine Operator, 3. Engineer, 4. Technician, 5. Sales Agent, 6. Accountant");
-                string? type = Console.ReadLine();
+                string? type = Console.ReadLine()!;
 
                 Employee? newEmp = null;
                
@@ -81,9 +81,9 @@
             }
             else if (sub == "2")
             {
-                Logger.Info("Enter Unique ID: "); string? id = Console.ReadLine();
+                Logger.Info("Enter Unique ID: "); string? id = Console.ReadLine()!;
                 Logger.Info("Type: 1. Production Manager, 2. Machine Operator, 3. Engineer, 4. Technician, 5. Sales Agent, 6. Accountant");
-                string? type = Console.ReadLine();
+                string? type = Console.ReadLine()!;
 
                 Employee? oldEmp = null;
 
@@ -112,9 +112,9 @@
         {
             Console.Clear();
             Logger.Info("Production Simulation");
-            Logger.Info("Enter Production Manager ID: "); string? managerId = Console.ReadLine();
-            Logger.Info("Enter Machine Operator ID: "); string? operatorId = Console.ReadLine();
-            Logger.Info("Enter Machine Serial Number: "); string? serial = Console.ReadLine();
+            Logger.Info("Enter Production Manager ID: "); string? managerId = Console.ReadLine()!;
+            Logger.Info("Enter Machine Operator ID: "); string? operatorId = Console.ReadLine()!;
+            Logger.Info("Enter Machine Serial Number: "); string? serial = Console.ReadLine()!;
 
             Logger.Info("Select Product to create: 1. Phone, 2. Headphones, 3. Computers, 4. Tablets");
             string? prodType = Console.ReadLine();
@@ -143,16 +143,16 @@
             Logger.Info("Choice: ");
             string? sub = Console.ReadLine();
 
-            Logger.Info("Enter Machine Serial: "); string? serial = Console.ReadLine();
+            Logger.Info("Enter Machine Serial: "); string? serial = Console.ReadLine()!;
 
             if (sub == "1")
             {
-                Logger.Info("Enter Engineer ID: "); string? engId = Console.ReadLine();
+                Logger.Info("Enter Engineer ID: "); string? engId = Console.ReadLine()!;
                 _factory.InspectMachineWithEngineer(engId, serial);
             }
             else if (sub == "2")
             {
-                Logger.Info("Enter Technician ID: "); string? techId = Console.ReadLine();
+                Logger.Info("Enter Technician ID: "); string? techId = Console.ReadLine()!;
                 _factory.RepairMachineWithTechnician(techId, serial);
             }
             WaitForEnter();

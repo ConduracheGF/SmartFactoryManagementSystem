@@ -101,7 +101,7 @@ namespace ElectronicsFactory
             components = new MachineParts[maxCapacity];
             nrOfComponents = 0;
 
-            components = new MachineParts[5];
+            components = new MachineParts[10];
 
             
             components[0] = new Motor(500, "Bosch", 1, ComponentsType_t.Motor, 200, 5);

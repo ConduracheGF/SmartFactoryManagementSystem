@@ -21,11 +21,14 @@ namespace ElectronicsFactory
 
             
             electronicsFactory.MachineManager.AddMachine(new TestingMachine("X100", 2));
+            electronicsFactory.MachineManager.AddMachine(new PackagingMachine("Z90", 3));
+            electronicsFactory.MachineManager.AddMachine(new PcbFabricationMachine("UY78", 1));
+            electronicsFactory.MachineManager.AddMachine(new AssemblyMachine("ER243", 3));
+            electronicsFactory.MachineManager.AddMachine(new PackagingMachine("PCKM21", 6));
 
             Logger.Info("The fabric was initialised.");
             Console.WriteLine("Press any key to show the menu");
             Console.ReadKey();
-
   
             MenuManagement menu = new MenuManagement(electronicsFactory);
             menu.DisplayMenu();

@@ -18,3 +18,13 @@ C:\Users\training\Desktop\SummerPractice\SmartFactoryManagementSystem\Electronic
 C:\Users\training\Desktop\SummerPractice\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\obj\Debug\net10.0\ElectronicsFactory.pdb
 C:\Users\training\Desktop\SummerPractice\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\obj\Debug\net10.0\ElectronicsFactory.genruntimeconfig.cache
 C:\Users\training\Desktop\SummerPractice\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\obj\Debug\net10.0\ref\ElectronicsFactory.dll
+C:\Users\Administrator\Desktop\SummerPractice2026\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\bin\Debug\net10.0\ElectronicsFactory.exe
+C:\Users\Administrator\Desktop\SummerPractice2026\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\bin\Debug\net10.0\ElectronicsFactory.deps.json
+C:\Users\Administrator\Desktop\SummerPractice2026\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\bin\Debug\net10.0\ElectronicsFactory.runtimeconfig.json
+C:\Users\Administrator\Desktop\SummerPractice2026\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\bin\Debug\net10.0\ElectronicsFactory.dll
+C:\Users\Administrator\Desktop\SummerPractice2026\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\bin\Debug\net10.0\ElectronicsFactory.pdb
+C:\Users\Administrator\Desktop\SummerPractice2026\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\obj\Debug\net10.0\ElectronicsFactory.dll
+C:\Users\Administrator\Desktop\SummerPractice2026\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\obj\Debug\net10.0\refint\ElectronicsFactory.dll
+C:\Users\Administrator\Desktop\SummerPractice2026\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\obj\Debug\net10.0\ElectronicsFactory.pdb
+C:\Users\Administrator\Desktop\SummerPractice2026\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\obj\Debug\net10.0\ElectronicsFactory.genruntimeconfig.cache
+C:\Users\Administrator\Desktop\SummerPractice2026\SmartFactoryManagementSystem\ElectronicsFactory\ElectronicsFactory\obj\Debug\net10.0\ref\ElectronicsFactory.dll
