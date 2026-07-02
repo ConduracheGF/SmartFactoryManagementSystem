@@ -29,6 +29,8 @@ namespace ElectronicsFactory
         private Employee[] employees;
         private int employeesCount = 0;
 
+        public Employee[] Employees { get { return employees; } set { employees = value; } }
+
         public EmployeeManagement(int maxCapacity)
         {
             employees = new Employee[maxCapacity];
@@ -220,16 +222,17 @@ namespace ElectronicsFactory
             : base(id, name, DepartmentStatus_t.Technical, JobStatus_t.Technician, salary) { }
 
 
-        public void RepairMachine(Machine machine)
+        public void RepairMachine(Machine machine, ref float income)
         {
             Logger.Info($"Technician {Name} is attempting to repair machine {machine.SerialNumber}.");
 
             if (machine.Status == MachineStatus_t.Running)
             {
-                Logger.Error($"Technician {Name} CANNOT repair a working machine!"); return;
+                Logger.Error($"Technician {Name} CANNOT repair a working machine!");
+                return;
             }
-
-            bool success = machine.Repair();
+            machine.Status = MachineStatus_t.Maintenance;
+            bool success = machine.Repair(ref income);
             if (success)
             {
                 Logger.Info($"Technician {Name} successfully completed the repair of machine {machine.SerialNumber}.");

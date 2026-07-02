@@ -22,8 +22,6 @@ namespace ElectronicsFactory
 
     internal class MachineManagement
     {
-        //de facut pe mai tarziu o metoda de vandut Masinaria in caz de nu ne mai trebuie sau e inutila sau e defecta de tot (suplimentar)
-        //de facut o metoda de cautat masina in registru fabricii (suplimentar)
         private Machine[] machines;
         private int machineCount = 0;
 
@@ -126,7 +124,7 @@ namespace ElectronicsFactory
             return true;
         }
 
-        public virtual bool Repair()
+        public virtual bool Repair(ref float income)
         {
             if (Status == MachineStatus_t.Running)
             {
@@ -134,9 +132,11 @@ namespace ElectronicsFactory
                 return false;
             }
 
-            Status = MachineStatus_t.Maintenance;
-            //trebuie facut ceva care sa lege cu mentenanta si tehnicianul
-            //se muta mentenanta catre cel care repara, iar dupa reparare sa ramana masina oprita
+            Logger.Info("Tehnician has found a piece of machine which it has a bad functionality!");
+            int indexRandom = Random.Shared.Next(components.Length);
+            income = components[indexRandom].Replacement(income);
+            ComponentsType_t swapComponents = (ComponentsType_t)indexRandom;
+            Logger.Warning($"The component with bad behavior is {swapComponents} and it will be replaced!");
             Condition = ConditionStatus_t.Good;
             Status = MachineStatus_t.Stopped;
             return true;
