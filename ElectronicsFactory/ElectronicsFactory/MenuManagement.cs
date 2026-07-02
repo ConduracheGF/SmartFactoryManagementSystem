@@ -36,7 +36,7 @@
                     case "0": running = false; break;
                     default:
                         Logger.Info("Invalid choice! Press Enter to retry...");
-                        Logger.Read();
+                        Console.ReadKey();
                         break;
                 }
             }
@@ -47,7 +47,7 @@
             Console.ForegroundColor = ConsoleColor.Gray;
             Logger.Info("\n[Press Enter to return to the menu...]");
             Logger.ResetColor();
-            Logger.Read();
+            Console.ReadKey();
         }
 
         private void SubMenuEmployees()
@@ -65,6 +65,12 @@
                 Logger.Info("Enter Unique ID: "); string? id = Console.ReadLine()!;
                 Logger.Info("Name: "); string? name = Console.ReadLine()!;
                 Logger.Info("Salary: "); double salary = double.Parse(Console.ReadLine()!);
+                if ( salary <= 0)
+                {
+                    Logger.Info("Invalid salary! Please enter a positive value.");
+                    WaitForEnter();
+                    return;
+                }
                 Logger.Info("Type: 1. Production Manager, 2. Machine Operator, 3. Engineer, 4. Technician, 5. Sales Agent, 6. Accountant");
                 string? type = Console.ReadLine()!;
 
@@ -119,6 +125,12 @@
             Logger.Info("Select Product to create: 1. Phone, 2. Headphones, 3. Computers, 4. Tablets");
             string? prodType = Console.ReadLine();
             Logger.Info("Quantity: "); int qty = int.Parse(Console.ReadLine()!);
+            if (qty <= 0)
+            {
+                Logger.Info("Invalid quantity! Please enter a positive value.");
+                WaitForEnter();
+                return;
+            }
 
             Product? target = null;
             // Products cannot have a negative production cost or selling price
@@ -193,6 +205,13 @@
             {
                 Logger.Info("Enter Sales Agent ID: "); string agentId = Console.ReadLine() ?? "";
                 Logger.Info("Enter Product ID to sell: "); int prodId = int.Parse(Console.ReadLine() ?? "0");
+
+                if (prodId <= 0)
+                {
+                    Logger.Info("Invalid product ID! Please enter a positive value.");
+                    WaitForEnter();
+                    return;
+                }
 
                 _factory.SellProductWithAgent(agentId, prodId);
             }

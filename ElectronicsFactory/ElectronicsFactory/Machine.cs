@@ -26,7 +26,7 @@ namespace ElectronicsFactory
         private int machineCount = 0;
 
         public Machine[] Machines { get { return machines; } set { machines = value; } }
-
+        public int MachineCount { get { return machineCount; } set { machineCount = value; } }
         public MachineManagement(int maxCapacity) 
         {
             machines = new Machine[maxCapacity];
@@ -98,17 +98,17 @@ namespace ElectronicsFactory
             SerialNumber = serialNumber;
             Status = MachineStatus_t.Stopped;
             Condition = ConditionStatus_t.Good;
-            components = new MachineParts[maxCapacity];
-            nrOfComponents = 0;
 
-            components = new MachineParts[10];
-
+            int size = Math.Max(maxCapacity, 5);
+            components = new MachineParts[size];
             
             components[0] = new Motor(500, "Bosch", 1, ComponentsType_t.Motor, 200, 5);
             components[1] = new Senzor(120, "Samsung", 1, ComponentsType_t.Senzor, 0.5f, 500);
             components[2] = new Controler(350, "Intel", 1, ComponentsType_t.Controler, 3200);
             components[3] = new Display(600, "LG", 1, ComponentsType_t.Display, 4000f);
             components[4] = new CoolingFan(80, "Noctua", 1, ComponentsType_t.CoolingFan, 2500);
+        
+            nrOfComponents = 5;
         }
 
         public bool Stop()
@@ -153,14 +153,14 @@ namespace ElectronicsFactory
             Logger.Info("Tehnician has found a piece of machine which it has a bad functionality!");
 
             
-            if (components == null || components.Length == 0)
+            if (components == null || nrOfComponents == 0)
             {
                 Logger.Error("This machine does not have any components configured to be repaired!");
                 return false;
             }
 
 
-            int indexRandom = Random.Shared.Next(components.Length);
+            int indexRandom = Random.Shared.Next(nrOfComponents);
      
             income = components[indexRandom].Replacement(income);
 
@@ -182,6 +182,7 @@ namespace ElectronicsFactory
                 case MachineStatus_t.Running:
                     if (nrOfComponents == 0)
                         Logger.Info("The machine is processing products");
+                    DegradeCondition();
                     return true;
                 case MachineStatus_t.Maintenance:
                     Logger.Warning($"The machine with serial number {SerialNumber} is under maintenance and cannot process products");
@@ -190,6 +191,19 @@ namespace ElectronicsFactory
                     Logger.Error($"The machine is broken and cannot process products!");
                     return false;
                 default: return false;
+            }
+        }
+
+        private void DegradeCondition()
+        {
+            if (Random.Shared.NextDouble() < 0.20)
+            {
+                var previous = Condition;
+                Condition = (Condition == ConditionStatus_t.Good ? ConditionStatus_t.Bad : ConditionStatus_t.Critical);
+                Logger.Warning($"Machine {SerialNumber} condition degraded to {Condition} after processing!");
+
+                if (Condition == ConditionStatus_t.Critical)
+                    Status = MachineStatus_t.Broken;
             }
         }
     }
@@ -217,6 +231,13 @@ namespace ElectronicsFactory
                     return false;
                 case MachineStatus_t.Running:
                     base.Process(product);
+
+                    if (Status == MachineStatus_t.Broken)
+                    {
+                        Logger.Error($"The packaging machine {SerialNumber} broke down during processing! Product not completed.");
+                        return false;
+                    }
+
                     product.TestProduct(); 
                     Logger.Info("The packaging machine is in the process of packaging the product!");
                     Logger.Info($"Its quality is: {product.Quality}");
@@ -258,6 +279,13 @@ namespace ElectronicsFactory
                     return false;
                 case MachineStatus_t.Running:
                     base.Process(product);
+
+                    if (Status == MachineStatus_t.Broken)
+                    {
+                        Logger.Error($"The PCB machine {SerialNumber} broke down during processing! Product not completed.");
+                        return false;
+                    }
+
                     product.TestProduct(); 
                     Logger.Info("The PCB manufacturing machine is in the soldering process for our product!");
                     Logger.Info($"Its quality is: {product.Quality}");
@@ -298,6 +326,13 @@ namespace ElectronicsFactory
                     return false;
                 case MachineStatus_t.Running:
                     base.Process(product);
+
+                    if (Status == MachineStatus_t.Broken)
+                    {
+                        Logger.Error($"The assembly machine {SerialNumber} broke down during processing! Product not completed.");
+                        return false;
+                    }
+
                     product.TestProduct(); 
                     Logger.Info("The machine is in assembly processing!");
                     Logger.Info($"Its quality is: {product.Quality}");
@@ -353,6 +388,13 @@ namespace ElectronicsFactory
                     return false;
                 case MachineStatus_t.Running:
                     base.Process(product);
+
+                    if (Status == MachineStatus_t.Broken)
+                    {
+                        Logger.Error($"The testing machine {SerialNumber} broke down during processing! Product not completed.");
+                        return false;
+                    }
+
                     product.TestProduct(); 
                     Logger.Info("The machine is undergoing product testing!");
                     Logger.Info($"Its quality is: {product.Quality}");

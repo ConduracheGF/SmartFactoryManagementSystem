@@ -26,14 +26,15 @@ namespace ElectronicsFactory
 
     internal class EmployeeManagement
     {
-        private Employee[] employees;
+        private Employee?[] employees;
         private int employeesCount = 0;
 
-        public Employee[] Employees { get { return employees; } set { employees = value; } }
+        public Employee?[] Employees { get { return employees; } set { employees = value; } }
+        public int EmployeesCount { get { return employeesCount; } set { employeesCount = value; } }
 
         public EmployeeManagement(int maxCapacity)
         {
-            employees = new Employee[maxCapacity];
+            employees = new Employee?[maxCapacity];
             employeesCount = 0;
         }
 
@@ -73,10 +74,12 @@ namespace ElectronicsFactory
 
             if (index != -1)
             {
-                for(int i = index; i < employees.Length - 1; i++)
+                for(int i = index; i < employeesCount - 1; i++)
                 {
                     employees[i] = employees[i + 1];
                 }
+                employees[employeesCount - 1] = null;
+                employeesCount--;
 
                 Logger.Info($"Employee with ID {employee.Id} has been fired.");
             }
@@ -96,9 +99,9 @@ namespace ElectronicsFactory
 
             for (int i = 0; i < employeesCount; i++)
             {
-                if (employees[i].Id == Id_or_Name || employees[i].Name == Id_or_Name)
+                if (employees[i]!.Id == Id_or_Name || employees[i]!.Name == Id_or_Name)
                 {
-                    employees[i].DisplayInfo();
+                    employees[i]!.DisplayInfo();
                     return i;
                 }
             }
@@ -273,19 +276,26 @@ namespace ElectronicsFactory
         {
             float costs = 0;
             float profit = 0;
+
             Logger.Info($"Accountant {Name} is calculating the value of current production...");
 
-            foreach (Product product in productManagement.Storage)
+            for (int i = 0; i < productManagement.ProductsCount; i++)
             {
+                Product product = productManagement.Storage[i];
                 income = product.SellProduct(income);
                 profit += product.Currency;
             }
 
-            for (int i = 0; i < machineManagement.Machines.Length; i++)
+            for (int i = 0; i < machineManagement.MachineCount; i++)
             {
-                foreach (MachineParts part in machineManagement.Machines[i].Components)
+                Machine machine = machineManagement.Machines[i];
+                
+                foreach (MachineParts part in machine.Components)
                 {
-                    costs += part.Currency;
+                    if (part != null)
+                    {
+                        costs += part.Currency;
+                    }
                 } 
             }
 

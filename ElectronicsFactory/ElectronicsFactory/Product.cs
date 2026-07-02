@@ -20,7 +20,7 @@ namespace ElectronicsFactory
         private int productsCount = 0;
 
         public Product[] Storage { get { return storage; } set { storage = value; } }
-
+        public int ProductsCount { get { return productsCount; } }
         public ProductManagement(int maxCapacity)
         {
             storage = new Product[maxCapacity];
@@ -46,15 +46,14 @@ namespace ElectronicsFactory
             }
             else
             {
-                Logger.Warning($"The employee with the ID {product.Id} already exists in the company!");
-                return false;
+                Logger.Warning($"The product with the ID {product.Id} already exists in the company!"); return false;
             }
         }
         public float SoldProduct(Product product, float income)
         {
             if (productsCount == 0)
             {
-                Logger.Error("The factory was left without employees!");
+                Logger.Error("The storage was left without products!"); 
                 return income;
             }
 
@@ -67,6 +66,7 @@ namespace ElectronicsFactory
                     storage[i] = storage[i + 1];
                 }
 
+                productsCount--;
                 income = product.SellProduct(income);
                 Logger.Info($"Product with ID {product.Id} has been sold with {product.Currency}.");
                 return income;
@@ -346,7 +346,7 @@ namespace ElectronicsFactory
                 Quality = "A";
             }
 
-            Logger.Info($"The phone is of quality type: {Quality}");
+            Logger.Info($"The headphone is of quality type: {Quality}");
         }
 
         public float QualitySound()
