@@ -27,6 +27,8 @@ namespace ElectronicsFactory
         private Machine[] machines;
         private int machineCount = 0;
 
+        public Machine[] Machines { get { return machines; } set { machines = value; } }
+
         public MachineManagement(int maxCapacity) 
         {
             machines = new Machine[maxCapacity];
@@ -82,6 +84,7 @@ namespace ElectronicsFactory
         public string SerialNumber { get; set; }
         public MachineStatus_t Status { get; set; }
         public ConditionStatus_t Condition { get; set; }
+        public MachineParts[] Components { get { return components; } set { components = value; } }
         public Machine(string serialNumber, int maxCapacity)
         {
             SerialNumber = serialNumber;
@@ -134,7 +137,7 @@ namespace ElectronicsFactory
             Status = MachineStatus_t.Maintenance;
             //trebuie facut ceva care sa lege cu mentenanta si tehnicianul
             //se muta mentenanta catre cel care repara, iar dupa reparare sa ramana masina oprita
-            Condition = ConditionStatus_t.Good; 
+            Condition = ConditionStatus_t.Good;
             Status = MachineStatus_t.Stopped;
             return true;
         }

@@ -12,6 +12,18 @@ namespace ElectronicsFactory
         Sales,
         Finance
     }
+
+    public enum JobStatus_t
+    {
+        Director,
+        ProductionManager,
+        Engineer,
+        Technician,
+        MachineOperator,
+        SalesAgent,
+        Acountant
+    }
+
     internal class EmployeeManagement
     {
         private Employee[] employees;
@@ -22,6 +34,7 @@ namespace ElectronicsFactory
             employees = new Employee[maxCapacity];
             employeesCount = 0;
         }
+
         public bool HiredEmployee(Employee employee)
         {
             if (employeesCount >= employees.Length)
@@ -45,6 +58,7 @@ namespace ElectronicsFactory
                 return false;
             }
         }
+
         public void FiredEmployee(Employee employee)
         {
             if (employeesCount == 0)
@@ -95,13 +109,15 @@ namespace ElectronicsFactory
         public string Id { get; set; } 
         public string Name { get; set; }
         public DepartmentStatus_t Department { get; set; }
+        public JobStatus_t JobStatus { get; set; }
         public double Salary { get; set; }
 
-        public Employee(string id, string name, DepartmentStatus_t department, double salary)
+        public Employee(string id, string name, DepartmentStatus_t department, JobStatus_t job, double salary)
         {
             Id = id;
             Name = name;
             Department = department;
+            JobStatus = job;
             Salary = salary;
         }
 
@@ -113,17 +129,15 @@ namespace ElectronicsFactory
 
     internal class Director : Employee
     {
-      
-        public Director(string id, string name, double salary): base(id, name, DepartmentStatus_t.Management, salary){}
+        public Director(string id, string name, double salary): base(id, name, DepartmentStatus_t.Management, JobStatus_t.Director, salary){}
 
-
-        public void ReviewProductionStatistics(int totalEmployees, int totalMachines, int totalStock)
+        public void ReviewProductionStatistics(int totalEmployees, int totalMachines, int totalStock, float income)
         {
             Logger.Info($"Director {Name} reviews the factory report:");
-            Logger.Info(" -> Total Active Employees: {totalEmployees}");
+            Logger.Info($" -> Total Active Employees: {totalEmployees}");
             Logger.Info($" -> Total Machines registered: {totalMachines}");
             Logger.Info($" -> Total Products in stock: {totalStock}");
-          
+            Logger.Info($" -> Total Income in finance: {income}");
         }
 
         public override void DisplayInfo()
@@ -136,19 +150,34 @@ namespace ElectronicsFactory
     internal class ProductionManager : Employee
     {
         public ProductionManager(string id, string name, double salary)
-            : base(id, name, DepartmentStatus_t.Production, salary) { }
+            : base(id, name, DepartmentStatus_t.Production, JobStatus_t.ProductionManager, salary) { }
 
-        public int CreateProductionOrder(string productType, int quantity)
+        public bool CreateProductionOrder(ref ProductManagement productManagement, Product product, int quantity)
         {
+            int count = 0;
             if (quantity <= 0)
             {
                 Logger.Warning($"Manager {Name} refused the order: The requested quantity ({quantity}) must be greater than 0!");
-                return 0;
+                return false;
             }
-            
-            Logger.Info($"Production Manager {Name} generated and approved the order for {quantity}x units of type {productType}.");
-            return quantity;
+
+            for (int i = 0; i < quantity; i++)
+            {
+                if (productManagement.AddProduct(product))
+                {
+                    count++;
+                }
+            }
+
+            if (count == quantity)
+            {
+                Logger.Info($"Production Manager {Name} generated and approved the order for {quantity} x units of type {product.ProductType}.");
+                return true;
+            }
+
+            return false;
         }
+
         public override void DisplayInfo()
         {
             base.DisplayInfo();
@@ -159,7 +188,7 @@ namespace ElectronicsFactory
     internal class Engineer : Employee
     {
         public Engineer(string id, string name, double salary)
-            : base(id, name, DepartmentStatus_t.Technical, salary) { }
+            : base(id, name, DepartmentStatus_t.Technical, JobStatus_t.Engineer, salary) { }
 
         public bool InspectMachine(Machine machine)
         {
@@ -188,7 +217,7 @@ namespace ElectronicsFactory
     internal class Technician : Employee
     {
         public Technician(string id, string name, double salary)
-            : base(id, name, DepartmentStatus_t.Technical, salary) { }
+            : base(id, name, DepartmentStatus_t.Technical, JobStatus_t.Technician, salary) { }
 
 
         public void RepairMachine(Machine machine)
@@ -217,58 +246,59 @@ namespace ElectronicsFactory
     internal class SalesAgent : Employee
     {
         public SalesAgent(string id, string name, double salary)
-            : base(id, name, DepartmentStatus_t.Sales, salary) { }
-
-
+            : base(id, name, DepartmentStatus_t.Sales, JobStatus_t.SalesAgent, salary) { }
        
-         public void SellElectronics(Product product, int quantityRequested, ref int productStock)
+        public float SellElectronics(ref ProductManagement productManagement, Product product, float income)
         {
-            Logger.Info($"Salesperson {Name} is attempting to sell {quantityRequested} units.");
-            if (productStock < quantityRequested)
-            {
-                Logger.Error($"Insufficient stock! Available: {productStock}, Requested: {quantityRequested}"); return;
-            }
-
-           
-            productStock -= quantityRequested;
-            float totalIncome = quantityRequested * product.Currency;
-
-            Logger.Info($"{quantityRequested} pieces sold. Revenue generated: {totalIncome} lei. Remaining stock: {productStock}");
+            Logger.Info($"The product has sold! The income is increasing!");
+            income = productManagement.SoldProduct(product, income);
+            return income;
         }
         
 
         public override void DisplayInfo()
         {
             base.DisplayInfo();
-            
         }
     }
 
     internal class Accountant : Employee
     {
         public Accountant(string id, string name, double salary)
-            : base(id, name, DepartmentStatus_t.Finance, salary) { }
+            : base(id, name, DepartmentStatus_t.Finance, JobStatus_t.Acountant, salary) { }
 
-        public void CalculateProductionValue(int productStock, double productionCost)
+        public void CalculateProductionValue(ProductManagement productManagement, MachineManagement machineManagement, float income)
         {
+            float costs = 0;
+            float profit = 0;
             Logger.Info($"Accountant {Name} is calculating the value of current production...");
 
-            double estimatedPricePerUnit = 1500.0;
-            double totalStockValue = productStock * estimatedPricePerUnit;
-            double financialBalance = totalStockValue - productionCost;
+            foreach (Product product in productManagement.Storage)
+            {
+                income = product.SellProduct(income);
+                profit += product.Currency;
+            }
 
+            for (int i = 0; i < machineManagement.Machines.Length; i++)
+            {
+                foreach (MachineParts part in machineManagement.Machines[i].Components)
+                {
+                    costs += part.Currency;
+                } 
+            }
 
+            float financialBalance = income - costs;
             Logger.Info($"[FINANCIAL REPORT] Generated by {Name}:");
-            Logger.Info($"Units in stock: {productStock} pcs.");
-            Logger.Info($"Total stock value: {totalStockValue} RON");
-            Logger.Info($"Total production costs: {productionCost} RON");
+            Logger.Info($"Total income: {income} pcs.");
+            Logger.Info($"Total production profit: {profit} RON");
+            Logger.Info($"Total production costs: {costs} RON");
             if (financialBalance >= 0)
             {
-                Logger.Info($" The factory is recording a potential PROFIT: +{financialBalance} lei");
+                Logger.Info($"The factory is recording a potential PROFIT: +{financialBalance} RON");
             }
             else
             {
-                Logger.Warning($" Factory records temporary LOSS: {financialBalance} lei");
+                Logger.Warning($"Factory records temporary LOSS: {financialBalance} RON");
             }
        
         }
@@ -283,7 +313,7 @@ namespace ElectronicsFactory
     internal class MachineOperator : Employee
     {
         public MachineOperator(string id, string name, double salary)
-            : base(id, name, DepartmentStatus_t.Production, salary) { }
+            : base(id, name, DepartmentStatus_t.Production, JobStatus_t.MachineOperator, salary) { }
 
        
         public bool StartMachine(Machine machine)
