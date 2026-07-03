@@ -8,6 +8,10 @@ The system leverages a centralized orchestration pattern. The entry point (`Prog
 
 The user interface exposes operational vectors via a CLI loop, translating user input into commands handled by the Factory orchestrator. The Factory then delegates business logic to domain-specific subsystem managers (`EmployeeManagement`, `MachineManagement`, `ProductManagement`) and domain models (workers/machines).
 
+![Employees-Diagram](https://github.com/ConduracheGF/SmartFactoryManagementSystem/blob/main/DiagramPhaseOne/diagrama1.png)
+
+![Product-and-Machine-Diagram](https://github.com/ConduracheGF/SmartFactoryManagementSystem/blob/main/DiagramPhaseOne/diagrama2.png)
+
 ---
 
 ## 2. System Workflows & Sequence Dynamics
