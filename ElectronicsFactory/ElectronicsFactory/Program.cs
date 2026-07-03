@@ -12,12 +12,12 @@ namespace ElectronicsFactory
             Factory electronicsFactory = new Factory(20, 10, 100, 50000f);
 
        
-            electronicsFactory.EmployeeManager.HiredEmployee(new ProductionManager("1", "Andrei Vasilescu", 6500));
-            electronicsFactory.EmployeeManager.HiredEmployee(new MachineOperator("2", "Mihai Ion", 3500));
-            electronicsFactory.EmployeeManager.HiredEmployee(new Engineer("3", "Elena Popa", 5500));
-            electronicsFactory.EmployeeManager.HiredEmployee(new Technician("4", "Dorel Stefan", 4500));
-            electronicsFactory.EmployeeManager.HiredEmployee(new SalesAgent("5", "Andreea Marin", 4000));
-            electronicsFactory.EmployeeManager.HiredEmployee(new Accountant("6", "Radu Georgescu", 5000));
+            electronicsFactory.EmployeeManager.HiredEmployee(new ProductionManager("Andrei Vasilescu", 6500));
+            electronicsFactory.EmployeeManager.HiredEmployee(new MachineOperator("Mihai Ion", 3500));
+            electronicsFactory.EmployeeManager.HiredEmployee(new Engineer("Elena Popa", 5500));
+            electronicsFactory.EmployeeManager.HiredEmployee(new Technician("Dorel Stefan", 4500));
+            electronicsFactory.EmployeeManager.HiredEmployee(new SalesAgent("Andreea Marin", 4000));
+            electronicsFactory.EmployeeManager.HiredEmployee(new Accountant("Radu Georgescu", 5000));
 
             
             electronicsFactory.MachineManager.AddMachine(new TestingMachine("X100", 2));

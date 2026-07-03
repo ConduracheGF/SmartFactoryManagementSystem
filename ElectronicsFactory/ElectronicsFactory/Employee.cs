@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 
@@ -62,7 +63,7 @@ namespace ElectronicsFactory
             }
         }
 
-        public void FiredEmployee(Employee employee)
+        public void FiredEmployee(string id)
         {
             if (employeesCount == 0)
             {
@@ -70,7 +71,7 @@ namespace ElectronicsFactory
                 return;
             }
 
-            int index = SearchEmployee(employee.Id);
+            int index = SearchEmployee(id);
 
             if (index != -1)
             {
@@ -81,11 +82,11 @@ namespace ElectronicsFactory
                 employees[employeesCount - 1] = null;
                 employeesCount--;
 
-                Logger.Info($"Employee with ID {employee.Id} has been fired.");
+                Logger.Info($"Employee with ID {id} has been fired.");
             }
             else
             {
-                Logger.Info($"The employee with the ID {employee.Id} does not exist in the company!");
+                Logger.Info($"The employee with the ID {id} does not exist in the company!");
             }
         }
 
@@ -111,15 +112,17 @@ namespace ElectronicsFactory
     }
     public abstract class Employee
     {
-        public string Id { get; set; } 
+        private static int nextId = 1;
+
+        public string Id { get; private set; } 
         public string Name { get; set; }
         public DepartmentStatus_t Department { get; set; }
         public JobStatus_t JobStatus { get; set; }
         public double Salary { get; set; }
 
-        public Employee(string id, string name, DepartmentStatus_t department, JobStatus_t job, double salary)
+        public Employee(string name, DepartmentStatus_t department, JobStatus_t job, double salary)
         {
-            Id = id;
+            Id = (nextId++).ToString();
             Name = name;
             Department = department;
             JobStatus = job;
@@ -134,7 +137,7 @@ namespace ElectronicsFactory
 
     internal class Director : Employee
     {
-        public Director(string id, string name, double salary): base(id, name, DepartmentStatus_t.Management, JobStatus_t.Director, salary){}
+        public Director(string name, double salary): base(name, DepartmentStatus_t.Management, JobStatus_t.Director, salary){}
 
         public void ReviewProductionStatistics(int totalEmployees, int totalMachines, int totalStock, float income)
         {
@@ -154,8 +157,8 @@ namespace ElectronicsFactory
 
     internal class ProductionManager : Employee
     {
-        public ProductionManager(string id, string name, double salary)
-            : base(id, name, DepartmentStatus_t.Production, JobStatus_t.ProductionManager, salary) { }
+        public ProductionManager(string name, double salary)
+            : base(name, DepartmentStatus_t.Production, JobStatus_t.ProductionManager, salary) { }
 
         public bool CreateProductionOrder(ref ProductManagement productManagement, Product product, int quantity)
         {
@@ -192,8 +195,8 @@ namespace ElectronicsFactory
 
     internal class Engineer : Employee
     {
-        public Engineer(string id, string name, double salary)
-            : base(id, name, DepartmentStatus_t.Technical, JobStatus_t.Engineer, salary) { }
+        public Engineer(string name, double salary)
+            : base(name, DepartmentStatus_t.Technical, JobStatus_t.Engineer, salary) { }
 
         public bool InspectMachine(Machine machine)
         {
@@ -221,8 +224,8 @@ namespace ElectronicsFactory
 
     internal class Technician : Employee
     {
-        public Technician(string id, string name, double salary)
-            : base(id, name, DepartmentStatus_t.Technical, JobStatus_t.Technician, salary) { }
+        public Technician(string name, double salary)
+            : base(name, DepartmentStatus_t.Technical, JobStatus_t.Technician, salary) { }
 
 
         public void RepairMachine(Machine machine, ref float income)
@@ -251,8 +254,8 @@ namespace ElectronicsFactory
 
     internal class SalesAgent : Employee
     {
-        public SalesAgent(string id, string name, double salary)
-            : base(id, name, DepartmentStatus_t.Sales, JobStatus_t.SalesAgent, salary) { }
+        public SalesAgent(string name, double salary)
+            : base(name, DepartmentStatus_t.Sales, JobStatus_t.SalesAgent, salary) { }
        
         public float SellElectronics(ref ProductManagement productManagement, Product product, float income)
         {
@@ -269,8 +272,8 @@ namespace ElectronicsFactory
 
     internal class Accountant : Employee
     {
-        public Accountant(string id, string name, double salary)
-            : base(id, name, DepartmentStatus_t.Finance, JobStatus_t.Acountant, salary) { }
+        public Accountant(string name, double salary)
+            : base(name, DepartmentStatus_t.Finance, JobStatus_t.Acountant, salary) { }
 
         public void CalculateProductionValue(ProductManagement productManagement, MachineManagement machineManagement, float income)
         {
@@ -324,8 +327,8 @@ namespace ElectronicsFactory
     }
     internal class MachineOperator : Employee
     {
-        public MachineOperator(string id, string name, double salary)
-            : base(id, name, DepartmentStatus_t.Production, JobStatus_t.MachineOperator, salary) { }
+        public MachineOperator(string name, double salary)
+            : base(name, DepartmentStatus_t.Production, JobStatus_t.MachineOperator, salary) { }
 
        
         public bool StartMachine(Machine machine)

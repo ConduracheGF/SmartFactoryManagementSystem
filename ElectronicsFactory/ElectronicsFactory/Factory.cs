@@ -71,7 +71,8 @@ namespace ElectronicsFactory
 
             Logger.Info($"Starting production of {quantity} x {targetProduct.GetType().Name}...");
 
-           
+            int producedCount = 0;
+
             for (int i = 0; i < quantity; i++)
             {
                 // A machine condition decreases after each production cycle
@@ -79,8 +80,9 @@ namespace ElectronicsFactory
 
                 if (processSuccess)
                 {
-                    
-                    ProductManager.AddProduct(targetProduct);
+                    Product newProduct = targetProduct.Clone();
+                    ProductManager.AddProduct(newProduct);
+                    producedCount++;
                 }
                 else
                 {
@@ -89,7 +91,14 @@ namespace ElectronicsFactory
                 }
             }
 
-            Logger.Info("Production cycle finished.");
+            if (producedCount == quantity)
+            {
+                Logger.Info($"Production cycle finished successfully. {producedCount}/{quantity} units produced.");
+            }
+            else
+            {
+                Logger.Warning($"Production cycle finished incomplete. Only {producedCount}/{quantity} units were produced before machine failure.");
+            }
         }
 
         //  An Engineer inspects the selected machine.

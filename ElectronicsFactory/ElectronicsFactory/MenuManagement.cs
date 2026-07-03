@@ -62,7 +62,6 @@
 
             if (sub == "1")
             {
-                Logger.Info("Enter Unique ID: "); string? id = Console.ReadLine()!;
                 Logger.Info("Name: "); string? name = Console.ReadLine()!;
                 Logger.Info("Salary: "); double salary = double.Parse(Console.ReadLine()!);
                 if ( salary <= 0)
@@ -76,31 +75,20 @@
 
                 Employee? newEmp = null;
                
-                if (type == "1") newEmp = new ProductionManager(id, name, salary);
-                if (type == "2") newEmp = new MachineOperator(id, name, salary);
-                if (type == "3") newEmp = new Engineer(id, name, salary); 
-                if (type == "4") newEmp = new Technician(id, name, salary);
-                if (type == "5") newEmp = new SalesAgent(id, name, salary); 
-                if (type == "6") newEmp = new Accountant(id, name, salary);
+                if (type == "1") newEmp = new ProductionManager(name, salary);
+                if (type == "2") newEmp = new MachineOperator(name, salary);
+                if (type == "3") newEmp = new Engineer(name, salary); 
+                if (type == "4") newEmp = new Technician(name, salary);
+                if (type == "5") newEmp = new SalesAgent(name, salary); 
+                if (type == "6") newEmp = new Accountant(name, salary);
 
                 if (newEmp != null) _factory.EmployeeManager.HiredEmployee(newEmp);
             }
             else if (sub == "2")
             {
                 Logger.Info("Enter Unique ID: "); string? id = Console.ReadLine()!;
-                Logger.Info("Type: 1. Production Manager, 2. Machine Operator, 3. Engineer, 4. Technician, 5. Sales Agent, 6. Accountant");
-                string? type = Console.ReadLine()!;
 
-                Employee? oldEmp = null;
-
-                if (type == "1") oldEmp = new ProductionManager(id, "", 0);
-                if (type == "2") oldEmp = new MachineOperator(id, "", 0);
-                if (type == "3") oldEmp = new Engineer(id, "", 0);
-                if (type == "4") oldEmp = new Technician(id, "", 0);
-                if (type == "5") oldEmp = new SalesAgent(id, "", 0);
-                if (type == "6") oldEmp = new Accountant(id, "", 0);
-
-                if (oldEmp != null) _factory.EmployeeManager.FiredEmployee(oldEmp);
+                if (id != null) _factory.EmployeeManager.FiredEmployee(id);
             }
             else if (sub == "3")
             {

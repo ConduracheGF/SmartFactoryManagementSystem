@@ -87,14 +87,17 @@ namespace ElectronicsFactory
     }
     abstract public class Machine
     {
+        private static int nextId = 1;
         private MachineParts[] components;
         private int nrOfComponents = 0;
+        public int Id { get; private set; }
         public string SerialNumber { get; set; }
         public MachineStatus_t Status { get; set; }
         public ConditionStatus_t Condition { get; set; }
         public MachineParts[] Components { get { return components; } set { components = value; } }
         public Machine(string serialNumber, int maxCapacity)
         {
+            Id = nextId++;
             SerialNumber = serialNumber;
             Status = MachineStatus_t.Stopped;
             Condition = ConditionStatus_t.Good;

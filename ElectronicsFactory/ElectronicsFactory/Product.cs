@@ -111,12 +111,14 @@ namespace ElectronicsFactory
     }
     public abstract class Product
     {
+        private static int nextId = 1;
+
         private int id;
         private float currency;
         private float consumption;
         private string? quality;
 
-        public int Id { get { return id; } set { id= value; } }
+        public int Id { get { return id; } private set { id= value; } }
         public float Currency { get { return currency; } set { currency = value; } }
         public float Consumption { get { return consumption; } set { consumption = value; } }
         public string? Quality { get { return quality; } set { quality = value; } }
@@ -124,6 +126,7 @@ namespace ElectronicsFactory
 
         public Product(float currency, float consumption, string? quality, ProductType_t ProductType)
         {
+            id = nextId++;
             this.currency = currency;
             this.consumption = consumption;
             this.quality = quality;
@@ -160,6 +163,8 @@ namespace ElectronicsFactory
                 quality = "A";
             }
         }
+
+        public abstract Product Clone();
     }
 
     internal class Phones : Product
@@ -207,6 +212,11 @@ namespace ElectronicsFactory
         public void DisplayFunctionality()
         {
             Logger.Info("The phone can make calls and perform various tasks!");
+        }
+
+        public override Product Clone()
+        {
+            return new Phones(Currency, Consumption, Quality, ProductType, YearOfProduction, Processor);
         }
     }
 
@@ -256,6 +266,11 @@ namespace ElectronicsFactory
         {
             Logger.Info("The tablet can perform any task you want, as long as you download the application!");
         }
+
+        public override Product Clone()
+        {
+            return new Tablets(Currency, Consumption, Quality, ProductType, YearOfProduction, Processor);
+        }
     }
 
     internal class Computers : Product
@@ -303,6 +318,11 @@ namespace ElectronicsFactory
         public void WifiConectionDescription()
         {
             Logger.Info("The computer can perform searches and any connection to Wifi!");
+        }
+
+        public override Product Clone()
+        {
+            return new Computers(Currency, Consumption, Quality, ProductType, Processor, Weight);
         }
     }
 
@@ -352,6 +372,11 @@ namespace ElectronicsFactory
         public float QualitySound()
         {
             return Power / Consumption;
+        }
+
+        public override Product Clone()
+        {
+            return new Headphones(Currency, Consumption, Quality, ProductType, YearOfProduction, Power);
         }
     }
 }
