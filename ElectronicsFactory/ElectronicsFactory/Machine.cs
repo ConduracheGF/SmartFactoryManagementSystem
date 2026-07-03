@@ -5,6 +5,9 @@ using System.Xml.Linq;
 
 namespace ElectronicsFactory
 {
+    /// <summary>
+    /// Operational status of a machine
+    /// </summary>
     public enum MachineStatus_t
     {
         Stopped,
@@ -13,6 +16,9 @@ namespace ElectronicsFactory
         Broken
     }
 
+    /// <summary>
+    /// Physical condition of a machine, degrades over production cycles
+    /// </summary>
     public enum ConditionStatus_t
     {
         Good,
@@ -20,18 +26,27 @@ namespace ElectronicsFactory
         Critical
     }
 
+    /// <summary>
+    /// Manages the collection of machines owned by the factory: registration, lookup, and capacity/duplicate validation
+    /// </summary>
     internal class MachineManagement
     {
         private Machine[] machines;
         private int machineCount = 0;
 
+        // Underlying fixed-size storage array for machines (may contain unused trailing slots)
         public Machine[] Machines { get { return machines; } }
         public int MachineCount { get { return machineCount; } }
+
+        // Initializes machine storage with a fixed maximum capacity.
         public MachineManagement(int maxCapacity) 
         {
             machines = new Machine[maxCapacity];
             machineCount = 0;
         }
+
+        // Registers a new machine in the factory, rejecting it if capacity is full
+        // Or if a machine with the same serial number already exists.
         public bool AddMachine(Machine machine)
         {
             if (machineCount >= machines.Length)
@@ -56,6 +71,7 @@ namespace ElectronicsFactory
             return true;
         }
 
+        // Looks up a machine by its serial number
         public Machine? FindMachine(string serialNumber)
         {
             for (int i = 0; i < machineCount; i++)
@@ -67,16 +83,35 @@ namespace ElectronicsFactory
             return null;
         }
     }
-    abstract public class Machine
+
+    /// <summary>
+    /// Abstract base class representing any production machine in the factory.
+    /// Encapsulates shared behavior (start/stop/repair/inspect/process) while leaving type-specific production logic to be overridden by derived classes.
+    /// </summary>
+    public abstract class Machine
     {
+        // Static counter shared across all Machine instances, used to auto-generate unique IDs.
         private static int nextId = 1;
+
         private MachineParts[] components;
         private int nrOfComponents = 0;
+
+        // Unique, auto-generated numeric identifier assigned at construction time
         public int Id { get; private set; }
+
+        // Business-facing unique identifier (assigned manually), used for lookups across the app
         public string SerialNumber { get; set; }
+
+        // Current operational status of the machine (Stopped, Running, Maintenance, Broken)
         public MachineStatus_t Status { get; set; }
+
+        // Current physical condition of the machine; degrades with use and resets on repair
         public ConditionStatus_t Condition { get; set; }
+
+        // The set of replaceable parts currently installed in this machine
         public MachineParts[] Components { get { return components; } set { components = value; } }
+
+        // Initializes a new machine with a default set of 5 standard components
         public Machine(string serialNumber, int maxCapacity)
         {
             Id = nextId++;
@@ -84,6 +119,7 @@ namespace ElectronicsFactory
             Status = MachineStatus_t.Stopped;
             Condition = ConditionStatus_t.Good;
 
+            // Ensure the array can always hold the 5 default components, regardless of requested capacity
             int size = Math.Max(maxCapacity, 5);
             components = new MachineParts[size];
             
@@ -96,6 +132,7 @@ namespace ElectronicsFactory
             nrOfComponents = 5;
         }
 
+        // Stops the machine, unless it is currently under maintenance
         public bool Stop()
         {
             if (Status == MachineStatus_t.Maintenance)
@@ -109,11 +146,14 @@ namespace ElectronicsFactory
             return true;
         }
 
+        // Diagnoses the machine's current condition 
+        // Overridden by derived classes to provide machine-type-specific diagnostic output
         public virtual bool Inspect()
         {
             return (Condition == ConditionStatus_t.Bad || Condition == ConditionStatus_t.Critical);
         }
 
+        // Starts the machine, unless its condition is Bad or Critical, in which case it becomes Broken
         public virtual bool Start()
         {
             if (Condition == ConditionStatus_t.Critical || Condition == ConditionStatus_t.Bad)
@@ -128,6 +168,9 @@ namespace ElectronicsFactory
             return true;
         }
 
+        // Repairs the machine by replacing one randomly-selected component
+        // Restoring its condition to Good and its status to Stopped
+        // Cannot be performed while running
         public virtual bool Repair(ref float income)
         {
             if (Status == MachineStatus_t.Running)
@@ -157,6 +200,9 @@ namespace ElectronicsFactory
             return true;
         }
 
+        // Processes a single unit of the given product
+        // Base implementation handles status validation and condition degradation
+        // Derived classes extend this with machine-type-specific production behavior
         public virtual bool Process(Product product)
         {
             switch(Status)
@@ -179,6 +225,9 @@ namespace ElectronicsFactory
             }
         }
 
+        // Randomly degrades the machine's condition after processing a unit
+        // 20% chance per unit: escalates Good → Bad → Critical
+        // The machine as Broken once it reaches Critical.
         private void DegradeCondition()
         {
             if (Random.Shared.NextDouble() < 0.20)
@@ -193,8 +242,12 @@ namespace ElectronicsFactory
         }
     }
 
+    /// <summary>
+    /// Machine specialized in packaging finished products into boxes
+    /// </summary>
     internal class PackagingMachine : Machine
     {
+        // Initializes a new PackagingMachine
         public PackagingMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
 
         public override bool Start()
@@ -206,6 +259,9 @@ namespace ElectronicsFactory
             }
             return false;
         }
+
+        /// Packages a product unit and re-evaluates its quality
+        /// Aborts mid-cycle if the machine breaks down due to condition degradation
         public override bool Process(Product product)
         {
             switch (Status)
@@ -240,8 +296,12 @@ namespace ElectronicsFactory
         }
     }
 
+    /// <summary>
+    /// Machine specialized in soldering/fabricating PCBs for products
+    /// </summary>
     internal class PcbFabricationMachine : Machine
     {
+        // Initializes a new PcbFabricationMachine
         public PcbFabricationMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
 
         public override bool Start()
@@ -254,6 +314,8 @@ namespace ElectronicsFactory
             return false;
         }
 
+        /// Solders a product's PCB and re-evaluates its quality
+        /// Aborts mid-cycle if the machine breaks down due to condition degradation
         public override bool Process(Product product)
         {
             switch (Status)
@@ -287,8 +349,12 @@ namespace ElectronicsFactory
         }
     }
 
+    /// <summary>
+    /// Machine specialized in assembling product components together
+    /// </summary>
     internal class AssemblyMachine : Machine
     {
+        // Initializes a new AssemblyMachine
         public AssemblyMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
 
         public override bool Start()
@@ -301,6 +367,8 @@ namespace ElectronicsFactory
             return false;
         }
 
+        /// Assembles a product and re-evaluates its quality
+        /// Aborts mid-cycle if the machine breaks down due to condition degradation
         public override bool Process(Product product)
         {
             switch (Status)
