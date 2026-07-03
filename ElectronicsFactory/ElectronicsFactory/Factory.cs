@@ -112,12 +112,9 @@ namespace ElectronicsFactory
             }
 
             Machine? machine = MachineManager.FindMachine(machineSerial);
-            if (machine != null)
-            {
-                // Diagnostics should produce different results depending on the machine type
-                machine.Inspect();
-                Logger.Info($"Engineer {engineer.Name} completed inspection on {machineSerial}.");
-            }
+            if (machine == null) return;
+
+            engineer.InspectMachine(machine);
         }
 
         // A Technician repairs the machine if necessary
@@ -170,6 +167,19 @@ namespace ElectronicsFactory
             Income = ProductManager.SoldProduct(p, currentIncome); 
 
             Logger.Info($"Product {productId} successfully sold by Agent. New factory income: {Income} RON");
+        }
+
+        public void GenerateDirectorReport(string directorId)
+        {
+            int index = EmployeeManager.SearchEmployee(directorId);
+
+            if((index == -1) || !(EmployeeManager.Employees[index] is Director director))
+            {
+                Logger.Error("Only a director can review factory-wide statics!");
+                return;
+            }
+
+            director.ReviewProductionStatistics(EmployeeManager.EmployeesCount, MachineManager.MachineCount, ProductManager.ProductsCount, Income);
         }
     }
 }

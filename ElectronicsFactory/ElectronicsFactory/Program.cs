@@ -11,7 +11,8 @@ namespace ElectronicsFactory
             
             Factory electronicsFactory = new Factory(20, 10, 100, 50000f);
 
-       
+
+            electronicsFactory.EmployeeManager.HiredEmployee(new Director("Ion Creanga", 9000));
             electronicsFactory.EmployeeManager.HiredEmployee(new ProductionManager("Andrei Vasilescu", 6500));
             electronicsFactory.EmployeeManager.HiredEmployee(new MachineOperator("Mihai Ion", 3500));
             electronicsFactory.EmployeeManager.HiredEmployee(new Engineer("Elena Popa", 5500));

@@ -22,6 +22,7 @@
                 Logger.Info("3. Product Management");
                 Logger.Info("4. Production");
                 Logger.Info("5. Sales & Reports");
+                Logger.Info("6. Factory Overview");
                 Logger.Info("0. Exit");
                 Logger.Info("\nSelect an option: ");
 
@@ -33,6 +34,7 @@
                     case "3": SubMenuProducts(); break;
                     case "4": SubMenuProductionWorkflow(); break;
                     case "5": SubMenuReports(); break;
+                    case "6": SubMenuFactoryOverview(); break;
                     case "0": running = false; break;
                     default:
                         Logger.Info("Invalid choice! Press Enter to retry...");
@@ -81,6 +83,7 @@
                 if (type == "4") newEmp = new Technician(name, salary);
                 if (type == "5") newEmp = new SalesAgent(name, salary); 
                 if (type == "6") newEmp = new Accountant(name, salary);
+                if (type == "7") newEmp = new Director(name, salary);
 
                 if (newEmp != null) _factory.EmployeeManager.HiredEmployee(newEmp);
             }
@@ -140,6 +143,7 @@
             Logger.Info("Machine Management");
             Logger.Info("1. Inspect Machine");
             Logger.Info("2. Repair Machine");
+            Logger.Info("3. View Machine Components");
             Logger.Info("Choice: ");
             string? sub = Console.ReadLine();
 
@@ -154,6 +158,21 @@
             {
                 Logger.Info("Enter Technician ID: "); string? techId = Console.ReadLine()!;
                 _factory.RepairMachineWithTechnician(techId, serial);
+            }
+            else if (sub == "3")
+            {
+                Machine? machine = _factory.MachineManager.FindMachine(serial);
+                if (machine != null && machine.Components != null)
+                {
+                    Logger.Info($"Components installed on machine {machine.SerialNumber}:");
+                    foreach (var part in machine.Components)
+                    {
+                        if (part != null)
+                        {
+                            Logger.Info($" -> {part.Component} | Brand: {part.Brand} | Energy Class: {part.EnergyClass} | Cost: {part.Currency} RON");
+                        }
+                    }
+                }
             }
             WaitForEnter();
         }
@@ -170,6 +189,11 @@
                 {
                     empty = false;
                     Logger.Info($"Product ID: {prod.Id} | Type: {prod.ProductType} | Cost: {prod.Currency} RON | Quality: {prod.Quality}");
+
+                    if (prod is Phones phone) phone.DisplayFunctionality();
+                    else if (prod is Tablets tablet) tablet.DisplayFunctionality();
+                    else if (prod is Computers computer) computer.WifiConectionDescription();
+                    else if (prod is Headphones headphones) headphones.TestProduct();
                 }
             }
 
@@ -217,6 +241,18 @@
                     Logger.Error("Invalid Accountant ID!");
                 }
             }
+            WaitForEnter();
+        }
+
+        private void SubMenuFactoryOverview()
+        {
+            Logger.Clear();
+            Logger.Info("Factory Overview");
+            Logger.Info("Enter Director ID: ");
+            string? directorId = Console.ReadLine()!;
+
+            _factory.GenerateDirectorReport(directorId);
+
             WaitForEnter();
         }
     }

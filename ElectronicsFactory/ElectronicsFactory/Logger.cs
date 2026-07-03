@@ -36,10 +36,5 @@ namespace ElectronicsFactory
         {
             Console.ResetColor();
         }
-
-        public static void Read()
-        {
-            Console.ReadLine();
-        }
     }
 }

@@ -25,8 +25,8 @@ namespace ElectronicsFactory
         private Machine[] machines;
         private int machineCount = 0;
 
-        public Machine[] Machines { get { return machines; } set { machines = value; } }
-        public int MachineCount { get { return machineCount; } set { machineCount = value; } }
+        public Machine[] Machines { get { return machines; } }
+        public int MachineCount { get { return machineCount; } }
         public MachineManagement(int maxCapacity) 
         {
             machines = new Machine[maxCapacity];
@@ -65,24 +65,6 @@ namespace ElectronicsFactory
             }
             Logger.Warning($"Machine with serial {serialNumber} not found.");
             return null;
-        }
-        public void DisplayMachinesStatus( string serialNumber )
-        {
-            if (machineCount == 0)
-            {
-                Logger.Warning("There are no machines in the factory.");
-                return;
-            }
-
-            for (int i = 0; i < machineCount; i++)
-            {
-                if (machines[i].SerialNumber == serialNumber)
-                {
-                    machines[i].Inspect();
-                    return;
-                }
-            }
-            Logger.Info($"Machine with serial number {serialNumber} not found.");
         }
     }
     abstract public class Machine

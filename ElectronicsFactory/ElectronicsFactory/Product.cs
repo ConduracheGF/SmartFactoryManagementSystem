@@ -98,16 +98,6 @@ namespace ElectronicsFactory
             Logger.Warning($"Product {id} was not found.");
             return -1;
         }
-
-        public float CalculateValue()
-        {
-            float value = 0;
-            foreach(Product product in storage)
-            {
-                value += product.Currency;
-            }
-            return value;
-        }
     }
     public abstract class Product
     {
@@ -366,7 +356,7 @@ namespace ElectronicsFactory
                 Quality = "A";
             }
 
-            Logger.Info($"The headphone is of quality type: {Quality}");
+            Logger.Info($"The headphone is of quality type: {Quality} and it is optimal sound");
         }
 
         public float QualitySound()

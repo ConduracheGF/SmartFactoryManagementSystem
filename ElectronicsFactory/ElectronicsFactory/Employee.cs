@@ -31,7 +31,7 @@ namespace ElectronicsFactory
         private int employeesCount = 0;
 
         public Employee?[] Employees { get { return employees; } set { employees = value; } }
-        public int EmployeesCount { get { return employeesCount; } set { employeesCount = value; } }
+        public int EmployeesCount { get { return employeesCount; } }
 
         public EmployeeManagement(int maxCapacity)
         {
