@@ -101,7 +101,7 @@ namespace ElectronicsFactory
     }
     public abstract class Product
     {
-        private static int nextId = 1;
+        private static int nextId = 0;
 
         private int id;
         private float currency;

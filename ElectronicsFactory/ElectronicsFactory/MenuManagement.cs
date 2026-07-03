@@ -115,7 +115,7 @@
 
             Logger.Info("Select Product to create: 1. Phone, 2. Headphones, 3. Computers, 4. Tablets");
             string? prodType = Console.ReadLine();
-            Logger.Info("Quantity: "); int qty = int.Parse(Console.ReadLine()!);
+            Logger.Info("Quantity: "); int.TryParse(Console.ReadLine()!, out int qty);
             if (qty <= 0)
             {
                 Logger.Info("Invalid quantity! Please enter a positive value.");
