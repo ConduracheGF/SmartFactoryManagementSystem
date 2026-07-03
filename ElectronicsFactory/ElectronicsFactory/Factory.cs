@@ -4,13 +4,26 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
+    /// <summary>
+    /// Central orchestrator of the Smart Factory Management System
+    /// Owns the employee, machine, and product managers, and coordinates all cross-cutting
+    /// business workflows (production, inspection, repair, sales, reporting).
+    /// </summary>
     internal class Factory
     {
+        // Manages the factory's employee roster
         public EmployeeManagement EmployeeManager { get; private set; }
+
+        // Manages the factory's registered machines
         public MachineManagement MachineManager { get; private set; }
+
+        // Manages the factory's product inventory
         public ProductManagement ProductManager { get; private set; }
+
+        // Current factory income/budget, in RON
         public float Income { get; set; }
 
+        // Initializes a new Factory with the given capacities and starting income
         public Factory(int maxEmployees, int maxMachines, int maxProducts, float initialIncome)
         {
             EmployeeManager = new EmployeeManagement(maxEmployees);
@@ -19,6 +32,9 @@ namespace ElectronicsFactory
             Income = initialIncome;
         }
 
+        /// Validates the manager/operator/machine
+        /// Starts the machine if needed, then manufactures the requested quantity
+        /// of a product one unit at a time (stopping early if the machine breaks down)
         public void RunProductionCycle(string managerId, string operatorId, string machineSerial, Product targetProduct, int quantity)
         {
             // Product quantity can never become negative
@@ -169,6 +185,7 @@ namespace ElectronicsFactory
             Logger.Info($"Product {productId} successfully sold by Agent. New factory income: {Income} RON");
         }
 
+        // Generates a factory-wide overview report through the given Director
         public void GenerateDirectorReport(string directorId)
         {
             int index = EmployeeManager.SearchEmployee(directorId);

@@ -403,8 +403,12 @@ namespace ElectronicsFactory
         }
     }
 
+    /// <summary>
+    /// Machine specialized in quality-testing finished products before storage
+    /// </summary>
     internal class TestingMachine : Machine
     {
+        // Initializes a new TestingMachine
         public TestingMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
 
         public override bool Start()
@@ -417,7 +421,7 @@ namespace ElectronicsFactory
             return false;
         }
 
-
+        /// Provides testing-machine-specific diagnostic output (voltage/calibration checks)
         public override bool Inspect()
         {
             if (Condition == ConditionStatus_t.Good)
@@ -431,6 +435,8 @@ namespace ElectronicsFactory
             return (Condition == ConditionStatus_t.Bad || Condition == ConditionStatus_t.Critical);
         }
 
+        // Tests a product and re-evaluates its quality
+        // Aborts mid-cycle if the machine breaks down due to condition degradation
         public override bool Process(Product product)
         {
             switch (Status)

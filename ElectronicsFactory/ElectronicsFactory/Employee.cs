@@ -5,6 +5,9 @@ using System.Reflection.PortableExecutable;
 
 namespace ElectronicsFactory
 {
+    /// <summary>
+    /// Organizational department an employee belongs to
+    /// </summary>
     public enum DepartmentStatus_t
     {
         Management,
@@ -14,6 +17,9 @@ namespace ElectronicsFactory
         Finance
     }
 
+    /// <summary>
+    /// Job role/title of an employee
+    /// </summary>
     public enum JobStatus_t
     {
         Director,
@@ -25,20 +31,26 @@ namespace ElectronicsFactory
         Acountant
     }
 
+    // Manages the factory's employee roster: hiring, firing, and lookup, enforcing the unique-ID business rule
     internal class EmployeeManagement
     {
         private Employee?[] employees;
         private int employeesCount = 0;
 
+        // Underlying fixed-size storage array for employees (may contain unused trailing slots)
         public Employee?[] Employees { get { return employees; } set { employees = value; } }
+
+        // Number of employees currently on the roster
         public int EmployeesCount { get { return employeesCount; } }
 
+        // Initializes employee storage with a fixed maximum capacity
         public EmployeeManagement(int maxCapacity)
         {
             employees = new Employee?[maxCapacity];
             employeesCount = 0;
         }
 
+        // Hires a new employee, rejecting it if capacity is full or if an employee with the same ID already exists
         public bool HiredEmployee(Employee employee)
         {
             if (employeesCount >= employees.Length)
@@ -63,6 +75,7 @@ namespace ElectronicsFactory
             }
         }
 
+        // Fires the employee with the given ID, shifting remaining elements left to keep storage compact
         public void FiredEmployee(string id)
         {
             if (employeesCount == 0)
@@ -75,7 +88,8 @@ namespace ElectronicsFactory
 
             if (index != -1)
             {
-                for(int i = index; i < employeesCount - 1; i++)
+                // Shift all subsequent elements one position left, then shrink the logical count
+                for (int i = index; i < employeesCount - 1; i++)
                 {
                     employees[i] = employees[i + 1];
                 }
@@ -90,6 +104,7 @@ namespace ElectronicsFactory
             }
         }
 
+        // Searches the roster for an employee by ID or by name. As a side effect, displays the employee's info when found
         public int SearchEmployee(string Id_or_Name)
         {
             if (employeesCount == 0)
@@ -110,16 +125,32 @@ namespace ElectronicsFactory
             return -1;
         }
     }
+
+    /// <summary>
+    /// Abstract base class representing any employee working in the factory.
+    /// Provides shared identity (auto-generated ID) and common employment attributes.
+    /// </summary>
     public abstract class Employee
     {
+        // Static counter shared across all Employee instances, used to auto-generate unique IDs
         private static int nextId = 1;
 
-        public string Id { get; private set; } 
+        // Unique, auto-generated identifier assigned at construction time
+        public string Id { get; private set; }
+
+        // Full name of the employee
         public string Name { get; set; }
+
+        // Organizational department this employee belongs to
         public DepartmentStatus_t Department { get; set; }
+
+        // Job role of this employee
         public JobStatus_t JobStatus { get; set; }
+
+        // Monthly salary, in RON
         public double Salary { get; set; }
 
+        // Initializes a new employee with an auto-generated unique ID
         public Employee(string name, DepartmentStatus_t department, JobStatus_t job, double salary)
         {
             Id = (nextId++).ToString();
@@ -129,16 +160,23 @@ namespace ElectronicsFactory
             Salary = salary;
         }
 
+        // Displays this employee's basic information 
+        // Overridden by each derived class to add role-specific details
         public virtual void DisplayInfo()
         {
             Logger.Info($"[{Id}] Employee: {Name}, Department: {Department}, Job: {JobStatus}, Salary: {Salary} RON");
         }
     }
 
+    /// <summary>
+    /// Represents the factory Director, responsible for reviewing factory-wide statistics but not for operating machines directly.
+    /// </summary>
     internal class Director : Employee
     {
+        // Initializes a new Director
         public Director(string name, double salary): base(name, DepartmentStatus_t.Management, JobStatus_t.Director, salary){}
 
+        // Prints a factory-wide overview report: employee count, machine count, stock levels, and current income
         public void ReviewProductionStatistics(int totalEmployees, int totalMachines, int totalStock, float income)
         {
             Logger.Info($"Director {Name} reviews the factory report:");
@@ -155,11 +193,16 @@ namespace ElectronicsFactory
         }
     }
 
+    /// <summary>
+    /// Represents a Production Manager, the only role authorized to create production orders
+    /// </summary>
     internal class ProductionManager : Employee
     {
+        // Initializes a new ProductionManager
         public ProductionManager(string name, double salary)
             : base(name, DepartmentStatus_t.Production, JobStatus_t.ProductionManager, salary) { }
 
+        // Creates and approves a production order for a given quantity of a product
         public bool CreateProductionOrder(ref ProductManagement productManagement, Product product, int quantity)
         {
             int count = 0;
@@ -193,11 +236,16 @@ namespace ElectronicsFactory
         }
     }
 
+    /// <summary>
+    /// Represents an Engineer, responsible for diagnosing machine condition before maintenance can proceed
+    /// </summary>
     internal class Engineer : Employee
     {
+        // Initializes a new Engineer
         public Engineer(string name, double salary)
             : base(name, DepartmentStatus_t.Technical, JobStatus_t.Engineer, salary) { }
 
+        // Inspects a machine and reports whether it requires repair
         public bool InspectMachine(Machine machine)
         {
             Logger.Info($"Engineer {Name} is inspecting the machine with serial number {machine.SerialNumber}.");
@@ -222,16 +270,21 @@ namespace ElectronicsFactory
         }
     }
 
+    /// <summary>
+    /// Represents a Technician, the only role authorized to repair machines and only when they are not currently running
+    /// </summary>
     internal class Technician : Employee
     {
+        // Initializes a new Technician
         public Technician(string name, double salary)
             : base(name, DepartmentStatus_t.Technical, JobStatus_t.Technician, salary) { }
 
-
+        // Attempts to repair the given machine. Refuses if the machine is currently running; otherwise puts it into Maintenance and repairs it
         public void RepairMachine(Machine machine, ref float income)
         {
             Logger.Info($"Technician {Name} is attempting to repair machine {machine.SerialNumber}.");
 
+            // A technician cannot repair a running machine.
             if (machine.Status == MachineStatus_t.Running)
             {
                 Logger.Error($"Technician {Name} CANNOT repair a working machine!");
@@ -252,11 +305,16 @@ namespace ElectronicsFactory
         }
     }
 
+    /// <summary>
+    /// Represents a Sales Agent, responsible for selling products from inventory
+    /// </summary>
     internal class SalesAgent : Employee
     {
+        // Initializes a new SalesAgent
         public SalesAgent(string name, double salary)
             : base(name, DepartmentStatus_t.Sales, JobStatus_t.SalesAgent, salary) { }
-       
+
+        // Sells a product from inventory and updates factory income
         public float SellElectronics(ref ProductManagement productManagement, Product product, float income)
         {
             Logger.Info($"The product has sold! The income is increasing!");
@@ -270,11 +328,17 @@ namespace ElectronicsFactory
         }
     }
 
+    /// <summary>
+    /// Represents an Accountant, responsible for generating the factory's financial report (income, profit, costs, and overall balance)
+    /// </summary>
     internal class Accountant : Employee
     {
+        // Initializes a new Accountant
         public Accountant(string name, double salary)
             : base(name, DepartmentStatus_t.Finance, JobStatus_t.Acountant, salary) { }
 
+
+        // Calculates and prints a full financial report: total income, profit from stocked products, and costs of installed machine components
         public void CalculateProductionValue(ProductManagement productManagement, MachineManagement machineManagement, float income)
         {
             float costs = 0;
@@ -282,6 +346,7 @@ namespace ElectronicsFactory
 
             Logger.Info($"Accountant {Name} is calculating the value of current production...");
 
+            // Only iterate the populated portion of storage (avoids null-reference on unused slots)
             for (int i = 0; i < productManagement.ProductsCount; i++)
             {
                 Product product = productManagement.Storage[i];
@@ -289,6 +354,7 @@ namespace ElectronicsFactory
                 profit += product.Currency;
             }
 
+            // Only iterate the populated portion of storage (avoids null-reference on unused slots)
             for (int i = 0; i < machineManagement.MachineCount; i++)
             {
                 Machine machine = machineManagement.Machines[i];
@@ -325,12 +391,17 @@ namespace ElectronicsFactory
         }
 
     }
+
+    /// <summary>
+    /// Represents a Machine Operator, the only role authorized to start machines for production
+    /// </summary>
     internal class MachineOperator : Employee
     {
+        // Initializes a new MachineOperator
         public MachineOperator(string name, double salary)
             : base(name, DepartmentStatus_t.Production, JobStatus_t.MachineOperator, salary) { }
 
-       
+        // Attempts to start the given machine
         public bool StartMachine(Machine machine)
         {
             Logger.Info($"Operator {Name} is attempting to start machine {machine.SerialNumber}.");
