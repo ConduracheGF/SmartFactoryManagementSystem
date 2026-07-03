@@ -1,7 +1,5 @@
 # SmartFactoryManagementSystem
 
-## Architectural & Operational Specification
-
 ## 1. Architectural Overview & System Summary
 
 The SmartFactoryManagementSystem is a console-based enterprise simulation that models the operations of an automated electronics manufacturing facility (producing smartphones, tablets, computers, and headphones).
@@ -93,41 +91,41 @@ Input characters map directly to backend dispatch routines:
 
 ---
 
-## 4. Domain Models & Role-Based Access Control (RBAC)
+## 4. Domain Models & Role-Based Access Control 
 
 Every worker class extends a base employee type, encapsulating distinct operational boundaries and system capabilities within the domain.
 
-### 1. Director (Director)
+### 1. Director 
 
 - **Domain Role:** Executive Operations Overseer.
 - **Functional Scope:** Holds exclusive execution rights to `ReviewProductionStatistics`. Aggregates and returns analytical data regarding global personnel counts, hardware infrastructure health, current inventory distribution, and real-time liquidity tracking.
 
-### 2. Production Manager (ProductionManager)
+### 2. Production Manager 
 
 - **Domain Role:** Operations Coordinator.
 - **Functional Scope:** Supervises the operational floor. Responsible for scheduling workflows, evaluating process efficiency metrics, and managing operational floor dispatching.
 
-### 3. Machine Operator (MachineOperator)
+### 3. Machine Operator 
 
 - **Domain Role:** Hardware Runtime Handler.
 - **Functional Scope:** Authorized to execute `StartMachine`. Acts as the mandatory execution trigger for hardware state transitions. Production routines fail immediately if an active, valid operator is not passed to the pipeline.
 
-### 4. Engineer (Engineer)
+### 4. Engineer 
 
 - **Domain Role:** Predictive Diagnostics Specialist.
 - **Functional Scope:** Evaluates asset metrics, inspects system components, and calculates degradation tolerances to prevent critical faults or unexpected system downtime during runtime blocks.
 
-### 5. Technician (Technician)
+### 5. Technician 
 
 - **Domain Role:** Remediation & Component Maintenance Specialist.
 - **Functional Scope:** Performs structural restorations and component replacements on units with high wear factors or crashed states, returning hardware parameters back to baseline limits.
 
-### 6. Sales Agent (SalesAgent)
+### 6. Sales Agent 
 
 - **Domain Role:** Fiscal Liquidation Representative.
 - **Functional Scope:** Holds exclusive privilege to call `SellProductWithAgent`. Mutates inventory collections, handles asset de-allocation, and routes incoming cash flows directly into the central ledger.
 
-### 7. Accountant (Accountant)
+### 7. Accountant 
 
 - **Domain Role:** Financial Auditor & General Ledger Assessor.
 - **Functional Scope:** Audits current production valuations, calculates operational overhead amortizations, evaluates asset profitability curves, and compiles the real-time financial balance sheet.
