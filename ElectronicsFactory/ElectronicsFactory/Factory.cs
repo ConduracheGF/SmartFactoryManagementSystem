@@ -28,7 +28,7 @@ namespace ElectronicsFactory
         {
             EmployeeManager = new EmployeeManagement(maxEmployees);
             MachineManager = new MachineManagement(maxMachines);
-            ProductManager = new ProductManagement(maxProducts);
+            ProductManager = new ProductManagement();
             Income = initialIncome;
         }
 

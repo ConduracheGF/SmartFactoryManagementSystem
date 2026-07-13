@@ -18,183 +18,67 @@ namespace ElectronicsFactory
     }
 
     /// <summary>
-    /// Manages the factory's product inventory: adding, selling, and searching
-    /// </summary>
-    internal class ProductManagement
-    {
-        private Product[] storage;
-        private int productsCount = 0;
-
-        // Underlying fixed-size storage array for products (may contain unused trailing slots)
-        public Product[] Storage { get { return storage; } set { storage = value; } }
-
-        // Number of products currently in stock
-        public int ProductsCount { get { return productsCount; } }
-
-        // Initializes product storage with a fixed maximum capacity
-        public ProductManagement(int maxCapacity)
-        {
-            storage = new Product[maxCapacity];
-            productsCount = 0;
-        }
-
-        // Adds a manufactured product to storage, rejecting it if capacity is full or if a product with the same ID already exists
-        public bool AddProduct(Product product)
-        {
-            if (productsCount >= storage.Length)
-            {
-                Logger.Error("The storage has reached its maximum products limit!");
-                return false;
-            }
-
-            int index = Search(product.Id);
-
-            if (index == -1)
-            {
-                storage[productsCount] = product;
-                productsCount++;
-
-                Logger.Info($"The product with ID {product.Id} has been added.");
-                return true;
-            }
-            else
-            {
-                Logger.Warning($"The product with the ID {product.Id} already exists in the company!"); return false;
-            }
-        }
-
-        // Removes a product from storage (marks it as sold)
-        // Shifting remaining elements left to keep storage compact
-        public float SoldProduct(Product product, float income)
-        {
-            if (productsCount == 0)
-            {
-                Logger.Error("The storage was left without products!"); 
-                return income;
-            }
-
-            int index = Search(product.Id);
-
-            if (index != -1)
-            {
-                for (int i = index; i < storage.Length - 1; i++)
-                {
-                    // Shift all subsequent elements one position left, then shrink the logical count
-                    storage[i] = storage[i + 1];
-                }
-
-                productsCount--;
-                income = product.SellProduct(income);
-                Logger.Info($"Product with ID {product.Id} has been sold with {product.Currency}.");
-                return income;
-            }
-            else
-            {
-                Logger.Info($"The product with the ID {product.Id} does not exist in the storage's company!");
-                return income;
-            }
-        }
-
-        // Searches storage for a product by ID
-        public int Search(int id)
-        {
-            if (productsCount == 0)
-            {
-                Logger.Info("There are no products in the storage's factory.");
-                return -1;
-            }
-
-            for (int i = 0; i < productsCount; i++)
-            {
-                if (storage[i].Id == id)
-                {
-                    // Re-evaluates the product's quality as a side effect when found
-                    storage[i].TestProduct();
-                    Logger.Info($"The product {id} was found and it is functional!");
-                    return i;
-                }
-            }
-            Logger.Warning($"Product {id} was not found.");
-            return -1;
-        }
-    }
-
-    /// <summary>
     /// Abstract base class representing any manufactured product in the factory
     /// Provides shared identity (auto-generated ID), pricing, and quality-testing behavior
     /// </summary>
     public abstract class Product
     {
         // Static counter shared across all Product instances, used to auto-generate unique IDs
-        private static int nextId = 0;
+        private static int _nextId = 1;
 
-        private int id;
-        private float currency;
-        private float consumption;
-        private string? quality;
+        private int _id;
+        private string _name;
+        private float _price;
+        private float _consumption;
+        private string? _quality;
 
         // Unique, auto-generated identifier assigned at construction time
-        public int Id { get { return id; } private set { id= value; } }
+        public int Id { get { return _id; } private set { _id = value; } }
+
+        // Business-facing name of the product
+        public string Name { get { return _name; } set { _name = value; } }
 
         // Selling price / production cost of the product, in RON
-        public float Currency { get { return currency; } set { currency = value; } }
+        public float Price { get { return _price; } set { _price = value; } }
 
         // Energy consumption metric used to compute the product's quality grade
-        public float Consumption { get { return consumption; } set { consumption = value; } }
+        public float Consumption { get { return _consumption; } set { _consumption = value; } }
 
         // Current quality grade of the product (A-E)
-        public string? Quality { get { return quality; } set { quality = value; } }
+        public string? Quality { get { return _quality; } set { _quality = value; } }
 
         // The product category (Phones, Tablets, Computers, Headphones)
         public ProductType_t ProductType { get; set; }
 
         // Initializes a new product with an auto-generated unique ID
-        public Product(float currency, float consumption, string? quality, ProductType_t ProductType)
+        public Product(string name, float price, float consumption, string? quality, ProductType_t ProductType)
         {
-            id = nextId++;
-            this.currency = currency;
-            this.consumption = consumption;
-            this.quality = quality;
+            _id = _nextId++;
+            this._name = name;
+            this._price = price;
+            this._consumption = consumption;
+            this._quality = quality;
             this.ProductType = ProductType;
         }
 
         /// Computes the updated factory income after selling this product
         public float SellProduct(float income)
         {
-            return currency + income;
+            return Price + income;
         }
 
         /// Recalculates this product's quality grade based on its consumption ratio
-        /// Overridden by each subclass with its own grading thresholds
-        public virtual void TestProduct()
-        {
-            float ratio = consumption;
-
-            if (ratio > 0 && ratio <= 5)
-            {
-                quality = "E";
-            }
-            else if (ratio > 5 && ratio <= 8)
-            {
-                quality = "D";
-            }
-            else if (ratio > 8 && ratio <= 10)
-            {
-                quality = "C";
-            }
-            else if (ratio > 10 && ratio <= 12)
-            {
-                quality = "B";
-            }
-            else if ( ratio > 12 && ratio < 15)
-            {
-                quality = "A";
-            }
-        }
+        public abstract void TestProduct();
 
         /// Creates a new, independent instance of this product with the same attributes, but a freshly auto-generated ID
         /// Used when manufacturing multiple units from a single "template" product during a production run
         public abstract Product Clone();
+
+        /// Converts the product data into a standardized CSV string format for file persistence
+        public virtual string ToFileRow()
+        {
+            return $"{Id};{Name};{Price};{Consumption};{Quality};{ProductType}";
+        }
     }
 
     /// <summary>
@@ -202,20 +86,20 @@ namespace ElectronicsFactory
     /// </summary>
     internal class Phones : Product
     {
-        private int yearOfProduction;
-        private string? processor;
+        private int _yearOfProduction;
+        private string? _processor;
 
         // Year the phone model was produced
-        public int YearOfProduction { get { return yearOfProduction; } set { yearOfProduction = value; } }
+        public int YearOfProduction { get { return _yearOfProduction; } set { _yearOfProduction = value; } }
 
         // Processor chip model used in the phone
-        public string? Processor { get { return processor; } set { processor = value; } }
+        public string? Processor { get { return _processor; } set { _processor = value; } }
 
         /// Initializes a new Phones product
-        public Phones(float currency, float consumption, string? quality, ProductType_t productType, int yearOfProduction, string? processor) : base(currency, consumption, quality, productType)
+        public Phones(string name, float currency, float consumption, string? quality, ProductType_t productType, int yearOfProduction, string? processor) : base(name, currency, consumption, quality, productType)
         {
-            this.yearOfProduction = yearOfProduction;
-            this.processor = processor;
+            this._yearOfProduction = yearOfProduction;
+            this._processor = processor;
         }
 
         // Phone-specific quality grading based on consumption thresholds
@@ -255,7 +139,12 @@ namespace ElectronicsFactory
 
         public override Product Clone()
         {
-            return new Phones(Currency, Consumption, Quality, ProductType, YearOfProduction, Processor);
+            return new Phones(Name, Price, Consumption, Quality, ProductType, YearOfProduction, Processor);
+        }
+
+        public override string ToFileRow()
+        {
+            return base.ToFileRow() + $";{YearOfProduction};{Processor}";
         }
     }
 
@@ -264,20 +153,20 @@ namespace ElectronicsFactory
     /// </summary>
     internal class Tablets : Product
     {
-        private int yearOfProduction;
-        private string? processor;
+        private int _yearOfProduction;
+        private string? _processor;
 
         // Year the tablet model was produced
-        public int YearOfProduction { get { return yearOfProduction; } set { yearOfProduction = value; } }
+        public int YearOfProduction { get { return _yearOfProduction; } set { _yearOfProduction = value; } }
 
         // Processor chip model used in the tablet
-        public string? Processor { get { return processor; } set { processor = value; } }
+        public string? Processor { get { return _processor; } set { _processor = value; } }
 
         // Initializes a new Tablets product
-        public Tablets(float currency, float consumption, string? quality, ProductType_t productType, int yearOfProduction, string? processor) : base(currency, consumption, quality, productType)
+        public Tablets(string name, float currency, float consumption, string? quality, ProductType_t productType, int yearOfProduction, string? processor) : base(name, currency, consumption, quality, productType)
         {
-            this.yearOfProduction = yearOfProduction;
-            this.processor = processor;
+            this._yearOfProduction = yearOfProduction;
+            this._processor = processor;
         }
 
         // Tablet-specific quality grading based on consumption thresholds
@@ -317,7 +206,12 @@ namespace ElectronicsFactory
 
         public override Product Clone()
         {
-            return new Tablets(Currency, Consumption, Quality, ProductType, YearOfProduction, Processor);
+            return new Tablets(Name, Price, Consumption, Quality, ProductType, YearOfProduction, Processor);
+        }
+
+        public override string ToFileRow()
+        {
+            return base.ToFileRow() + $";{YearOfProduction};{Processor}";
         }
     }
 
@@ -326,20 +220,20 @@ namespace ElectronicsFactory
     /// </summary>
     internal class Computers : Product
     {
-        private int weight;
-        private string? processor;
+        private int _weight;
+        private string? _processor;
 
         // Physical weight of the computer, in kilograms
-        public int Weight { get { return weight; } set { weight = value; } }
+        public int Weight { get { return _weight; } set { _weight = value; } }
 
         // Processor chip model used in the computer
-        public string? Processor { get { return processor; } set { processor = value; } }
+        public string? Processor { get { return _processor; } set { _processor = value; } }
 
         // Initializes a new Computers product
-        public Computers(float currency, float consumption, string? quality, ProductType_t productType, string? processor, int weight) : base(currency, consumption, quality, productType)
+        public Computers(string name, float currency, float consumption, string? quality, ProductType_t productType, string? processor, int weight) : base(name, currency, consumption, quality, productType)
         {
-            this.processor = processor;
-            this.weight = weight;
+            this._processor = processor;
+            this._weight = weight;
         }
 
         // Computer-specific quality grading based on consumption thresholds
@@ -379,7 +273,12 @@ namespace ElectronicsFactory
 
         public override Product Clone()
         {
-            return new Computers(Currency, Consumption, Quality, ProductType, Processor, Weight);
+            return new Computers(Name, Price, Consumption, Quality, ProductType, Processor, Weight);
+        }
+
+        public override string ToFileRow()
+        {
+            return base.ToFileRow() + $";{Weight};{Processor}";
         }
     }
 
@@ -388,20 +287,20 @@ namespace ElectronicsFactory
     /// </summary>
     internal class Headphones : Product
     {
-        private int yearOfProduction;
-        private int power;
+        private int _yearOfProduction;
+        private int _power;
 
         // Year the headphones model was produced
-        public int YearOfProduction { get { return yearOfProduction; } set { yearOfProduction = value; } }
+        public int YearOfProduction { get { return _yearOfProduction; } set { _yearOfProduction = value; } }
 
         // Audio output power of the headphones, in milliwatts
-        public int Power { get { return power; } set { power = value; } }
+        public int Power { get { return _power; } set { _power = value; } }
 
         // Initializes a new Headphones product
-        public Headphones(float currency, float consumption, string? quality, ProductType_t productType, int yearOfProduction, int power) : base(currency, consumption, quality, productType)
+        public Headphones(string name, float currency, float consumption, string? quality, ProductType_t productType, int yearOfProduction, int power) : base(name, currency, consumption, quality, productType)
         {
-            this.yearOfProduction = yearOfProduction;
-            this.power = power;
+            this._yearOfProduction = yearOfProduction;
+            this._power = power;
         }
 
         // Headphones-specific quality grading, factoring in sound quality (power-to-consumption ratio) alongside raw consumption.
@@ -442,7 +341,12 @@ namespace ElectronicsFactory
 
         public override Product Clone()
         {
-            return new Headphones(Currency, Consumption, Quality, ProductType, YearOfProduction, Power);
+            return new Headphones(Name, Price, Consumption, Quality, ProductType, YearOfProduction, Power);
+        }
+
+        public override string ToFileRow()
+        {
+            return base.ToFileRow() + $";{YearOfProduction};{Power}";
         }
     }
 }

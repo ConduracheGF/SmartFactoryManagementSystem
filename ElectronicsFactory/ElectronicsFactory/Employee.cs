@@ -31,101 +31,6 @@ namespace ElectronicsFactory
         Acountant
     }
 
-    // Manages the factory's employee roster: hiring, firing, and lookup, enforcing the unique-ID business rule
-    internal class EmployeeManagement
-    {
-        private Employee?[] employees;
-        private int employeesCount = 0;
-
-        // Underlying fixed-size storage array for employees (may contain unused trailing slots)
-        public Employee?[] Employees { get { return employees; } set { employees = value; } }
-
-        // Number of employees currently on the roster
-        public int EmployeesCount { get { return employeesCount; } }
-
-        // Initializes employee storage with a fixed maximum capacity
-        public EmployeeManagement(int maxCapacity)
-        {
-            employees = new Employee?[maxCapacity];
-            employeesCount = 0;
-        }
-
-        // Hires a new employee, rejecting it if capacity is full or if an employee with the same ID already exists
-        public bool HiredEmployee(Employee employee)
-        {
-            if (employeesCount >= employees.Length)
-            {
-                Logger.Error("The factory has reached its maximum employee limit!");
-                return false;
-            }
-
-            int index = SearchEmployee(employee.Id);
-
-            if (index == -1)
-            {
-                employees[employeesCount] = employee;
-                employeesCount++;
-
-                Logger.Info($"The employee with ID {employee.Id} has been added.");
-                return true;
-            } else
-            {
-                Logger.Warning($"The employee with the ID {employee.Id} already exists in the company!");
-                return false;
-            }
-        }
-
-        // Fires the employee with the given ID, shifting remaining elements left to keep storage compact
-        public void FiredEmployee(string id)
-        {
-            if (employeesCount == 0)
-            {
-                Logger.Error("The factory was left without employees!");
-                return;
-            }
-
-            int index = SearchEmployee(id);
-
-            if (index != -1)
-            {
-                // Shift all subsequent elements one position left, then shrink the logical count
-                for (int i = index; i < employeesCount - 1; i++)
-                {
-                    employees[i] = employees[i + 1];
-                }
-                employees[employeesCount - 1] = null;
-                employeesCount--;
-
-                Logger.Info($"Employee with ID {id} has been fired.");
-            }
-            else
-            {
-                Logger.Info($"The employee with the ID {id} does not exist in the company!");
-            }
-        }
-
-        // Searches the roster for an employee by ID or by name. As a side effect, displays the employee's info when found
-        public int SearchEmployee(string Id_or_Name)
-        {
-            if (employeesCount == 0)
-            {
-                Logger.Info("There are no employees in the factory.");
-                return -1;
-            }
-
-            for (int i = 0; i < employeesCount; i++)
-            {
-                if (employees[i]!.Id == Id_or_Name || employees[i]!.Name == Id_or_Name)
-                {
-                    employees[i]!.DisplayInfo();
-                    return i;
-                }
-            }
-            Logger.Warning($"Employee {Id_or_Name} was not found.");
-            return -1;
-        }
-    }
-
     /// <summary>
     /// Abstract base class representing any employee working in the factory.
     /// Provides shared identity (auto-generated ID) and common employment attributes.
@@ -166,6 +71,12 @@ namespace ElectronicsFactory
         {
             Logger.Info($"[{Id}] Employee: {Name}, Department: {Department}, Job: {JobStatus}, Salary: {Salary} RON");
         }
+
+        // Converts the employee's data into a standardized CSV string for file persistence.
+        public virtual string ToFileRow()
+        {
+            return $"{GetType().Name};{Id};{Name};{Salary};{Department};{JobStatus}";
+        }
     }
 
     /// <summary>
@@ -174,7 +85,7 @@ namespace ElectronicsFactory
     internal class Director : Employee
     {
         // Initializes a new Director
-        public Director(string name, double salary): base(name, DepartmentStatus_t.Management, JobStatus_t.Director, salary){}
+        public Director(string name, double salary): base(name, DepartmentStatus_t.Management, JobStatus_t.Director, salary) { }
 
         // Prints a factory-wide overview report: employee count, machine count, stock levels, and current income
         public void ReviewProductionStatistics(int totalEmployees, int totalMachines, int totalStock, float income)
@@ -347,11 +258,11 @@ namespace ElectronicsFactory
             Logger.Info($"Accountant {Name} is calculating the value of current production...");
 
             // Only iterate the populated portion of storage (avoids null-reference on unused slots)
-            for (int i = 0; i < productManagement.ProductsCount; i++)
+            for (int i = 0; i < productManagement.ProductCount; i++)
             {
                 Product product = productManagement.Storage[i];
                 income = product.SellProduct(income);
-                profit += product.Currency;
+                profit += product.Price;
             }
 
             // Only iterate the populated portion of storage (avoids null-reference on unused slots)

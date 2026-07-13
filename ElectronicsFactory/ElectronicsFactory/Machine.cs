@@ -1,5 +1,8 @@
-﻿using System;
+﻿using ElectronicsFactory;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Xml.Linq;
 
@@ -10,7 +13,7 @@ namespace ElectronicsFactory
     /// </summary>
     public enum MachineStatus_t
     {
-        Stopped,
+        Offline,
         Running,
         Maintenance,
         Broken
@@ -27,79 +30,18 @@ namespace ElectronicsFactory
     }
 
     /// <summary>
-    /// Manages the collection of machines owned by the factory: registration, lookup, and capacity/duplicate validation
-    /// </summary>
-    internal class MachineManagement
-    {
-        private Machine[] machines;
-        private int machineCount = 0;
-
-        // Underlying fixed-size storage array for machines (may contain unused trailing slots)
-        public Machine[] Machines { get { return machines; } }
-        public int MachineCount { get { return machineCount; } }
-
-        // Initializes machine storage with a fixed maximum capacity.
-        public MachineManagement(int maxCapacity) 
-        {
-            machines = new Machine[maxCapacity];
-            machineCount = 0;
-        }
-
-        // Registers a new machine in the factory, rejecting it if capacity is full
-        // Or if a machine with the same serial number already exists.
-        public bool AddMachine(Machine machine)
-        {
-            if (machineCount >= machines.Length)
-            {
-                Logger.Error("The factory has reached the maximum limit of machines!");
-                return false;
-            }
-
-            for (int i = 0; i < machineCount; i++)
-            {
-                if (machines[i].SerialNumber == machine.SerialNumber)
-                {
-                    Logger.Warning($"A machine with serial number {machine.SerialNumber} already exists!");
-                    return false;
-                }
-            }
-
-            machines[machineCount] = machine;
-            machineCount++;
-
-            Logger.Info($"Machine with serial number {machine.SerialNumber} has been added.");
-            return true;
-        }
-
-        // Looks up a machine by its serial number
-        public Machine? FindMachine(string serialNumber)
-        {
-            for (int i = 0; i < machineCount; i++)
-            {
-                if (machines[i] != null && machines[i].SerialNumber == serialNumber)
-                    return machines[i];
-            }
-            Logger.Warning($"Machine with serial {serialNumber} not found.");
-            return null;
-        }
-    }
-
-    /// <summary>
     /// Abstract base class representing any production machine in the factory.
     /// Encapsulates shared behavior (start/stop/repair/inspect/process) while leaving type-specific production logic to be overridden by derived classes.
     /// </summary>
     public abstract class Machine
     {
         // Static counter shared across all Machine instances, used to auto-generate unique IDs.
-        private static int nextId = 1;
-
-        private MachineParts[] components;
-        private int nrOfComponents = 0;
+        private static int _nextId = 1;
 
         // Unique, auto-generated numeric identifier assigned at construction time
         public int Id { get; private set; }
 
-        // Business-facing unique identifier (assigned manually), used for lookups across the app
+        public string Name { get; set; }
         public string SerialNumber { get; set; }
 
         // Current operational status of the machine (Stopped, Running, Maintenance, Broken)
@@ -108,28 +50,68 @@ namespace ElectronicsFactory
         // Current physical condition of the machine; degrades with use and resets on repair
         public ConditionStatus_t Condition { get; set; }
 
-        // The set of replaceable parts currently installed in this machine
-        public MachineParts[] Components { get { return components; } set { components = value; } }
+        public float WearLevel { get; set; }
+        public int TotalHoursOperated { get; set; }
+        public int SuccessfulCycles { get; set; }
+        public int TotalCyclesAttempted { get; set; }
+
+        public List<MachineParts> Components { get; set; } = new List<MachineParts>();
 
         // Initializes a new machine with a default set of 5 standard components
-        public Machine(string serialNumber, int maxCapacity)
+        public Machine(string name, string serialNumber, MachineStatus_t status, ConditionStatus_t condition)
         {
-            Id = nextId++;
+            Id = _nextId++;
+            Name = name;
             SerialNumber = serialNumber;
-            Status = MachineStatus_t.Stopped;
+            Status = MachineStatus_t.Offline;
             Condition = ConditionStatus_t.Good;
 
-            // Ensure the array can always hold the 5 default components, regardless of requested capacity
-            int size = Math.Max(maxCapacity, 5);
-            components = new MachineParts[size];
-            
-            components[0] = new Motor(500, "Bosch", 1, ComponentsType_t.Motor, 200, 5);
-            components[1] = new Senzor(120, "Samsung", 1, ComponentsType_t.Senzor, 0.5f, 500);
-            components[2] = new Controler(350, "Intel", 1, ComponentsType_t.Controler, 3200);
-            components[3] = new Display(600, "LG", 1, ComponentsType_t.Display, 4000f);
-            components[4] = new CoolingFan(80, "Noctua", 1, ComponentsType_t.CoolingFan, 2500);
-        
-            nrOfComponents = 5;
+            WearLevel = condition switch
+            {
+                ConditionStatus_t.Critical => 85.0f,
+                ConditionStatus_t.Bad => 50.0f,
+                _ => 0.0f
+            };
+
+            TotalHoursOperated = 0;
+            SuccessfulCycles = 0;
+            TotalCyclesAttempted = 0;
+
+            Components = new List<MachineParts>
+            {
+                new Motor(currency: 500, brand: "Bosch", energyClass: 2, component: ComponentsType_t.Motor, powerEnergy: 1500.0f, horsePower: 3),
+                new Senzor(currency: 150, brand: "Sick", energyClass: 1, component: ComponentsType_t.Senzor, percentAccuracy: 0.98f, frequency: 100),
+                new Controler(currency: 800, brand: "Siemens", energyClass: 1, component: ComponentsType_t.Controler, frequency: 400),
+                new Display(currency: 300, brand: "Nextion", energyClass: 3, component: ComponentsType_t.Display, rezolution: 1080.0f),
+                new CoolingFan(currency: 75, brand: "Noctua", energyClass: 1, component: ComponentsType_t.CoolingFan, speed: 2000)
+            };
+        }
+
+        public Machine(int id, string name, string serialNumber, MachineStatus_t status, ConditionStatus_t condition, float wearLevel, int totalHoursOperated, int successfulCycles, int totalCyclesAttempted)
+        {
+            Id = id;
+            Name = name;
+            SerialNumber = serialNumber;
+            Status = status;
+            Condition = condition;
+            WearLevel = wearLevel;
+            TotalHoursOperated = totalHoursOperated;
+            SuccessfulCycles = successfulCycles;
+            TotalCyclesAttempted = totalCyclesAttempted;
+
+            if (id >= _nextId)
+            {
+                _nextId = id + 1;
+            }
+
+            Components = new List<MachineParts>
+            {
+                new Motor(currency: 500, brand: "Bosch", energyClass: 2, component: ComponentsType_t.Motor, powerEnergy: 1500.0f, horsePower: 3),
+                new Senzor(currency: 150, brand: "Sick", energyClass: 1, component: ComponentsType_t.Senzor, percentAccuracy: 0.98f, frequency: 100),
+                new Controler(currency: 800, brand: "Siemens", energyClass: 1, component: ComponentsType_t.Controler, frequency: 400),
+                new Display(currency: 300, brand: "Nextion", energyClass: 3, component: ComponentsType_t.Display, rezolution: 1080.0f),
+                new CoolingFan(currency: 75, brand: "Noctua", energyClass: 1, component: ComponentsType_t.CoolingFan, speed: 2000)
+            };
         }
 
         // Stops the machine, unless it is currently under maintenance
@@ -141,7 +123,7 @@ namespace ElectronicsFactory
                 return false;
             }
 
-            Status = MachineStatus_t.Stopped;
+            Status = MachineStatus_t.Offline;
             Logger.Info($"The machine with serial number: {SerialNumber} has been stopped.");
             return true;
         }
@@ -181,22 +163,23 @@ namespace ElectronicsFactory
             Logger.Info("Tehnician has found a piece of machine which it has a bad functionality!");
 
             
-            if (components == null || nrOfComponents == 0)
+            if (Components == null || Components.Count == 0)
             {
                 Logger.Error("This machine does not have any components configured to be repaired!");
                 return false;
             }
 
 
-            int indexRandom = Random.Shared.Next(nrOfComponents);
+            int indexRandom = Random.Shared.Next(Components.Count);
      
-            income = components[indexRandom].Replacement(income);
+            income = Components[indexRandom].Replacement(income);
 
             ComponentsType_t swapComponents = (ComponentsType_t)indexRandom;
             Logger.Warning($"The component with bad behavior is {swapComponents} and it will be replaced!");
 
             Condition = ConditionStatus_t.Good;
-            Status = MachineStatus_t.Stopped;
+            Status = MachineStatus_t.Offline;
+            WearLevel = 0.0f;
             return true;
         }
 
@@ -205,15 +188,22 @@ namespace ElectronicsFactory
         // Derived classes extend this with machine-type-specific production behavior
         public virtual bool Process(Product product)
         {
+            TotalCyclesAttempted++;
+            TotalHoursOperated++;
+
             switch(Status)
             {
-                case MachineStatus_t.Stopped:
+                case MachineStatus_t.Offline:
                     Logger.Warning($"The machine with serial number {SerialNumber} is stopped and cannot process products!"); 
                     return false;
                 case MachineStatus_t.Running:
-                    if (nrOfComponents == 0)
-                        Logger.Info("The machine is processing products");
+                    Logger.Info("The machine is processing products");
                     DegradeCondition();
+
+                    if (Status != MachineStatus_t.Broken)
+                    {
+                        SuccessfulCycles++;
+                    }
                     return true;
                 case MachineStatus_t.Maintenance:
                     Logger.Warning($"The machine with serial number {SerialNumber} is under maintenance and cannot process products");
@@ -232,13 +222,24 @@ namespace ElectronicsFactory
         {
             if (Random.Shared.NextDouble() < 0.20)
             {
-                var previous = Condition;
                 Condition = (Condition == ConditionStatus_t.Good ? ConditionStatus_t.Bad : ConditionStatus_t.Critical);
                 Logger.Warning($"Machine {SerialNumber} condition degraded to {Condition} after processing!");
 
+                if (Condition == ConditionStatus_t.Bad) WearLevel = 55.0f;
                 if (Condition == ConditionStatus_t.Critical)
+                {
+                    WearLevel = 100.0f;
                     Status = MachineStatus_t.Broken;
+                }
             }
+            else
+            {
+                WearLevel += 2.5f;
+            }
+        }
+        public string ToFileRow()
+        {
+            return $"{GetType().Name};{Id};{Name};{SerialNumber};{Status};{Condition};{WearLevel};{TotalHoursOperated};{SuccessfulCycles};{TotalCyclesAttempted}";
         }
     }
 
@@ -248,8 +249,8 @@ namespace ElectronicsFactory
     internal class PackagingMachine : Machine
     {
         // Initializes a new PackagingMachine
-        public PackagingMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
-
+        public PackagingMachine(string name, string serialNumber, MachineStatus_t status, ConditionStatus_t condition)
+                    : base(name, serialNumber, status, condition) { }
         public override bool Start()
         {
             if (base.Start())
@@ -264,35 +265,29 @@ namespace ElectronicsFactory
         /// Aborts mid-cycle if the machine breaks down due to condition degradation
         public override bool Process(Product product)
         {
-            switch (Status)
+            if (Status == MachineStatus_t.Offline)
             {
-                case MachineStatus_t.Stopped:
-                    base.Process(product);
-                    Logger.Warning($"PackagingMachine nu poate impacheta produsul!");
-                    return false;
-                case MachineStatus_t.Running:
-                    base.Process(product);
-
-                    if (Status == MachineStatus_t.Broken)
-                    {
-                        Logger.Error($"The packaging machine {SerialNumber} broke down during processing! Product not completed.");
-                        return false;
-                    }
-
-                    product.TestProduct(); 
-                    Logger.Info("The packaging machine is in the process of packaging the product!");
-                    Logger.Info($"Its quality is: {product.Quality}");
-                    return true;
-                case MachineStatus_t.Maintenance:
-                    base.Process(product);
-                    Logger.Warning($"The packaging machine is under maintenance and cannot process products"); 
-                    return false;
-                case MachineStatus_t.Broken:
-                    base.Process(product);
-                    Logger.Error($"The packaging machine is broken and cannot process products!");
-                    return false;
-                default: return false;
+                base.Process(product);
+                Logger.Warning($"PackagingMachine nu poate impacheta produsul!");
+                return false;
             }
+
+            bool baseResult = base.Process(product);
+
+            if (Status == MachineStatus_t.Broken)
+            {
+                Logger.Error($"The packaging machine {SerialNumber} broke down during processing! Product not completed.");
+                return false;
+            }
+
+            if (baseResult)
+            {
+                product.TestProduct();
+                Logger.Info("The packaging machine is in the process of packaging the product!");
+                Logger.Info($"Its quality is: {product.Quality}");
+                return true;
+            }
+            return false;
         }
     }
 
@@ -302,8 +297,8 @@ namespace ElectronicsFactory
     internal class PcbFabricationMachine : Machine
     {
         // Initializes a new PcbFabricationMachine
-        public PcbFabricationMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
-
+        public PcbFabricationMachine(string name, string serialNumber, MachineStatus_t status, ConditionStatus_t condition)
+                    : base(name, serialNumber, status, condition) { }
         public override bool Start()
         {
             if (base.Start())
@@ -318,34 +313,29 @@ namespace ElectronicsFactory
         /// Aborts mid-cycle if the machine breaks down due to condition degradation
         public override bool Process(Product product)
         {
-            switch (Status)
+            if (Status == MachineStatus_t.Offline)
             {
-                case MachineStatus_t.Stopped:
-                    base.Process(product);
-                    Logger.Warning($"PCB Fabrication Machine cannot solder PCBs for our product!");
-                    return false;
-                case MachineStatus_t.Running:
-                    base.Process(product);
-
-                    if (Status == MachineStatus_t.Broken)
-                    {
-                        Logger.Error($"The PCB machine {SerialNumber} broke down during processing! Product not completed.");
-                        return false;
-                    }
-
-                    product.TestProduct(); 
-                    Logger.Info("The PCB manufacturing machine is in the soldering process for our product!");
-                    Logger.Info($"Its quality is: {product.Quality}");
-                    return true;
-                case MachineStatus_t.Maintenance:
-                    base.Process(product);
-                    Logger.Warning($"The PCB machine with serial number {SerialNumber} is under maintenance and cannot process tasks!"); return false;
-                case MachineStatus_t.Broken:
-                    base.Process(product);
-                    Logger.Error($"The machine is broken and cannot process commands!");
-                    return false;
-                default: return false;
+                base.Process(product);
+                Logger.Warning($"PCB Fabrication Machine cannot solder PCBs for our product!");
+                return false;
             }
+
+            bool baseResult = base.Process(product);
+
+            if (Status == MachineStatus_t.Broken)
+            {
+                Logger.Error($"The PCB machine {SerialNumber} broke down during processing! Product not completed.");
+                return false;
+            }
+
+            if (baseResult)
+            {
+                product.TestProduct();
+                Logger.Info("The PCB manufacturing machine is in the soldering process for our product!");
+                Logger.Info($"Its quality is: {product.Quality}");
+                return true;
+            }
+            return false;
         }
     }
 
@@ -355,13 +345,13 @@ namespace ElectronicsFactory
     internal class AssemblyMachine : Machine
     {
         // Initializes a new AssemblyMachine
-        public AssemblyMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
-
+        public AssemblyMachine(string name, string serialNumber, MachineStatus_t status, ConditionStatus_t condition)
+                    : base(name, serialNumber, status, condition) { }
         public override bool Start()
         {
             if (base.Start())
             {
-                Logger.Info("Assembling the machine components"); 
+                Logger.Info("Assembling the machine components");
                 return true;
             }
             return false;
@@ -371,35 +361,29 @@ namespace ElectronicsFactory
         /// Aborts mid-cycle if the machine breaks down due to condition degradation
         public override bool Process(Product product)
         {
-            switch (Status)
+            if (Status == MachineStatus_t.Offline)
             {
-                case MachineStatus_t.Stopped:
-                    base.Process(product);
-                    Logger.Warning($"Assembly machine cannot assemble the product!");
-                    return false;
-                case MachineStatus_t.Running:
-                    base.Process(product);
-
-                    if (Status == MachineStatus_t.Broken)
-                    {
-                        Logger.Error($"The assembly machine {SerialNumber} broke down during processing! Product not completed.");
-                        return false;
-                    }
-
-                    product.TestProduct(); 
-                    Logger.Info("The machine is in assembly processing!");
-                    Logger.Info($"Its quality is: {product.Quality}");
-                    return true;
-                case MachineStatus_t.Maintenance:
-                    base.Process(product);
-                    Logger.Warning($"Assembly machine {SerialNumber} is under maintenance and cannot process products");
-                    return false;
-                case MachineStatus_t.Broken:
-                    base.Process(product);
-                    Logger.Error($"The machine is broken and cannot assemble products!");
-                    return false;
-                default: return false;
+                base.Process(product);
+                Logger.Warning($"Assembly machine cannot assemble the product!");
+                return false;
             }
+
+            bool baseResult = base.Process(product);
+
+            if (Status == MachineStatus_t.Broken)
+            {
+                Logger.Error($"The assembly machine {SerialNumber} broke down during processing! Product not completed.");
+                return false;
+            }
+
+            if (baseResult)
+            {
+                product.TestProduct();
+                Logger.Info("The machine is in assembly processing!");
+                Logger.Info($"Its quality is: {product.Quality}");
+                return true;
+            }
+            return false;
         }
     }
 
@@ -409,8 +393,8 @@ namespace ElectronicsFactory
     internal class TestingMachine : Machine
     {
         // Initializes a new TestingMachine
-        public TestingMachine(string serialNumber, int maxCapacity) : base(serialNumber, maxCapacity) { }
-
+        public TestingMachine(string name, string serialNumber, MachineStatus_t status, ConditionStatus_t condition)
+                    : base(name, serialNumber, status, condition) { }
         public override bool Start()
         {
             if (base.Start())
@@ -432,42 +416,36 @@ namespace ElectronicsFactory
             {
                 Logger.Warning($"Voltage fluctuations detected. The reported condition is {Condition}.");
             }
-            return (Condition == ConditionStatus_t.Bad || Condition == ConditionStatus_t.Critical);
+            return base.Inspect();
         }
 
         // Tests a product and re-evaluates its quality
         // Aborts mid-cycle if the machine breaks down due to condition degradation
         public override bool Process(Product product)
         {
-            switch (Status)
+            if (Status == MachineStatus_t.Offline)
             {
-                case MachineStatus_t.Stopped:
-                    base.Process(product);
-                    Logger.Warning($"Testing Machine cannot test the product!");
-                    return false;
-                case MachineStatus_t.Running:
-                    base.Process(product);
-
-                    if (Status == MachineStatus_t.Broken)
-                    {
-                        Logger.Error($"The testing machine {SerialNumber} broke down during processing! Product not completed.");
-                        return false;
-                    }
-
-                    product.TestProduct(); 
-                    Logger.Info("The machine is undergoing product testing!");
-                    Logger.Info($"Its quality is: {product.Quality}");
-                    return true;
-                case MachineStatus_t.Maintenance:
-                    base.Process(product);
-                    Logger.Warning($"Test machine {SerialNumber} is under maintenance and cannot process products"); 
-                    return false;
-                case MachineStatus_t.Broken:
-                    base.Process(product);
-                    Logger.Error($"The machine is broken and cannot test the product!");
-                    return false;
-                default: return false;
+                base.Process(product);
+                Logger.Warning($"Testing Machine cannot test the product!");
+                return false;
             }
+
+            bool baseResult = base.Process(product);
+
+            if (Status == MachineStatus_t.Broken)
+            {
+                Logger.Error($"The testing machine {SerialNumber} broke down during processing! Product not completed.");
+                return false;
+            }
+
+            if (baseResult)
+            {
+                product.TestProduct();
+                Logger.Info("The machine is undergoing product testing!");
+                Logger.Info($"Its quality is: {product.Quality}");
+                return true;
+            }
+            return false;
         }
     }
 }
