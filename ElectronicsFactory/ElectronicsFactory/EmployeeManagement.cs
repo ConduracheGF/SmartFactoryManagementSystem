@@ -66,7 +66,7 @@ namespace ElectronicsFactory
                 return _storage.IndexOf(employee);
             }
 
-            Logger.Warning($"Employee {idOrName} was not found.");
+            Logger.Warning($"Employee {Id_or_Name} was not found.");
             return -1;
         }
     }
