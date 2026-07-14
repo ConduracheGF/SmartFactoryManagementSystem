@@ -11,7 +11,10 @@ namespace ElectronicsFactory
         {
             Console.Title = "Smart Factory Management System";
 
-            FileStorageService storageService = new FileStorageService();
+            const string OperationsFile = "operations.txt";
+
+
+        FileStorageService storageService = new FileStorageService();
             DataPersistenceService persistenceService = new DataPersistenceService(storageService);
 
             // Create the factory with capacities for employees, machines, products, and a starting budget

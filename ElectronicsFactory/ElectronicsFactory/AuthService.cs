@@ -7,7 +7,6 @@ namespace ElectronicsFactory
     {
         private readonly EmployeeManagement _employeeManager;
         private readonly FileStorageService _fileStorage;
-        private const string OperationsFile = "operations.txt";
 
         public Employee? CurrentUser { get; private set; }
 
@@ -28,12 +27,12 @@ namespace ElectronicsFactory
             if (user != null)
             {
                 CurrentUser = user;
-                _fileStorage.Append(OperationsFile, $"{timestamp} | {username} | Successful login");
+                _fileStorage.Append("operations.txt", $"{timestamp} | {username} | Successful login");
                 Logger.Info($"Autentificare reusita! Bun venit, {user.Name} ({user.JobStatus}).");
                 return true;
             }
 
-            _fileStorage.Append(OperationsFile, $"{timestamp} | {username} | Failed login attempt");
+            _fileStorage.Append("operations.txt", $"{timestamp} | {username} | Failed login attempt");
             Logger.Error("Credentiale invalide! Incercare esuata de logare.");
             return false;
         }
@@ -43,7 +42,7 @@ namespace ElectronicsFactory
             if (CurrentUser != null)
             {
                 string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                _fileStorage.Append(OperationsFile, $"{timestamp} | {CurrentUser.Username} | Logged out");
+                _fileStorage.Append("operations.txt", $"{timestamp} | {CurrentUser.Username} | Logged out");
                 Logger.Info($"La revedere, {CurrentUser.Name}!");
                 CurrentUser = null;
             }

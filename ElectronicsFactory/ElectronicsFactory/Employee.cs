@@ -59,7 +59,7 @@ namespace ElectronicsFactory
         public double Salary { get; set; }
 
         // Initializes a new employee with an auto-generated unique ID
-        public Employee(string name, DepartmentStatus_t department, JobStatus_t job, double salary, string username = "", string password = "")
+        public Employee(string name, DepartmentStatus_t department, JobStatus_t job, double salary, string username, string password)
         {
             Id = (nextId++).ToString();
             Name = name;
@@ -67,8 +67,8 @@ namespace ElectronicsFactory
             JobStatus = job;
             Salary = salary;
 
-            Username = string.IsNullOrEmpty(username) ? name.Replace(" ", "").ToLower() : username;
-            Password = string.IsNullOrEmpty(password) ? "1234" : password;
+            Username = username;
+            Password = password;
         }
 
         // Displays this employee's basic information 
@@ -91,7 +91,7 @@ namespace ElectronicsFactory
     internal class Director : Employee
     {
         // Initializes a new Director
-        public Director(string name, double salary): base(name, DepartmentStatus_t.Management, JobStatus_t.Director, salary) { }
+        public Director(string name, double salary, string username, string password): base(name, DepartmentStatus_t.Management, JobStatus_t.Director, salary, username, password) { }
 
         // Prints a factory-wide overview report: employee count, machine count, stock levels, and current income
         public void ReviewProductionStatistics(int totalEmployees, int totalMachines, int totalStock, float income)
@@ -116,8 +116,8 @@ namespace ElectronicsFactory
     internal class ProductionManager : Employee
     {
         // Initializes a new ProductionManager
-        public ProductionManager(string name, double salary)
-            : base(name, DepartmentStatus_t.Production, JobStatus_t.ProductionManager, salary) { }
+        public ProductionManager(string name, double salary, string username, string password)
+            : base(name, DepartmentStatus_t.Production, JobStatus_t.ProductionManager, salary, username, password) { }
 
         // Creates and approves a production order for a given quantity of a product
         public bool CreateProductionOrder(ref ProductManagement productManagement, Product product, int quantity)
@@ -159,8 +159,8 @@ namespace ElectronicsFactory
     internal class Engineer : Employee
     {
         // Initializes a new Engineer
-        public Engineer(string name, double salary)
-            : base(name, DepartmentStatus_t.Technical, JobStatus_t.Engineer, salary) { }
+        public Engineer(string name, double salary, string username, string password)
+            : base(name, DepartmentStatus_t.Technical, JobStatus_t.Engineer, salary, username, password) { }
 
         // Inspects a machine and reports whether it requires repair
         public bool InspectMachine(Machine machine)
@@ -193,8 +193,8 @@ namespace ElectronicsFactory
     internal class Technician : Employee
     {
         // Initializes a new Technician
-        public Technician(string name, double salary)
-            : base(name, DepartmentStatus_t.Technical, JobStatus_t.Technician, salary) { }
+        public Technician(string name, double salary, string username, string password)
+            : base(name, DepartmentStatus_t.Technical, JobStatus_t.Technician, salary, username, password) { }
 
         // Attempts to repair the given machine. Refuses if the machine is currently running; otherwise puts it into Maintenance and repairs it
         public void RepairMachine(Machine machine, ref float income)
@@ -228,8 +228,8 @@ namespace ElectronicsFactory
     internal class SalesAgent : Employee
     {
         // Initializes a new SalesAgent
-        public SalesAgent(string name, double salary)
-            : base(name, DepartmentStatus_t.Sales, JobStatus_t.SalesAgent, salary) { }
+        public SalesAgent(string name, double salary, string username, string password)
+            : base(name, DepartmentStatus_t.Sales, JobStatus_t.SalesAgent, salary, username, password) { }
 
         // Sells a product from inventory and updates factory income
         public float SellElectronics(ref ProductManagement productManagement, Product product, float income)
@@ -251,8 +251,8 @@ namespace ElectronicsFactory
     internal class Accountant : Employee
     {
         // Initializes a new Accountant
-        public Accountant(string name, double salary)
-            : base(name, DepartmentStatus_t.Finance, JobStatus_t.Acountant, salary) { }
+        public Accountant(string name, double salary, string username, string password)
+            : base(name, DepartmentStatus_t.Finance, JobStatus_t.Acountant, salary, username, password) { }
 
 
         // Calculates and prints a full financial report: total income, profit from stocked products, and costs of installed machine components
@@ -315,8 +315,8 @@ namespace ElectronicsFactory
     internal class MachineOperator : Employee
     {
         // Initializes a new MachineOperator
-        public MachineOperator(string name, double salary)
-            : base(name, DepartmentStatus_t.Production, JobStatus_t.MachineOperator, salary) { }
+        public MachineOperator(string name, double salary, string username, string password)
+            : base(name, DepartmentStatus_t.Production, JobStatus_t.MachineOperator, salary, username, password) { }
 
         // Attempts to start the given machine
         public bool StartMachine(Machine machine)
