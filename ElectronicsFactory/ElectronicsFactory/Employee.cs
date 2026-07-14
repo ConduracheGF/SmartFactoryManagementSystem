@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 
@@ -45,6 +46,8 @@ namespace ElectronicsFactory
 
         // Full name of the employee
         public string Name { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
 
         // Organizational department this employee belongs to
         public DepartmentStatus_t Department { get; set; }
@@ -56,13 +59,16 @@ namespace ElectronicsFactory
         public double Salary { get; set; }
 
         // Initializes a new employee with an auto-generated unique ID
-        public Employee(string name, DepartmentStatus_t department, JobStatus_t job, double salary)
+        public Employee(string name, DepartmentStatus_t department, JobStatus_t job, double salary, string username = "", string password = "")
         {
             Id = (nextId++).ToString();
             Name = name;
             Department = department;
             JobStatus = job;
             Salary = salary;
+
+            Username = string.IsNullOrEmpty(username) ? name.Replace(" ", "").ToLower() : username;
+            Password = string.IsNullOrEmpty(password) ? "1234" : password;
         }
 
         // Displays this employee's basic information 
@@ -75,7 +81,7 @@ namespace ElectronicsFactory
         // Converts the employee's data into a standardized CSV string for file persistence.
         public virtual string ToFileRow()
         {
-            return $"{GetType().Name};{Id};{Name};{Salary};{Department};{JobStatus}";
+            return $"{GetType().Name};{Id};{Name};{Username};{Password};{Salary};{Department};{JobStatus}";
         }
     }
 
