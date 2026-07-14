@@ -1,0 +1,6 @@
+Director;EMP001;Vasile;admin;admin123;10000;Management;Director
+Accountant;EMP002;Maria;maria.contabil;parola123;5500;Finance;Acountant
+Engineer;EMP003;Andrei;andrei.inginer;parola123;6000;Technical;Engineer
+Technician;EMP004;Mihai;mihai.tehnic;parola123;4500;Technical;Technician
+SalesAgent;EMP005;Elena;elena.vanzari;parola123;4000;Sales;SalesAgent
+ProductionManager;EMP006;Stefan;stefan.manager;parola123;5000;Production;ProductionManager

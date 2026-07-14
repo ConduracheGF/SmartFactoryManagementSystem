@@ -1,0 +1,4 @@
+1;iPhone 15;4500;1.2;A;Phones;2023;A16
+2;iPad Air;3500;1.8;B;Tablets;2023;M1
+3;Asus ROG;7500;3.5;A;Computers;3;i9
+4;Sony XM5;1500;0.8;A;Headphones;2023;40

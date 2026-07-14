@@ -1,0 +1,2 @@
+AssemblyMachine;1;Smart Assembler;M001;Running;Good;0.1;10;5;5
+TestingMachine;2;QC Tester;M002;Running;Good;0.0;2;1;1

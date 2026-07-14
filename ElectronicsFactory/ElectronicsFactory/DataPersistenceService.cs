@@ -87,9 +87,12 @@ namespace ElectronicsFactory
                 string jobName = tokens[0];
                 string id = tokens[1];
                 string name = tokens[2];
-                double salary = double.Parse(tokens[3]);
-                string username = tokens[6];
-                string password = tokens[7];
+
+                // Potrivirea corectă a indecșilor conform ToFileRow():
+                string username = tokens[3];
+                string password = tokens[4];
+                double salary = double.Parse(tokens[5]);
+                // note: tokens[6] este Department, iar tokens[7] este JobStatus (sunt gestionate deja de constructorul fiecărei clase)
 
                 Employee? employee = jobName switch
                 {
@@ -105,9 +108,19 @@ namespace ElectronicsFactory
 
                 if (employee != null)
                 {
+                    // Alocăm username-ul și parola corecte citite din fișier
                     employee.Username = username;
                     employee.Password = password;
-                    employee.GetType().GetProperty("Id")?.SetValue(employee, id);
+
+                    var idProperty = employee.GetType().GetProperty("Id");
+                    if (idProperty != null)
+                    {
+                        idProperty.DeclaringType?
+                                  .GetProperty("Id")?
+                                  .GetSetMethod(nonPublic: true)?
+                                  .Invoke(employee, new object[] { id });
+                    }
+
                     employeeManager.HiredEmployee(employee);
                 }
             }
@@ -161,7 +174,6 @@ namespace ElectronicsFactory
                     machine.TotalCyclesAttempted = total;
                     machine.Status = status;
 
-                    machine.GetType().GetProperty("Id")?.SetValue(machine, id);
                     machineManager.AddMachine(machine);
                 }
             }

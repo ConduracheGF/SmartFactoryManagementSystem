@@ -7,12 +7,15 @@
     internal class MenuManagement
     {
         private Factory _factory;
+        private AuthService _authService; 
 
-        // Initializes the menu with a reference to the factory it manages
-        public MenuManagement(Factory factory)
+    
+        public MenuManagement(Factory factory, AuthService authService)
         {
             _factory = factory;
+            _authService = authService;
         }
+       
 
         // Displays the main menu loop, routing user choices to the appropriate submenu until the user chooses to exit
         public void DisplayMenu()
@@ -22,13 +25,23 @@
             {
                 Logger.Clear();
                 Logger.Info("SMART FACTORY MANAGEMENT SYSTEM");
+
+                if (_authService.CurrentUser != null)
+                {
+                    Logger.Info($"Logged in as: {_authService.CurrentUser.Name} | Role: {_authService.CurrentUser.GetType().Name}");
+                }
+
                 Logger.Info($"Current Factory Budget: {_factory.Income} RON");
                 Logger.Info("1. Employee Management");
                 Logger.Info("2. Machine Management");
                 Logger.Info("3. Product Management");
                 Logger.Info("4. Production");
                 Logger.Info("5. Sales & Reports");
-                Logger.Info("6. Factory Overview");
+
+                if(_authService.IsDirector)
+                {
+                    Logger.Info("6. Factory Overview");
+                }
                 Logger.Info("0. Exit");
                 Logger.Info("\nSelect an option: ");
 
@@ -40,8 +53,21 @@
                     case "3": SubMenuProducts(); break;
                     case "4": SubMenuProductionWorkflow(); break;
                     case "5": SubMenuReports(); break;
-                    case "6": SubMenuFactoryOverview(); break;
-                    case "0": running = false; break;
+                    case "6": 
+                        if (_authService.IsDirector)
+                        {
+                            SubMenuFactoryOverview();
+                        }
+                        else
+                        {
+                            Logger.Error("Access Denied! Only the Director can view the factory overview.");
+                            Console.ReadKey();
+                        }
+                        break;
+                    case "0":
+                        _authService.Logout();
+                        running = false;
+                        break;
                     default:
                         Logger.Info("Invalid choice! Press Enter to retry...");
                         Console.ReadKey();
@@ -72,6 +98,13 @@
 
             if (sub == "1")
             {
+
+                if (!_authService.IsDirector)
+                {
+                    Logger.Error("Access Denied! Only Director can hire staff.");
+                    WaitForEnter();
+                    return;
+                }
                 // Hire a new employee of the chosen type. ID is auto-generated internally
                 Logger.Info("Name: "); string? name = Console.ReadLine()!;
                 Logger.Info("Salary: "); double salary = double.Parse(Console.ReadLine()!);
@@ -98,6 +131,13 @@
             }
             else if (sub == "2")
             {
+
+                if (!_authService.IsDirector)
+                {
+                    Logger.Error("Access Denied! Only Director can fire staff.");
+                    WaitForEnter();
+                    return;
+                }
                 // Fire an employee by ID
                 Logger.Info("Enter Unique ID: "); string? id = Console.ReadLine()!;
 
@@ -137,10 +177,17 @@
 
             Product? target = null;
             // Products cannot have a negative production cost or selling price
-            if (prodType == "1") target = new Phones(currency: 1200, consumption: 2.5f, quality: "A", ProductType_t.Phones, yearOfProduction: 2026, processor: "M3");
-            if (prodType == "2") target = new Headphones(currency: 300, consumption: 1.2f, quality: "B", ProductType_t.Headphones, yearOfProduction: 2024, power: 50);
-            if (prodType == "3") target = new Computers(currency: 500, consumption: 3.0f, quality: "C", ProductType_t.Computers, processor: "i5", weight: 10);
-            if (prodType == "4") target = new Tablets(currency: 300, consumption: 1.7f, quality: "B", ProductType_t.Tablets, yearOfProduction: 2023, processor: "snapdragon");
+            if (prodType == "1")
+                target = new Phones("PhoneTemplate", 1200f, 2.5f, "A", ProductType_t.Phones, 2026, "M3");
+
+            if (prodType == "2")
+                target = new Headphones("HeadphonesTemplate", 300f, 1.2f, "B", ProductType_t.Headphones, 2024, 50);
+
+            if (prodType == "3")
+                target = new Computers("ComputerTemplate", 500f, 3.0f, "C", ProductType_t.Computers, "i5", 10);
+
+            if (prodType == "4")
+                target = new Tablets("TabletTemplate", 300f, 1.7f, "B", ProductType_t.Tablets, 2023, "snapdragon");
 
             if (target != null)
             {
@@ -165,11 +212,24 @@
 
             if (sub == "1")
             {
+                if (!_authService.IsEngineer)
+                {
+                    Logger.Error("Access Denied! Only Engineers can inspect machines.");
+                    WaitForEnter();
+                    return;
+                }
                 Logger.Info("Enter Engineer ID: "); string? engId = Console.ReadLine()!;
                 _factory.InspectMachineWithEngineer(engId, serial);
             }
             else if (sub == "2")
             {
+
+                if (!_authService.IsTechnician)
+                {
+                    Logger.Error("Access Denied! Only Technicians can repair machines.");
+                    WaitForEnter();
+                    return;
+                }
                 Logger.Info("Enter Technician ID: "); string? techId = Console.ReadLine()!;
                 _factory.RepairMachineWithTechnician(techId, serial);
             }
@@ -204,7 +264,7 @@
                 if (prod != null)
                 {
                     empty = false;
-                    Logger.Info($"Product ID: {prod.Id} | Type: {prod.ProductType} | Cost: {prod.Currency} RON | Quality: {prod.Quality}");
+                    Logger.Info($"Product ID: {prod.Id} | Type: {prod.ProductType} | Cost: {prod.Price}| Quality: {prod.Quality}");
 
                     // Invoke the type-specific description for each concrete product subtype
                     if (prod is Phones phone) phone.DisplayFunctionality();
@@ -234,6 +294,13 @@
 
             if (sub == "1")
             {
+
+                if (!_authService.IsSalesAgent)
+                {
+                    Logger.Error("Access Denied! Only Sales Agents can sell products.");
+                    WaitForEnter();
+                    return;
+                }
                 Logger.Info("Enter Sales Agent ID: "); string agentId = Console.ReadLine() ?? "";
                 Logger.Info("Enter Product ID to sell: "); int prodId = int.Parse(Console.ReadLine() ?? "0");
 
@@ -248,6 +315,12 @@
             }
             else if (sub == "2")
             {
+                if (!_authService.IsAccountant)
+                {
+                    Logger.Error("Access Denied! Only Accountants can generate reports.");
+                    WaitForEnter();
+                    return;
+                }
                 Logger.Info("Enter Accountant ID: "); string accId = Console.ReadLine() ?? "";
 
                 int index = _factory.EmployeeManager.SearchEmployee(accId);

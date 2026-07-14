@@ -47,6 +47,8 @@ namespace ElectronicsFactory
         // Current quality grade of the product (A-E)
         public string? Quality { get { return _quality; } set { _quality = value; } }
 
+ 
+
         // The product category (Phones, Tablets, Computers, Headphones)
         public ProductType_t ProductType { get; set; }
 

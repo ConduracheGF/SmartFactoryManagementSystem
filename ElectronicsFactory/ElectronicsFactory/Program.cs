@@ -11,31 +11,53 @@ namespace ElectronicsFactory
         {
             Console.Title = "Smart Factory Management System";
 
+            FileStorageService storageService = new FileStorageService();
+            DataPersistenceService persistenceService = new DataPersistenceService(storageService);
+
             // Create the factory with capacities for employees, machines, products, and a starting budget
             Factory electronicsFactory = new Factory(20, 10, 100, 50000f);
 
-            // Seed the factory with an initial staff
-            electronicsFactory.EmployeeManager.HiredEmployee(new Director("Ion Creanga", 9000));
-            electronicsFactory.EmployeeManager.HiredEmployee(new ProductionManager("Andrei Vasilescu", 6500));
-            electronicsFactory.EmployeeManager.HiredEmployee(new MachineOperator("Mihai Ion", 3500));
-            electronicsFactory.EmployeeManager.HiredEmployee(new Engineer("Elena Popa", 5500));
-            electronicsFactory.EmployeeManager.HiredEmployee(new Technician("Dorel Stefan", 4500));
-            electronicsFactory.EmployeeManager.HiredEmployee(new SalesAgent("Andreea Marin", 4000));
-            electronicsFactory.EmployeeManager.HiredEmployee(new Accountant("Radu Georgescu", 5000));
+            persistenceService.LoadEmployees("employees.txt", electronicsFactory.EmployeeManager);
+            persistenceService.LoadMachines("machines.txt", electronicsFactory.MachineManager);
+            persistenceService.LoadProducts("products.txt", electronicsFactory.ProductManager);
 
-            // Seed the factory with an initial set of machines across all machine types
-            electronicsFactory.MachineManager.AddMachine(new TestingMachine("X100", 2));
-            electronicsFactory.MachineManager.AddMachine(new PackagingMachine("Z90", 3));
-            electronicsFactory.MachineManager.AddMachine(new PcbFabricationMachine("UY78", 1));
-            electronicsFactory.MachineManager.AddMachine(new AssemblyMachine("ER243", 3));
-            electronicsFactory.MachineManager.AddMachine(new PackagingMachine("PCKM21", 6));
+            AuthService authService = new AuthService(electronicsFactory.EmployeeManager, storageService);
 
-            Logger.Info("The fabric was initialised.");
-            Console.WriteLine("Press any key to show the menu");
+            Logger.Info("The factory was initialised and data has been loaded from files.");
+            Console.WriteLine("Press any key to proceed to the login screen...");
             Console.ReadKey();
-  
-            MenuManagement menu = new MenuManagement(electronicsFactory);
+
+    
+            bool isAuthenticated = false;
+            while (!isAuthenticated)
+            {
+                Console.Clear();
+                Logger.Info("SMART FACTORY SYSTEM - LOGIN");
+
+                Console.Write("Username: ");
+                string username = Console.ReadLine() ?? "";
+
+                Console.Write("Password: ");
+                string password = Console.ReadLine() ?? "";
+
+                
+                isAuthenticated = authService.Login(username, password);
+
+                if (!isAuthenticated)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n[Eroare] Informatii incorecte! Incearca din nou.");
+                    Console.ResetColor();
+                    Console.WriteLine("Apasa Enter pentru a reincerca...");
+                    Console.ReadLine();
+                }
+            }
+
+   
+            MenuManagement menu = new MenuManagement(electronicsFactory, authService);
             menu.DisplayMenu();
+
         }
     }
 }
+   

@@ -26,8 +26,8 @@ namespace ElectronicsFactory
         // Initializes a new Factory with the given capacities and starting income
         public Factory(int maxEmployees, int maxMachines, int maxProducts, float initialIncome)
         {
-            EmployeeManager = new EmployeeManagement(maxEmployees);
-            MachineManager = new MachineManagement(maxMachines);
+            EmployeeManager = new EmployeeManagement();
+            MachineManager = new MachineManagement();
             ProductManager = new ProductManagement();
             Income = initialIncome;
         }
@@ -196,7 +196,7 @@ namespace ElectronicsFactory
                 return;
             }
 
-            director.ReviewProductionStatistics(EmployeeManager.EmployeesCount, MachineManager.MachineCount, ProductManager.ProductsCount, Income);
+            director.ReviewProductionStatistics(EmployeeManager.EmployeeCount, MachineManager.MachineCount, ProductManager.ProductCount, Income);
         }
     }
 }
