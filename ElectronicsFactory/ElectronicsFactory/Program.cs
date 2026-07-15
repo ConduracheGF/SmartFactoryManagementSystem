@@ -2,35 +2,37 @@
 
 namespace ElectronicsFactory
 {
-    /// <summary>
-    /// Application entry point. Bootstraps the factory with an initial set of employees and machines, then hands control over to the console menu
-    /// </summary>
     internal class Program
     {
         static void Main(string[] args)
         {
             Console.Title = "Smart Factory Management System";
 
+            
+            const string EmployeesFile = "employees.txt";
+            const string MachinesFile = "machines.txt";
+            const string ProductsFile = "products.txt";
+            const string OrdersFile = "orders.txt";
             const string OperationsFile = "operations.txt";
 
-
-        FileStorageService storageService = new FileStorageService();
+            FileStorageService storageService = new FileStorageService();
             DataPersistenceService persistenceService = new DataPersistenceService(storageService);
 
-            // Create the factory with capacities for employees, machines, products, and a starting budget
+           
             Factory electronicsFactory = new Factory(20, 10, 100, 50000f);
 
-            persistenceService.LoadEmployees("employees.txt", electronicsFactory.EmployeeManager);
-            persistenceService.LoadMachines("machines.txt", electronicsFactory.MachineManager);
-            persistenceService.LoadProducts("products.txt", electronicsFactory.ProductManager);
+            persistenceService.LoadProducts(ProductsFile, electronicsFactory.ProductManager);
+            persistenceService.LoadEmployees(EmployeesFile, electronicsFactory.EmployeeManager);
+            persistenceService.LoadMachines(MachinesFile, electronicsFactory.MachineManager);
+            persistenceService.LoadOrders(OrdersFile, electronicsFactory.OrderManager, electronicsFactory.ProductManager);
 
-            AuthService authService = new AuthService(electronicsFactory.EmployeeManager, storageService);
+            
+            AuthService authService = new AuthService(electronicsFactory.EmployeeManager, storageService, OperationsFile);
 
             Logger.Info("The factory was initialised and data has been loaded from files.");
             Console.WriteLine("Press any key to proceed to the login screen...");
             Console.ReadKey();
 
-    
             bool isAuthenticated = false;
             while (!isAuthenticated)
             {
@@ -43,7 +45,6 @@ namespace ElectronicsFactory
                 Console.Write("Password: ");
                 string password = Console.ReadLine() ?? "";
 
-                
                 isAuthenticated = authService.Login(username, password);
 
                 if (!isAuthenticated)
@@ -56,11 +57,8 @@ namespace ElectronicsFactory
                 }
             }
 
-   
             MenuManagement menu = new MenuManagement(electronicsFactory, authService);
             menu.DisplayMenu();
-
         }
     }
 }
-   

@@ -20,6 +20,10 @@ namespace ElectronicsFactory
         // Manages the factory's product inventory
         public ProductManagement ProductManager { get; private set; }
 
+        public OrderPriorityService OrderManager { get; private set; } = new OrderPriorityService();
+
+        public UndoService UndoManager { get; private set; } = new UndoService();
+
         // Current factory income/budget, in RON
         public float Income { get; set; }
 
@@ -30,6 +34,7 @@ namespace ElectronicsFactory
             MachineManager = new MachineManagement();
             ProductManager = new ProductManagement();
             Income = initialIncome;
+            UndoManager = new UndoService();
         }
 
         /// Validates the manager/operator/machine

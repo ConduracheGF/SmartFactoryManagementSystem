@@ -211,7 +211,7 @@ namespace ElectronicsFactory
         public void LoadOrders(string filename, OrderPriorityService orderManager, ProductManagement productManager)
         {
             var rows = _storageService.Read(filename);
-            orderManager.ClearAllOrders(); // Curățăm coada curentă din memorie
+            orderManager.ClearAllOrders(); 
 
             foreach (var row in rows)
             {

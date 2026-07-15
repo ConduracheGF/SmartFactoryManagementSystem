@@ -7,13 +7,16 @@ namespace ElectronicsFactory
     {
         private readonly EmployeeManagement _employeeManager;
         private readonly FileStorageService _fileStorage;
+        private readonly string _operationsFilename; 
 
         public Employee? CurrentUser { get; private set; }
 
-        public AuthService(EmployeeManagement employeeManager, FileStorageService fileStorage)
+       
+        public AuthService(EmployeeManagement employeeManager, FileStorageService fileStorage, string operationsFilename)
         {
             _employeeManager = employeeManager;
             _fileStorage = fileStorage;
+            _operationsFilename = operationsFilename; 
             CurrentUser = null;
         }
 
@@ -27,12 +30,12 @@ namespace ElectronicsFactory
             if (user != null)
             {
                 CurrentUser = user;
-                _fileStorage.Append("operations.txt", $"{timestamp} | {username} | Successful login");
+                _fileStorage.Append(_operationsFilename, $"{timestamp} | {username} | Successful login"); 
                 Logger.Info($"Autentificare reusita! Bun venit, {user.Name} ({user.JobStatus}).");
                 return true;
             }
 
-            _fileStorage.Append("operations.txt", $"{timestamp} | {username} | Failed login attempt");
+            _fileStorage.Append(_operationsFilename, $"{timestamp} | {username} | Failed login attempt"); 
             Logger.Error("Credentiale invalide! Incercare esuata de logare.");
             return false;
         }
@@ -42,7 +45,7 @@ namespace ElectronicsFactory
             if (CurrentUser != null)
             {
                 string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                _fileStorage.Append("operations.txt", $"{timestamp} | {CurrentUser.Username} | Logged out");
+                _fileStorage.Append(_operationsFilename, $"{timestamp} | {CurrentUser.Username} | Logged out"); 
                 Logger.Info($"La revedere, {CurrentUser.Name}!");
                 CurrentUser = null;
             }

@@ -93,6 +93,11 @@ namespace ElectronicsFactory
         // Initializes a new Director
         public Director(string name, double salary, string username, string password): base(name, DepartmentStatus_t.Management, JobStatus_t.Director, salary, username, password) { }
 
+        public Director(string name, double salary)
+    : base(name, DepartmentStatus_t.Management, JobStatus_t.Director, salary,
+           name.ToLower().Replace(" ", "") + ".director", "parola123")
+        { }
+
         // Prints a factory-wide overview report: employee count, machine count, stock levels, and current income
         public void ReviewProductionStatistics(int totalEmployees, int totalMachines, int totalStock, float income)
         {
@@ -118,6 +123,11 @@ namespace ElectronicsFactory
         // Initializes a new ProductionManager
         public ProductionManager(string name, double salary, string username, string password)
             : base(name, DepartmentStatus_t.Production, JobStatus_t.ProductionManager, salary, username, password) { }
+
+        public ProductionManager(string name, double salary)
+    : base(name, DepartmentStatus_t.Production, JobStatus_t.ProductionManager, salary,
+           name.ToLower().Replace(" ", "") + ".manager", "parola123")
+        { }
 
         // Creates and approves a production order for a given quantity of a product
         public bool CreateProductionOrder(ref ProductManagement productManagement, Product product, int quantity)
@@ -162,6 +172,11 @@ namespace ElectronicsFactory
         public Engineer(string name, double salary, string username, string password)
             : base(name, DepartmentStatus_t.Technical, JobStatus_t.Engineer, salary, username, password) { }
 
+        public Engineer(string name, double salary)
+        : base(name, DepartmentStatus_t.Technical, JobStatus_t.Engineer, salary,
+               name.ToLower().Replace(" ", "") + ".inginer", "parola123")
+        { }
+
         // Inspects a machine and reports whether it requires repair
         public bool InspectMachine(Machine machine)
         {
@@ -195,6 +210,11 @@ namespace ElectronicsFactory
         // Initializes a new Technician
         public Technician(string name, double salary, string username, string password)
             : base(name, DepartmentStatus_t.Technical, JobStatus_t.Technician, salary, username, password) { }
+
+        public Technician(string name, double salary)
+    : base(name, DepartmentStatus_t.Technical, JobStatus_t.Technician, salary,
+           name.ToLower().Replace(" ", "") + ".tehnic", "parola123")
+        { }
 
         // Attempts to repair the given machine. Refuses if the machine is currently running; otherwise puts it into Maintenance and repairs it
         public void RepairMachine(Machine machine, ref float income)
@@ -231,6 +251,11 @@ namespace ElectronicsFactory
         public SalesAgent(string name, double salary, string username, string password)
             : base(name, DepartmentStatus_t.Sales, JobStatus_t.SalesAgent, salary, username, password) { }
 
+        public SalesAgent(string name, double salary)
+    : base(name, DepartmentStatus_t.Sales, JobStatus_t.SalesAgent, salary,
+           name.ToLower().Replace(" ", "") + ".vanzari", "parola123")
+        { }
+
         // Sells a product from inventory and updates factory income
         public float SellElectronics(ref ProductManagement productManagement, Product product, float income)
         {
@@ -253,6 +278,11 @@ namespace ElectronicsFactory
         // Initializes a new Accountant
         public Accountant(string name, double salary, string username, string password)
             : base(name, DepartmentStatus_t.Finance, JobStatus_t.Acountant, salary, username, password) { }
+
+        public Accountant(string name, double salary)
+    : base(name, DepartmentStatus_t.Finance, JobStatus_t.Acountant, salary,
+           name.ToLower().Replace(" ", "") + ".contabil", "parola123")
+        { }
 
 
         // Calculates and prints a full financial report: total income, profit from stocked products, and costs of installed machine components
@@ -317,6 +347,11 @@ namespace ElectronicsFactory
         // Initializes a new MachineOperator
         public MachineOperator(string name, double salary, string username, string password)
             : base(name, DepartmentStatus_t.Production, JobStatus_t.MachineOperator, salary, username, password) { }
+
+        public MachineOperator(string name, double salary)
+    : base(name, DepartmentStatus_t.Production, JobStatus_t.MachineOperator, salary,
+           name.ToLower().Replace(" ", "") + ".operator", "parola123")
+        { }
 
         // Attempts to start the given machine
         public bool StartMachine(Machine machine)
