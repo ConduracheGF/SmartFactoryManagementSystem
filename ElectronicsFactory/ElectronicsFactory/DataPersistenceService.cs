@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection.Metadata;
 using System.Text;
 
@@ -190,6 +191,52 @@ namespace ElectronicsFactory
                 if (machine != null)
                     machineManager.AddMachine(machine);
             }
+        }
+
+        // ORDERS PERSISTENCE
+        public void SaveOrders(string filename, OrderPriorityService orderManager)
+        {
+            var rows = new List<string>();
+
+            foreach(var order in orderManager.GetAllOrders())
+            {
+                string row = $"{order.Product.Id};{order.Quantity};{order.Priority};{order.Requester}";
+                rows.Add(row);
+            }
+
+            _storageService.Write(filename, rows);
+            Logger.Info("Production orders successfully saved.");
+        }
+
+        public void LoadOrders(string filename, OrderPriorityService orderManager, ProductManagement productManager)
+        {
+            var rows = _storageService.Read(filename);
+            orderManager.ClearAllOrders(); // Curățăm coada curentă din memorie
+
+            foreach (var row in rows)
+            {
+                if (string.IsNullOrWhiteSpace(row)) continue;
+
+                string[] tokens = row.Split(';');
+                if (tokens.Length < 4) continue;
+
+                int productId = int.Parse(tokens[0]);
+                int quantity = int.Parse(tokens[1]);
+                PriorityLevel_t priority = Enum.Parse<PriorityLevel_t>(tokens[2]);
+                string requester = tokens[3];
+
+                Product? product = productManager.Storage.FirstOrDefault(p => p.Id == productId);
+
+                if (product != null)
+                {
+                    orderManager.AddOrder(product, quantity, priority, requester);
+                }
+                else
+                {
+                    Logger.Warning($"Could not load order for Product ID {productId} because the product does not exist in the database.");
+                }
+            }
+            Logger.Info("Production orders successfully loaded.");
         }
     }
 }
