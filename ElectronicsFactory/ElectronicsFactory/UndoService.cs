@@ -42,6 +42,8 @@ namespace ElectronicsFactory
             _order = order;
         }
 
+
+
         public void Undo()
         {
             _orderManager.RemoveOrder(_order);

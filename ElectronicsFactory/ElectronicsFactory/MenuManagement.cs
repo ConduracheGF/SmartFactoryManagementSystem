@@ -160,6 +160,10 @@
                     var persistence = new DataPersistenceService(new FileStorageService());
                     persistence.SaveEmployees("employees.txt", _factory.EmployeeManager);
 
+                    string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    string operatorName = _authService.CurrentUser?.Username ?? "System";
+                    new FileStorageService().Append("operations.txt", $"{timestamp} | {operatorName} | Employee added: {newEmp.Name} (ID: {newEmp.Id})"); 
+
                     Logger.Info($"Employee {newEmp.Name} hired successfully and saved to file.");
                     WaitForEnter();
                 }
@@ -176,7 +180,12 @@
                 // Fire an employee by ID
                 Logger.Info("Enter Unique ID: "); string? id = Console.ReadLine()!;
 
-                if (id != null) _factory.EmployeeManager.FiredEmployee(id);
+                if (id != null)
+                    _factory.EmployeeManager.FiredEmployee(id);
+
+                string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                string operatorName = _authService.CurrentUser?.Username ?? "System";
+                new FileStorageService().Append("operations.txt", $"{timestamp} | {operatorName} | Employee removed with ID: {id}");
             }
             else if (sub == "3")
             {

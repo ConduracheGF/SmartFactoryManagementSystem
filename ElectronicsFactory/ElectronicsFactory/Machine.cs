@@ -123,7 +123,13 @@ namespace ElectronicsFactory
                 return false;
             }
 
+
+
             Status = MachineStatus_t.Offline;
+
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            new FileStorageService().Append("operations.txt", $"{timestamp} | System | Machine {SerialNumber} ({Name}) stopped");
+
             Logger.Info($"The machine with serial number: {SerialNumber} has been stopped.");
             return true;
         }
@@ -145,8 +151,14 @@ namespace ElectronicsFactory
                 return false;
             }
 
+         
+
             Logger.Info($"The machine with serial number {SerialNumber} started successfully!");
             Status = MachineStatus_t.Running;
+
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            new FileStorageService().Append("operations.txt", $"{timestamp} | System | Machine {SerialNumber} ({Name}) started");
+
             return true;
         }
 

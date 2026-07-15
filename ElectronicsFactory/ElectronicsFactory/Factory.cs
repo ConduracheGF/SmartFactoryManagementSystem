@@ -120,6 +120,10 @@ namespace ElectronicsFactory
             {
                 Logger.Warning($"Production cycle finished incomplete. Only {producedCount}/{quantity} units were produced before machine failure.");
             }
+
+            // La finalul logicii de producție din RunProductionCycle, după ce s-au adăugat produsele:
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            new FileStorageService().Append("operations.txt", $"{timestamp} | System | Produced {quantity} (Type: {targetProduct})");
         }
 
         //  An Engineer inspects the selected machine.
@@ -160,7 +164,11 @@ namespace ElectronicsFactory
 
             float currentIncome = Income;
             technician.RepairMachine(machine, ref currentIncome);
-            Income = currentIncome; 
+            Income = currentIncome;
+
+            
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            new FileStorageService().Append("operations.txt", $"{timestamp} | {techIdx} | Machine {machineSerial} successfully repaired");
         }
 
         // A Sales Agent sells products.
