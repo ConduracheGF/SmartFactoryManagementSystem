@@ -33,32 +33,41 @@ namespace ElectronicsFactory
             Console.WriteLine("Press any key to proceed to the login screen...");
             Console.ReadKey();
 
-            bool isAuthenticated = false;
-            while (!isAuthenticated)
+            bool applicationRunning = true;
+            while (applicationRunning)
             {
-                Console.Clear();
-                Logger.Info("SMART FACTORY SYSTEM - LOGIN");
-
-                Console.Write("Username: ");
-                string username = Console.ReadLine() ?? "";
-
-                Console.Write("Password: ");
-                string password = Console.ReadLine() ?? "";
-
-                isAuthenticated = authService.Login(username, password);
-
-                if (!isAuthenticated)
+                bool isAuthenticated = false;
+                while (!isAuthenticated)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n[Error] Wrong information. Try again");
-                    Console.ResetColor();
-                    Console.WriteLine("Press enter to reload.");
-                    Console.ReadLine();
+                    Console.Clear();
+                    Logger.Info("SMART FACTORY SYSTEM - LOGIN");
+
+                    Console.Write("Username: ");
+                    string username = Console.ReadLine() ?? "";
+
+                    Console.Write("Password: ");
+                    string password = Console.ReadLine() ?? "";
+
+                    isAuthenticated = authService.Login(username, password);
+
+                    if (!isAuthenticated)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\n[Error] Wrong information. Try again");
+                        Console.ResetColor();
+                        Console.WriteLine("Press enter to reload.");
+                        Console.ReadLine();
+                    }
+                }
+
+                MenuManagement menu = new MenuManagement(electronicsFactory, authService);
+                MenuExitReason reason = menu.DisplayMenu();
+
+                if (reason == MenuExitReason.CloseApplication)
+                {
+                    applicationRunning = false;
                 }
             }
-
-            MenuManagement menu = new MenuManagement(electronicsFactory, authService);
-            menu.DisplayMenu();
         }
     }
 }

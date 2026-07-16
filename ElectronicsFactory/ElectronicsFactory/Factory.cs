@@ -26,6 +26,8 @@ namespace ElectronicsFactory
         public OrderPriorityService OrderManager { get; private set; } = new OrderPriorityService();
 
         public UndoService UndoManager { get; private set; } = new UndoService();
+        public MachineHealthService HealthService { get; private set; }
+        public InventoryDashboardService DashboardService { get; private set; }
 
         // Current factory income/budget, in RON
         public float Income { get; set; }
@@ -52,6 +54,8 @@ namespace ElectronicsFactory
             );
             Income = initialIncome;
             UndoManager = new UndoService();
+            HealthService = new MachineHealthService(MachineManager);
+            DashboardService = new InventoryDashboardService(ProductManager);
         }
 
         /// Validates the manager/operator/machine

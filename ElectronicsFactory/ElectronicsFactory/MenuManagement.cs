@@ -1,5 +1,11 @@
 ﻿namespace ElectronicsFactory
 {
+    internal enum MenuExitReason
+    {
+        Logout,
+        CloseApplication
+    }
+
     /// <summary>
     /// Console-based user interface layer for the Smart Factory Management System
     /// Renders menus, reads user input, and delegates all business logic to the underlying instance
@@ -8,19 +14,19 @@
     {
         private Factory _factory;
         private AuthService _authService; 
-
     
         public MenuManagement(Factory factory, AuthService authService)
         {
             _factory = factory;
             _authService = authService;
         }
-       
 
         // Displays the main menu loop, routing user choices to the appropriate submenu until the user chooses to exit
-        public void DisplayMenu()
+        public MenuExitReason DisplayMenu()
         {
             bool running = true;
+            MenuExitReason exitReason = MenuExitReason.CloseApplication;
+
             while (running)
             {
                 Logger.Clear();
@@ -46,7 +52,8 @@
                 Logger.Info("7. Manage Production Orders");
 
                 string lastActionDesc = _factory.UndoManager.GetLastActionDescription();
-                Logger.Info($"8. Undo Last Action");
+                Logger.Info($"8. Undo Last Action: {lastActionDesc}");
+                Logger.Info($"9. LogOut");
                 Logger.Info("0. Exit");
                 Logger.Info("\nSelect an option: ");
 
@@ -84,8 +91,13 @@
 
                         WaitForEnter();
                         break;
-                    case "0":
+                    case "9":
                         _authService.Logout();
+                        exitReason = MenuExitReason.Logout;
+                        running = false;
+                        break;
+                    case "0":
+                        exitReason = MenuExitReason.CloseApplication;
                         running = false;
                         break;
                     default:
@@ -94,6 +106,7 @@
                         break;
                 }
             }
+            return exitReason;
         }
 
         // Pauses execution until the user presses a key, used to let the user read output before returning to the previous menu
@@ -221,7 +234,9 @@
                 foreach (var emp in _factory.EmployeeManager.Employees)
                 {
                     if (emp != null)
-                    emp.DisplayInfo();
+                    {
+                        emp.DisplayInfo();
+                    }
                 }
             }
             WaitForEnter();
@@ -277,8 +292,30 @@
             Logger.Info("1. Inspect Machine");
             Logger.Info("2. Repair Machine");
             Logger.Info("3. View Machine Components");
+            Logger.Info("4. Production Efficiency Dashboard");
+            Logger.Info("5. Predictive Maintenance Report");
+            Logger.Info("6. Check Machine Alerts");
             Logger.Info("Choice: ");
             string? sub = Console.ReadLine();
+
+            if (sub == "4")
+            {
+                _factory.HealthService.DisplayEfficencyDashboard();
+                WaitForEnter();
+                return;
+            }
+            else if (sub == "5")
+            {
+                _factory.HealthService.RunPredictiveMaintenanceReport();
+                WaitForEnter();
+                return;
+            }
+            else if (sub == "6")
+            {
+                _factory.HealthService.CheckMachineAlerts();
+                WaitForEnter();
+                return;
+            }
 
             Logger.Info("Enter Machine Serial: "); string? serial = Console.ReadLine()!;
 
@@ -458,6 +495,13 @@
         {
             Console.Clear();
             Logger.Info("ADD NEW PRODUCTION ORDER");
+
+            if (!_authService.IsProductionManager)
+            {
+                Logger.Error("Access Denied! Only Production Manager can create production orders!");
+                WaitForEnter();
+                return;
+            }
 
             
             if (!_factory.ProductManager.Storage.Any())

@@ -17,7 +17,7 @@ namespace ElectronicsFactory
     {
         private static int _id = 1;
 
-        public int Id { get { return _id; } set { _id = value; } }
+        public int Id { get; }
         public Product Product { get; set; }
         public int Quantity { get; set; }
         public PriorityLevel_t Priority { get; set; }
@@ -41,17 +41,17 @@ namespace ElectronicsFactory
         private readonly HashSet<int> _processedOrdersIds = new HashSet<int>();
         private readonly List<ProductionOrder> _orders = new List<ProductionOrder>();
 
-        public void AddOrder(Product product, int quantity, PriorityLevel_t priority, string requester)
+        public ProductionOrder AddOrder(Product product, int quantity, PriorityLevel_t priority, string requester)
         {
             var newOrder = new ProductionOrder(product, quantity, priority, requester);
             _orders.Add(newOrder);
             RebuildQueue();
+            return newOrder;
         }
 
         
         public IEnumerable<ProductionOrder> GetAllOrders()
         {
-           
             return _orders.OrderByDescending(o => o.Priority).ThenBy(o => o.Created);
         }
 

@@ -32,3 +32,11 @@
 2026-07-16 13:45:54 | Stefan | Failed login attempt
 2026-07-16 13:46:14 | raluca.inginer | Successful login
 2026-07-16 13:47:49 | raluca.inginer | Logged out
+2026-07-16 15:19:36 | admin | Successful login
+2026-07-16 15:19:50 | admin | Logged out
+2026-07-16 15:36:36 | admin | Successful login
+2026-07-16 15:36:38 | admin | Logged out
+2026-07-16 15:36:49 | admin | Successful login
+2026-07-16 15:37:13 | admin | Employee added: Barbaliu (ID: 8)
+2026-07-16 15:37:43 | admin | Logged out
+2026-07-16 15:37:51 | admin | Successful login
