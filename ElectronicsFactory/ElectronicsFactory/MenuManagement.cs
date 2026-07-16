@@ -77,10 +77,10 @@
                     case "8":
                         _factory.UndoManager.UndoLastOperation();
 
-                        
                         var persistence = new DataPersistenceService(new FileStorageService());
                         persistence.SaveEmployees("employees.txt", _factory.EmployeeManager);
                         persistence.SaveOrders("orders.txt", _factory.OrderManager);
+                        persistence.SaveProducts("products.txt", _factory.ProductManager);
 
                         WaitForEnter();
                         break;
