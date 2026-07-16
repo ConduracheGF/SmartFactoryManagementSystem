@@ -81,6 +81,11 @@ namespace ElectronicsFactory
         {
             return $"{Id};{Name};{Price};{Consumption};{Quality};{ProductType}";
         }
+
+        public override string ToString()
+        {
+            return $"{ProductType} '{Name}' (ID: #{Id}, Price: {Price} RON, Quality: {Quality ?? "N/A"})";
+        }
     }
 
     /// <summary>

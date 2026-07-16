@@ -9,3 +9,8 @@
 2026-07-15 11:33:55 | admin | Failed login attempt
 2026-07-15 11:34:01 | admin | Successful login
 2026-07-15 12:00:38 | admin | Successful login
+2026-07-15 15:35:05 | admin | Successful login
+2026-07-15 15:35:44 | admin | Logged out
+2026-07-16 11:30:52 | admin | Successful login
+2026-07-16 11:31:02 | admin | Employee added: gabi (ID: 8)
+2026-07-16 11:31:17 | admin | Logged out

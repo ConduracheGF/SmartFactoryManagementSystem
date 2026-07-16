@@ -13,6 +13,16 @@ namespace ElectronicsFactory
         public List<Machine> Storage => _storage;
         public List<Machine> Machines => _storage;
 
+        public MachineManagement(IEnumerable<Machine> initialData, Action saveCallback)
+            : base(initialData, saveCallback){}
+
+        public void UpdateMachine(Machine machine)
+        {
+            if (machine == null) return;
+            Update(machine);
+            Logger.Info($"Machine {machine.Name} (Serial: {machine.SerialNumber}) has been updated and saved.");
+        }
+
         // Registers a new machine in the factory, rejecting it if capacity is full
         // Or if a machine with the same serial number already exists.
         public bool AddMachine(Machine machine)
@@ -50,6 +60,7 @@ namespace ElectronicsFactory
             if (machine != null)
             {
                 machine.Inspect();
+                UpdateMachine(machine);
                 Logger.Info($"The machine {id} ({machine.Name}) was found!");
                 return _storage.IndexOf(machine);
             }

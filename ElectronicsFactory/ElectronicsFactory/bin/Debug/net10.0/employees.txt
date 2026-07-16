@@ -5,3 +5,4 @@ Technician;4;Mihai;mihai.tehnic;parola123;4500;Technical;Technician
 SalesAgent;5;Elena;elena.vanzari;parola123;4000;Sales;SalesAgent
 ProductionManager;6;Stefan;stefan.manager;parola123;5000;Production;ProductionManager
 Engineer;7;Raluca;raluca.inginer;parola123;6000;Technical;Engineer
+ProductionManager;8;gabi;gabi.manager;parola123;23;Production;ProductionManager

@@ -19,7 +19,7 @@ namespace ElectronicsFactory
             DataPersistenceService persistenceService = new DataPersistenceService(storageService);
 
            
-            Factory electronicsFactory = new Factory(20, 10, 100, 50000f);
+            Factory electronicsFactory = new Factory(50000f);
 
             persistenceService.LoadProducts(ProductsFile, electronicsFactory.ProductManager);
             persistenceService.LoadEmployees(EmployeesFile, electronicsFactory.EmployeeManager);

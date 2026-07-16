@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
 
@@ -24,6 +25,8 @@ namespace ElectronicsFactory
 
         public Product? LoadProduct(string row)
         {
+            if (string.IsNullOrWhiteSpace(row)) return null;
+
             List<string> tokens = row.Split(';').ToList();
             if (tokens.Count < 6) return null;
 
@@ -43,7 +46,13 @@ namespace ElectronicsFactory
                 _ => null
             };
 
-            return (product != null) ? product : null;
+            if (product != null)
+            {
+                var idField = typeof(Product).GetField("_id", BindingFlags.NonPublic | BindingFlags.Instance);
+                idField?.SetValue(product, id);
+            }
+
+            return product;
         }
         public void LoadProducts(string filename, ProductManagement productManager)
         {
@@ -56,7 +65,6 @@ namespace ElectronicsFactory
 
                 if (product != null)
                 {
-                    product.GetType().GetField("_id", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(product, product.Id);
                     productManager.AddProduct(product);
                 }
             }
@@ -71,6 +79,8 @@ namespace ElectronicsFactory
 
         public Employee? LoadEmployee(string row)
         {
+            if (string.IsNullOrWhiteSpace(row)) return null;
+
             List<string> tokens = row.Split(';').ToList();
             if (tokens.Count < 8) return null;
 
@@ -96,7 +106,21 @@ namespace ElectronicsFactory
                 _ => null
             };
 
-            return (employee != null) ? employee : null;
+            if (employee != null)
+            {
+                var idProp = typeof(Employee).GetProperty("Id", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (idProp != null && idProp.CanWrite)
+                {
+                    idProp.SetValue(employee, id);
+                }
+                else
+                {
+                    var backingField = typeof(Employee).GetField($"<{idProp?.Name}>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance);
+                    backingField!.SetValue(employee, id);
+                }
+            }
+
+            return employee;
         }
 
         public void LoadEmployees(string filename, EmployeeManagement employeeManager)
@@ -118,15 +142,6 @@ namespace ElectronicsFactory
 
                 if (employee != null)
                 {
-                    var idProperty = employee.GetType().GetProperty("Id");
-                    if (idProperty != null)
-                    {
-                        idProperty.DeclaringType?
-                                  .GetProperty("Id")?
-                                  .GetSetMethod(nonPublic: true)?
-                                  .Invoke(employee, new object[] { employee.Id });
-                    }
-
                     employeeManager.HiredEmployee(employee);
                 }
             }
@@ -141,6 +156,8 @@ namespace ElectronicsFactory
 
         public Machine? LoadMachine(string row)
         {
+            if (string.IsNullOrWhiteSpace(row)) return null;
+
             List<string> tokens = row.Split(';').ToList();
             if (tokens.Count < 10)
             {
@@ -169,6 +186,18 @@ namespace ElectronicsFactory
 
             if (machine != null)
             {
+                var idField = typeof(Machine).GetField("_id", BindingFlags.NonPublic | BindingFlags.Instance);
+
+                if (idField != null)
+                {
+                    idField.SetValue(machine, id);
+                }
+                else
+                {
+                    var idProp = typeof(Machine).GetProperty("Id", BindingFlags.Public | BindingFlags.Instance);
+                    idProp?.GetSetMethod(nonPublic: true)?.Invoke(machine, new object[] { id });
+                }
+
                 machine.WearLevel = wear;
                 machine.TotalHoursOperated = hours;
                 machine.SuccessfulCycles = success;
@@ -189,7 +218,9 @@ namespace ElectronicsFactory
                 Machine? machine = LoadMachine(row);
 
                 if (machine != null)
+                {
                     machineManager.AddMachine(machine);
+                }
             }
         }
 
@@ -236,6 +267,7 @@ namespace ElectronicsFactory
                     Logger.Warning($"Could not load order for Product ID {productId} because the product does not exist in the database.");
                 }
             }
+            orderManager.RebuildQueue();
             Logger.Info("Production orders successfully loaded.");
         }
     }

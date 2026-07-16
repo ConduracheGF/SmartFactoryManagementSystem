@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ElectronicsFactory
@@ -10,6 +11,19 @@ namespace ElectronicsFactory
         // Underlying fixed-size storage array for employees (may contain unused trailing slots)
         public int EmployeeCount => _storage.Count;
         public List<Employee> Employees => _storage;
+
+        public EmployeeManagement(IEnumerable<Employee> initialData, Action saveCallback)
+            : base(initialData, saveCallback){}
+
+        public void UpdateEmployee(Employee employee)
+        {
+            if (employee == null)
+            {
+                return;
+            }
+            Update(employee);
+            Logger.Info($"Employee {employee.Name} (ID: {employee.Id}) details have been updated.");
+        }
 
         // Hires a new employee, rejecting it if capacity is full or if an employee with the same ID already exists
         public bool HiredEmployee(Employee employee)

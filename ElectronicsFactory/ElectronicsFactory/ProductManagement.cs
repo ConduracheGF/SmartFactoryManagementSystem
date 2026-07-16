@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ElectronicsFactory
@@ -13,11 +14,23 @@ namespace ElectronicsFactory
         public int ProductCount => _storage.Count;
         public List<Product> Storage => _storage;
 
+        public ProductManagement(IEnumerable<Product> initialData, Action saveCallback)
+            : base(initialData, saveCallback){}
+
+        public void UpdateProduct(Product product)
+        {
+            if (product == null) return;
+            Update(product);
+            Logger.Info($"Product {product.Name} (ID: #{product.Id}) has been updated and saved.");
+        }
+
         /// <summary>
         /// Adds a manufactured product to the generic collection.
         /// </summary>
         public bool AddProduct(Product product)
         {
+            if (product == null) return false;
+
             if (_storage.Any(p => p.Id == product.Id))
             {
                 Logger.Warning($"The product with the ID {product.Id} already exists in the company!");
@@ -61,11 +74,12 @@ namespace ElectronicsFactory
         /// </summary>
         public int Search(int id)
         {
-            var product = Find(p => p.Id == id);
+            var product = _storage.Find(p => p.Id == id);
 
             if (product != null)
             {
                 product.TestProduct();
+                UpdateProduct(product);
                 Logger.Info($"The product {id} ({product.Name}) was found and it is functional!");
                 return _storage.IndexOf(product);
             }

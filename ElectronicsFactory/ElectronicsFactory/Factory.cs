@@ -11,6 +11,9 @@ namespace ElectronicsFactory
     /// </summary>
     internal class Factory
     {
+        private readonly FileStorageService _storageService;
+        private readonly DataPersistenceService _persistenceService;
+
         // Manages the factory's employee roster
         public EmployeeManagement EmployeeManager { get; private set; }
 
@@ -28,11 +31,25 @@ namespace ElectronicsFactory
         public float Income { get; set; }
 
         // Initializes a new Factory with the given capacities and starting income
-        public Factory(int maxEmployees, int maxMachines, int maxProducts, float initialIncome)
+        public Factory(float initialIncome)
         {
-            EmployeeManager = new EmployeeManagement();
-            MachineManager = new MachineManagement();
-            ProductManager = new ProductManagement();
+            _storageService = new FileStorageService();
+            _persistenceService = new DataPersistenceService(_storageService);
+
+            EmployeeManager = new EmployeeManagement(
+                new List<Employee>(),
+                () => _persistenceService.SaveEmployees("employees.txt", EmployeeManager!)
+            );
+
+            MachineManager = new MachineManagement(
+                new List<Machine>(),
+                () => _persistenceService.SaveMachines("machines.txt", MachineManager!)
+            );
+
+            ProductManager = new ProductManagement(
+                new List<Product>(),
+                () => _persistenceService.SaveProducts("products.txt", ProductManager!)
+            );
             Income = initialIncome;
             UndoManager = new UndoService();
         }

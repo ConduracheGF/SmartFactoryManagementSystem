@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace ElectronicsFactory
@@ -8,32 +9,50 @@ namespace ElectronicsFactory
     {
         void Add(T genericObject);
         bool Remove(T genericObject);
+        void Update(T genericObject);
         IEnumerable<T> GetAll();
-        T? Find(Predicate<T> predicate);
+        IEnumerable<T?> Find(Predicate<T> predicate);
     }
 
     public class GenericRepository<T>: IRepository<T> where T: class
     {
         protected readonly List<T> _storage = new List<T>();
+        private readonly Action _saveCallback;
+
+        public GenericRepository(IEnumerable<T> initialData, Action saveCallback)
+        {
+            if (initialData != null)
+            {
+                _storage.AddRange(initialData);
+            }
+            _saveCallback = saveCallback;
+        }
 
         public void Add(T genericObject)
         {
             _storage.Add(genericObject);
+            _saveCallback?.Invoke();
         }
 
         public bool Remove(T genericObject)
         {
-            return _storage.Remove(genericObject);
+            bool flag = _storage.Remove(genericObject);
+            _saveCallback?.Invoke();
+            return flag;
         }
 
-        public IEnumerable<T> GetAll()
+        public void Update(T genericObject)
         {
-            return _storage;
+            var index = _storage.IndexOf(genericObject);
+            if (index != -1)
+            {
+                _storage[index] = genericObject;
+            }
+            _saveCallback.Invoke();
         }
 
-        public T? Find(Predicate<T> predicate)
-        {
-            return _storage.Find(predicate);
-        }
+        public IEnumerable<T> GetAll() => _storage;
+
+        public IEnumerable<T?> Find(Predicate<T> predicate) => _storage.Where(x => predicate(x));
     }
 }
