@@ -27,3 +27,8 @@
 2026-07-16 12:02:51 | admin | Employee removed with ID: 2
 2026-07-16 12:04:07 | admin | Successful login
 2026-07-16 12:04:11 | admin | Employee removed with ID: 3
+2026-07-16 13:39:09 | admin | Successful login
+2026-07-16 13:42:34 | admin | Logged out
+2026-07-16 13:45:54 | Stefan | Failed login attempt
+2026-07-16 13:46:14 | raluca.inginer | Successful login
+2026-07-16 13:47:49 | raluca.inginer | Logged out

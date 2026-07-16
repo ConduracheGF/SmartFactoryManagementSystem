@@ -46,7 +46,7 @@
                 Logger.Info("7. Manage Production Orders");
 
                 string lastActionDesc = _factory.UndoManager.GetLastActionDescription();
-                Logger.Info($"8. Undo Last Action (Ultima: {lastActionDesc})");
+                Logger.Info($"8. Undo Last Action");
                 Logger.Info("0. Exit");
                 Logger.Info("\nSelect an option: ");
 

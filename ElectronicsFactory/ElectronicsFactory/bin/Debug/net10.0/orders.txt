@@ -1,3 +1,5 @@
 2;10;Critical;stefan.manager
 1;5;High;stefan.manager
 3;1;Low;admin
+1;2;Low;Vasile
+4;2;Low;Raluca
