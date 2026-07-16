@@ -14,3 +14,16 @@
 2026-07-16 11:30:52 | admin | Successful login
 2026-07-16 11:31:02 | admin | Employee added: gabi (ID: 8)
 2026-07-16 11:31:17 | admin | Logged out
+2026-07-16 11:48:27 | admin | Successful login
+2026-07-16 11:48:41 | admin | Employee removed with ID: 1
+2026-07-16 11:52:13 | admin | Failed login attempt
+2026-07-16 11:52:23 | admin | Failed login attempt
+2026-07-16 11:53:39 | admin | Failed login attempt
+2026-07-16 11:53:57 | admin\ | Failed login attempt
+2026-07-16 11:54:03 | admin | Failed login attempt
+2026-07-16 11:58:46 | admin | Failed login attempt
+2026-07-16 12:00:06 | admin | Successful login
+2026-07-16 12:02:41 | admin | Successful login
+2026-07-16 12:02:51 | admin | Employee removed with ID: 2
+2026-07-16 12:04:07 | admin | Successful login
+2026-07-16 12:04:11 | admin | Employee removed with ID: 3

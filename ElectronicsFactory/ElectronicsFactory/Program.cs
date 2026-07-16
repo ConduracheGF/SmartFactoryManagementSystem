@@ -50,9 +50,9 @@ namespace ElectronicsFactory
                 if (!isAuthenticated)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n[Eroare] Informatii incorecte! Incearca din nou.");
+                    Console.WriteLine("\n[Error] Wrong information. Try again");
                     Console.ResetColor();
-                    Console.WriteLine("Apasa Enter pentru a reincerca...");
+                    Console.WriteLine("Press enter to reload.");
                     Console.ReadLine();
                 }
             }

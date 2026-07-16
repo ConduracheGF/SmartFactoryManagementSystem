@@ -1,8 +1,7 @@
 Director;1;Vasile;admin;admin123;10000;Management;Director
-Accountant;2;Maria;maria.contabil;parola123;5500;Finance;Acountant
-Engineer;3;Andrei;andrei.inginer;parola123;6000;Technical;Engineer
 Technician;4;Mihai;mihai.tehnic;parola123;4500;Technical;Technician
 SalesAgent;5;Elena;elena.vanzari;parola123;4000;Sales;SalesAgent
 ProductionManager;6;Stefan;stefan.manager;parola123;5000;Production;ProductionManager
 Engineer;7;Raluca;raluca.inginer;parola123;6000;Technical;Engineer
-ProductionManager;8;gabi;gabi.manager;parola123;23;Production;ProductionManager
+ProductionManager;8;Gabi;gabi.manager;parola123;23;Production;ProductionManager
+Engineer;3;Andrei;andrei.inginer;parola123;6000;Technical;Engineer

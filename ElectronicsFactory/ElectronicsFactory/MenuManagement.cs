@@ -178,14 +178,42 @@
                     return;
                 }
                 // Fire an employee by ID
-                Logger.Info("Enter Unique ID: "); string? id = Console.ReadLine()!;
+                Logger.Info("Enter Unique ID: ");
+                string? id = Console.ReadLine()!;
 
-                if (id != null)
-                    _factory.EmployeeManager.FiredEmployee(id);
+                if (!string.IsNullOrEmpty(id))
+                {
 
-                string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                string operatorName = _authService.CurrentUser?.Username ?? "System";
-                new FileStorageService().Append("operations.txt", $"{timestamp} | {operatorName} | Employee removed with ID: {id}");
+                    int index = _factory.EmployeeManager.SearchEmployee(id);
+
+                    if (index != -1)
+                    {
+                        Employee empToFire = _factory.EmployeeManager.Employees[index];
+
+
+                        _factory.EmployeeManager.FiredEmployee(id);
+
+
+                        _factory.UndoManager.RegisterAction(new FireEmployeeAction(_factory.EmployeeManager, empToFire));
+
+
+                        var persistence = new DataPersistenceService(new FileStorageService());
+                        persistence.SaveEmployees("employees.txt", _factory.EmployeeManager);
+
+
+                        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        string operatorName = _authService.CurrentUser?.Username ?? "System";
+                        new FileStorageService().Append("operations.txt", $"{timestamp} | {operatorName} | Employee removed with ID: {id}");
+
+                        Logger.Info($"Employee {empToFire.Name} was fired. You can now undo this action.");
+                    }
+                    else
+                    {
+                        Logger.Error("Employee not found!");
+                    }
+                }
+
+                
             }
             else if (sub == "3")
             {

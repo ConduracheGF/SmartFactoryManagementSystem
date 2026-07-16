@@ -31,12 +31,12 @@ namespace ElectronicsFactory
             {
                 CurrentUser = user;
                 _fileStorage.Append(_operationsFilename, $"{timestamp} | {username} | Successful login"); 
-                Logger.Info($"Autentificare reusita! Bun venit, {user.Name} ({user.JobStatus}).");
+                Logger.Info($"Successful login, welcome {user.Name} ({user.JobStatus}).");
                 return true;
             }
 
             _fileStorage.Append(_operationsFilename, $"{timestamp} | {username} | Failed login attempt"); 
-            Logger.Error("Credentiale invalide! Incercare esuata de logare.");
+            Logger.Error("Failed login attempt. Wrong credentials");
             return false;
         }
 
@@ -46,7 +46,7 @@ namespace ElectronicsFactory
             {
                 string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 _fileStorage.Append(_operationsFilename, $"{timestamp} | {CurrentUser.Username} | Logged out"); 
-                Logger.Info($"La revedere, {CurrentUser.Name}!");
+                Logger.Info($"Goodbye, {CurrentUser.Name}!");
                 CurrentUser = null;
             }
         }

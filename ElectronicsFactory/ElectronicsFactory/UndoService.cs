@@ -48,6 +48,52 @@ namespace ElectronicsFactory
         }
     }
 
+    internal class FireEmployeeAction : IReversibleAction
+    {
+        private readonly EmployeeManagement _employeeManager;
+        private readonly Employee _employee;
+
+        public string Description => $"Fired employee {_employee.Name} (ID: {_employee.Id})";
+
+        public FireEmployeeAction(EmployeeManagement employeeManager, Employee employee)
+        {
+            _employeeManager = employeeManager;
+            _employee = employee;
+        }
+
+        public void Undo()
+        {
+            
+            _employeeManager.Add(_employee);
+            Logger.Info($"[UNDO] Employee {_employee.Name} has been reinstated.");
+        }
+    }
+
+    internal class SellProductAction : IReversibleAction
+    {
+        private readonly ProductManagement _productManager;
+        private readonly Product _product;
+        private readonly Factory _factory; 
+
+        public string Description => $"Sold product {_product.Name} (ID: {_product.Id}) for {_product.Price} RON";
+
+        public SellProductAction(ProductManagement productManager, Product product, Factory factory)
+        {
+            _productManager = productManager;
+            _product = product;
+            _factory = factory;
+        }
+
+        public void Undo()
+        {
+            
+            _productManager.AddProduct(_product);
+           
+            _factory.Income -= _product.Price;
+            Logger.Info($"[UNDO] Sale cancelled. Product {_product.Id} returned to stock. Budget adjusted.");
+        }
+    }
+
     internal class UndoService
     {
         private readonly Stack<IReversibleAction> _actionHistory = new Stack<IReversibleAction>(); 

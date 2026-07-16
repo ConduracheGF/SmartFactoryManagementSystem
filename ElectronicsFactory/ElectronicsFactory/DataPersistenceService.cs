@@ -88,11 +88,11 @@ namespace ElectronicsFactory
             string id = tokens[1];
             string name = tokens[2];
 
-            // Potrivirea corectă a indecșilor conform ToFileRow():
+            
             string username = tokens[3];
             string password = tokens[4];
             double salary = double.Parse(tokens[5]);
-            // note: tokens[6] este Department, iar tokens[7] este JobStatus (sunt gestionate deja de constructorul fiecărei clase)
+            
 
             Employee? employee = jobName switch
             {
