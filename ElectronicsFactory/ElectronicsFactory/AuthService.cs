@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace ElectronicsFactory
 {
+    // Manages user authentication (login, logout) and tracks who is currently active in the system.
     internal class AuthService: IAuthService
     {
         private readonly EmployeeManagement _employeeManager;
@@ -56,6 +57,7 @@ namespace ElectronicsFactory
             }
         }
 
+        // Quick helper checks to easily verify the active user's role across the app
         public bool IsDirector => CurrentUser is Director;
         public bool IsTechnician => CurrentUser is Technician;
         public bool IsEngineer => CurrentUser is Engineer;

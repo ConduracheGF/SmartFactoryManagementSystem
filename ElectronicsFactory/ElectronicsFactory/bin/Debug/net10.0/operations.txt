@@ -40,3 +40,5 @@
 2026-07-16 15:37:13 | admin | Employee added: Barbaliu (ID: 8)
 2026-07-16 15:37:43 | admin | Logged out
 2026-07-16 15:37:51 | admin | Successful login
+2026-07-17 10:37:07 | admin | Successful login
+2026-07-17 10:38:08 | admin | Logged out
