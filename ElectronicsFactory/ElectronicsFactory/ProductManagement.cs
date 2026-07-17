@@ -69,6 +69,11 @@ namespace ElectronicsFactory
             }
         }
 
+        public IEnumerable<Product> SearchByName(string searchText)
+        {
+            return _storage.Where(p => p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+        }
+
         /// <summary>
         /// Searches storage for a product by ID. Re-evaluates quality as a side effect.
         /// </summary>

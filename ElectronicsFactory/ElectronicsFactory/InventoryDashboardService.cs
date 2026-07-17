@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
-    internal class InventoryDashboardService
+    internal class InventoryDashboardService: IInventoryDashboardService
     {
         private readonly ProductManagement _productManager;
 

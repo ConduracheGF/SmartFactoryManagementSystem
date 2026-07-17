@@ -94,7 +94,7 @@ namespace ElectronicsFactory
         }
     }
 
-    internal class UndoService
+    internal class UndoService: IUndoService
     {
         private readonly Stack<IReversibleAction> _actionHistory = new Stack<IReversibleAction>(); 
 

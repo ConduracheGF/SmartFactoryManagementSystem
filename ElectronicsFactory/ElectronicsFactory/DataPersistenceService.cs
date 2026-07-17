@@ -27,32 +27,39 @@ namespace ElectronicsFactory
         {
             if (string.IsNullOrWhiteSpace(row)) return null;
 
-            List<string> tokens = row.Split(';').ToList();
-            if (tokens.Count < 6) return null;
-
-            int id = int.Parse(tokens[0]);
-            string name = tokens[1];
-            float price = float.Parse(tokens[2]);
-            float consumption = float.Parse(tokens[3]);
-            string quality = tokens[4];
-            ProductType_t type = Enum.Parse<ProductType_t>(tokens[5]);
-
-            Product? product = type switch
+            try
             {
-                ProductType_t.Phones when tokens.Count >= 8 => new Phones(name, price, consumption, quality, type, int.Parse(tokens[6]), tokens[7]),
-                ProductType_t.Tablets when tokens.Count >= 8 => new Tablets(name, price, consumption, quality, type, int.Parse(tokens[6]), tokens[7]),
-                ProductType_t.Computers when tokens.Count >= 8 => new Computers(name, price, consumption, quality, type, tokens[7], int.Parse(tokens[6])),
-                ProductType_t.Headphones when tokens.Count >= 8 => new Headphones(name, price, consumption, quality, type, int.Parse(tokens[6]), int.Parse(tokens[7])),
-                _ => null
-            };
+                List<string> tokens = row.Split(';').ToList();
+                if (tokens.Count < 6) return null;
 
-            if (product != null)
-            {
-                var idField = typeof(Product).GetField("_id", BindingFlags.NonPublic | BindingFlags.Instance);
-                idField?.SetValue(product, id);
+                int id = int.Parse(tokens[0]);
+                string name = tokens[1];
+                float price = float.Parse(tokens[2]);
+                float consumption = float.Parse(tokens[3]);
+                string quality = tokens[4];
+                ProductType_t type = Enum.Parse<ProductType_t>(tokens[5]);
+
+                Product? product = type switch
+                {
+                    ProductType_t.Phones when tokens.Count >= 8 => new Phones(name, price, consumption, quality, type, int.Parse(tokens[6]), tokens[7]),
+                    ProductType_t.Tablets when tokens.Count >= 8 => new Tablets(name, price, consumption, quality, type, int.Parse(tokens[6]), tokens[7]),
+                    ProductType_t.Computers when tokens.Count >= 8 => new Computers(name, price, consumption, quality, type, tokens[7], int.Parse(tokens[6])),
+                    ProductType_t.Headphones when tokens.Count >= 8 => new Headphones(name, price, consumption, quality, type, int.Parse(tokens[6]), int.Parse(tokens[7])),
+                    _ => null
+                };
+
+                if (product != null)
+                {
+                    var idField = typeof(Product).GetField("_id", BindingFlags.NonPublic | BindingFlags.Instance);
+                    idField?.SetValue(product, id);
+                }
+
+                return product;
             }
-
-            return product;
+            catch (Exception e) when (e is FormatException || e is ArgumentException)
+            {
+                throw new DataPersistenceException($"Failed parsing product row: '{row}'. Inner details: {e.Message}", e);
+            }
         }
         public void LoadProducts(string filename, ProductManagement productManager)
         {
@@ -203,6 +210,7 @@ namespace ElectronicsFactory
                 machine.SuccessfulCycles = success;
                 machine.TotalCyclesAttempted = total;
                 machine.Status = status;
+                machine.Condition = condition;
             }
 
             return machine;

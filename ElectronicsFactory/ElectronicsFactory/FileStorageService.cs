@@ -12,9 +12,13 @@ namespace ElectronicsFactory
             {
                 File.WriteAllLines(fileName, text);
             }
-            catch (Exception e)
+            catch (IOException e)
             {
-                Logger.Error($"File storage error while saving {fileName}: {e.Message}");
+                throw new DataPersistenceException($"Critical I/O error while writing to {fileName}.", e);
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                throw new DataPersistenceException($"Access denied to write file {fileName}.", e);
             }
         }
 

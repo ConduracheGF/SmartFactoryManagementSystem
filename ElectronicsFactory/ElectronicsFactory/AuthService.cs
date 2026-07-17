@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace ElectronicsFactory
 {
-    internal class AuthService
+    internal class AuthService: IAuthService
     {
         private readonly EmployeeManagement _employeeManager;
         private readonly FileStorageService _fileStorage;
@@ -22,6 +22,11 @@ namespace ElectronicsFactory
 
         public bool Login(string username, string password)
         {
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                throw new AuthenticationException("Username and password fields cannot be empty.");
+            }
+
             var user = _employeeManager.Employees.FirstOrDefault(e =>
                 e.Username.Equals(username, StringComparison.OrdinalIgnoreCase) && e.Password == password);
 

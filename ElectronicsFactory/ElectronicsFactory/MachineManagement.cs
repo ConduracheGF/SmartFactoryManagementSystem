@@ -40,6 +40,11 @@ namespace ElectronicsFactory
             return true;
         }
 
+        public IEnumerable<Machine> FilterByStatus(MachineStatus_t status)
+        {
+            return _storage.Where(m => m.Status == status);
+        }
+
         // Looks up a machine by its serial number
         public Machine? FindMachine(string serialNumber)
         {

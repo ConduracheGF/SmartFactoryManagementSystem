@@ -193,21 +193,19 @@ namespace ElectronicsFactory
         }
 
         // A Sales Agent sells products.
-        public void SellProductWithAgent(string agentId, int productId)
+        public Product? SellProductWithAgent(string agentId, int productId)
         {
             int agentIdx = EmployeeManager.SearchEmployee(agentId);
             if (agentIdx == -1 || !(EmployeeManager.Employees[agentIdx] is SalesAgent))
             {
-                Logger.Error("Only a Sales Agent can sell products!");
-                return;
+                throw new UnauthorizedAccessException("Only an authorized Sales Agent can perform product sales!");
             }
 
             int prodIdx = ProductManager.Search(productId);
             // A Sales Agent cannot sell products that are not available in inventory.
             if (prodIdx == -1)
             {
-                Logger.Error($"Product with ID {productId} is not available in inventory!");
-                return;
+                throw new ProductNotFoundException($"Product with ID #{productId} is not available in inventory!");
             }
 
             Product p = ProductManager.Storage[prodIdx];
@@ -217,6 +215,12 @@ namespace ElectronicsFactory
             Income = ProductManager.SoldProduct(p, currentIncome); 
 
             Logger.Info($"Product {productId} successfully sold by Agent. New factory income: {Income} RON");
+
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            string agentName = EmployeeManager.Employees[agentIdx].Username;
+            new FileStorageService().Append("operations.txt", $"{timestamp} | {agentName} | Sold product {p.Name} #{p.Id} for {p.Price} RON");
+
+            return p;
         }
 
         // Generates a factory-wide overview report through the given Director

@@ -41,6 +41,11 @@ namespace ElectronicsFactory
             return true;
         }
 
+        public IEnumerable<Employee> GetSortedByName()
+        {
+            return _storage.OrderBy(e => e.Name);
+        }
+
         // Fires the employee with the given ID, shifting remaining elements left to keep storage compact
         public void FiredEmployee(string id)
         {

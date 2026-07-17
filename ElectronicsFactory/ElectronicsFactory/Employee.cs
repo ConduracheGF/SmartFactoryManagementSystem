@@ -29,7 +29,7 @@ namespace ElectronicsFactory
         Technician,
         MachineOperator,
         SalesAgent,
-        Acountant
+        Accountant
     }
 
     /// <summary>
@@ -277,10 +277,10 @@ namespace ElectronicsFactory
     {
         // Initializes a new Accountant
         public Accountant(string name, double salary, string username, string password)
-            : base(name, DepartmentStatus_t.Finance, JobStatus_t.Acountant, salary, username, password) { }
+            : base(name, DepartmentStatus_t.Finance, JobStatus_t.Accountant, salary, username, password) { }
 
         public Accountant(string name, double salary)
-    : base(name, DepartmentStatus_t.Finance, JobStatus_t.Acountant, salary,
+    : base(name, DepartmentStatus_t.Finance, JobStatus_t.Accountant, salary,
            name.ToLower().Replace(" ", "") + ".contabil", "parola123")
         { }
 

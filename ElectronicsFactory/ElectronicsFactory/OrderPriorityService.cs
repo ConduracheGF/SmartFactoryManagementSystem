@@ -91,7 +91,7 @@ namespace ElectronicsFactory
 
             foreach (var order in sortedList)
             {
-                if (_processedOrdersIds.Contains(order.Id))
+                if (!_processedOrdersIds.Contains(order.Id))
                 {
                     _orderQueue.Enqueue(order);
                 }

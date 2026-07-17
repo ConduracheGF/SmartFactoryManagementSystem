@@ -1,4 +1,6 @@
-﻿namespace ElectronicsFactory
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ElectronicsFactory
 {
     internal enum MenuExitReason
     {
@@ -126,6 +128,7 @@
             Logger.Info("1. Hire Employee");
             Logger.Info("2. Fire Employee");
             Logger.Info("3. Display All Employees");
+            Logger.Info("4. Sorted by name");
             Logger.Info("Choice: ");
             string? sub = Console.ReadLine()!;
 
@@ -147,7 +150,7 @@
                     WaitForEnter();
                     return;
                 }
-                Logger.Info("Type: 1. Production Manager, 2. Machine Operator, 3. Engineer, 4. Technician, 5. Sales Agent, 6. Accountant");
+                Logger.Info("Type: 1. Production Manager, 2. Machine Operator, 3. Engineer, 4. Technician, 5. Sales Agent, 6. Accountant, 7. Director");
                 string? type = Console.ReadLine()!;
 
                 Employee? newEmp = null;
@@ -239,6 +242,16 @@
                     }
                 }
             }
+            else if (sub == "4")
+            {
+                foreach (var emp in _factory.EmployeeManager.GetSortedByName())
+                {
+                    if (emp != null)
+                    {
+                        emp.DisplayInfo();
+                    }
+                }
+            }
             WaitForEnter();
         }
 
@@ -295,6 +308,7 @@
             Logger.Info("4. Production Efficiency Dashboard");
             Logger.Info("5. Predictive Maintenance Report");
             Logger.Info("6. Check Machine Alerts");
+            Logger.Info("7. Filter Machine by Status");
             Logger.Info("Choice: ");
             string? sub = Console.ReadLine();
 
@@ -313,6 +327,41 @@
             else if (sub == "6")
             {
                 _factory.HealthService.CheckMachineAlerts();
+                WaitForEnter();
+                return;
+            }
+            else if (sub == "7")
+            {
+                Logger.Info("Select Status: 1. Offline, 2. Running, 3. Maintenance, 4. Broken");
+                string? statusChoice = Console.ReadLine();
+                MachineStatus_t? filterStatus = statusChoice switch
+                {
+                    "1" => MachineStatus_t.Offline,
+                    "2" => MachineStatus_t.Running,
+                    "3" => MachineStatus_t.Maintenance,
+                    "4" => MachineStatus_t.Broken,
+                    _ => null
+                };
+
+                if (filterStatus == null)
+                {
+                    Logger.Error("Invalid status choice!");
+                    WaitForEnter();
+                    return;
+                }
+
+                var filtered = _factory.MachineManager.FilterByStatus(filterStatus.Value);
+                if (!filtered.Any())
+                {
+                    Logger.Warning($"No machines found with status {filterStatus}.");
+                }
+                else
+                {
+                    foreach (var m in filtered)
+                    {
+                        Console.WriteLine($"[{m.SerialNumber}] {m.Name} | Status: {m.Status} | Condition: {m.Condition}");
+                    }
+                }
                 WaitForEnter();
                 return;
             }
@@ -341,6 +390,23 @@
                 }
                 Logger.Info("Enter Technician ID: "); string? techId = Console.ReadLine()!;
                 _factory.RepairMachineWithTechnician(techId, serial);
+
+                try
+                {
+                    _factory.RepairMachineWithTechnician(techId, serial);
+                }
+                catch (InvalidMachineStateException e)
+                {
+                    Logger.Error($"[Machine State Error] {e.Message}");
+                }
+                catch (InsufficientFundException e)
+                {
+                    Logger.Error($"[Financial Constraint] {e.Message}");
+                }
+                catch (FactoryException e)
+                {
+                    Logger.Error($"[Factory Error] {e.Message}");
+                }
             }
             else if (sub == "3")
             {
@@ -366,6 +432,52 @@
         {
             Console.Clear();
             Logger.Info("Product Management & Inventory");
+            Logger.Info("1. Display All Products");
+            Logger.Info("2. Search Product by Name");
+            Logger.Info("3. Check Inventory Alerts (Stock Thresholds)");
+            Logger.Info("4. Advanced Financial Report");
+            Logger.Info("Choice: ");
+            string? sub = Console.ReadLine();
+
+            if (sub == "2")
+            {
+                Logger.Info("Enter search text: ");
+                string searchText = Console.ReadLine() ?? "";
+                var results = _factory.ProductManager.SearchByName(searchText);
+
+                if (!results.Any())
+                {
+                    Logger.Warning($"No products found matching '{searchText}'.");
+                }
+                else
+                {
+                    foreach (var prod in results)
+                    {
+                        Console.WriteLine($"Product ID: {prod.Id} | Name: {prod.Name} | Type: {prod.ProductType} | Cost: {prod.Price} | Quality: {prod.Quality}");
+                    }
+                }
+
+                WaitForEnter();
+                return;
+            }
+            else if (sub == "3")
+            {
+                Logger.Info("Enter minimum allowed units per category: ");
+                if (!int.TryParse(Console.ReadLine(), out int minUnits))
+                {
+                    minUnits = 5;
+                }
+
+                _factory.DashboardService.VerifyStockThresholds(minUnits);
+                WaitForEnter();
+                return;
+            }
+            else if (sub == "4")
+            {
+                _factory.DashboardService.DisplayAdvancedReports();
+                WaitForEnter();
+                return;
+            }
 
             bool empty = true;
             foreach (var prod in _factory.ProductManager.Storage)
@@ -420,7 +532,11 @@
                     return;
                 }
 
-                _factory.SellProductWithAgent(agentId, prodId);
+                Product? soldProduct = _factory.SellProductWithAgent(agentId, prodId);
+                if (soldProduct != null)
+                {
+                    _factory.UndoManager.RegisterAction(new SellProductAction(_factory.ProductManager, soldProduct, _factory));
+                }
             }
             else if (sub == "2")
             {
@@ -528,7 +644,6 @@
                 return;
             }
 
-            
             Console.Write("Enter Quantity: ");
             if (!int.TryParse(Console.ReadLine(), out int qty) || qty <= 0)
             {
@@ -537,7 +652,6 @@
                 return;
             }
 
-            
             Logger.Info("Select Priority: 1. Low, 2. Medium, 3. High, 4. Critical");
             string? pChoice = Console.ReadLine();
             PriorityLevel_t priority = pChoice switch
@@ -548,14 +662,13 @@
                 "4" => PriorityLevel_t.Critical,
                 _ => PriorityLevel_t.Low
             };
-
             
             string requester = _authService.CurrentUser?.Name ?? "System";
-
             
-            _factory.OrderManager.AddOrder(product, qty, priority, requester);
+            var newOrder = _factory.OrderManager.AddOrder(product, qty, priority, requester);
 
-            
+            _factory.UndoManager.RegisterAction(new AddOrderAction(_factory.OrderManager, newOrder));
+
             var persistence = new DataPersistenceService(new FileStorageService());
             persistence.SaveOrders("orders.txt", _factory.OrderManager);
 
@@ -613,9 +726,6 @@
             storage.Append("operations.txt", $"{timestamp} | {_authService.CurrentUser?.Username} | Processed order for {nextOrder.Quantity}x {nextOrder.Product.Name}");
 
             WaitForEnter();
-        }
-
-        
-       
+        } 
     }
 }

@@ -87,33 +87,6 @@ namespace ElectronicsFactory
             };
         }
 
-        public Machine(int id, string name, string serialNumber, MachineStatus_t status, ConditionStatus_t condition, float wearLevel, int totalHoursOperated, int successfulCycles, int totalCyclesAttempted)
-        {
-            Id = id;
-            Name = name;
-            SerialNumber = serialNumber;
-            Status = status;
-            Condition = condition;
-            WearLevel = wearLevel;
-            TotalHoursOperated = totalHoursOperated;
-            SuccessfulCycles = successfulCycles;
-            TotalCyclesAttempted = totalCyclesAttempted;
-
-            if (id >= _nextId)
-            {
-                _nextId = id + 1;
-            }
-
-            Components = new List<MachineParts>
-            {
-                new Motor(currency: 500, brand: "Bosch", energyClass: 2, component: ComponentsType_t.Motor, powerEnergy: 1500.0f, horsePower: 3),
-                new Senzor(currency: 150, brand: "Sick", energyClass: 1, component: ComponentsType_t.Senzor, percentAccuracy: 0.98f, frequency: 100),
-                new Controler(currency: 800, brand: "Siemens", energyClass: 1, component: ComponentsType_t.Controler, frequency: 400),
-                new Display(currency: 300, brand: "Nextion", energyClass: 3, component: ComponentsType_t.Display, rezolution: 1080.0f),
-                new CoolingFan(currency: 75, brand: "Noctua", energyClass: 1, component: ComponentsType_t.CoolingFan, speed: 2000)
-            };
-        }
-
         // Stops the machine, unless it is currently under maintenance
         public bool Stop()
         {
@@ -167,6 +140,16 @@ namespace ElectronicsFactory
         // Cannot be performed while running
         public virtual bool Repair(ref float income)
         {
+            if (Status == MachineStatus_t.Running)
+            {
+                throw new InvalidMachineStateException($"Cannot perform repair on machine {SerialNumber} while it is RUNNING! Stop it first.");
+            }
+
+            if (Components == null || Components.Count == 0)
+            {
+                throw new InvalidOperationException($"Machine {SerialNumber} does not have any components configured to be repaired!");
+            }
+
             if (Status == MachineStatus_t.Running)
             {
                 Logger.Warning($"Cannot perform repair on machine {SerialNumber} while it is running");

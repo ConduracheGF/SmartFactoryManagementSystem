@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
-    internal class MachineHealthService
+    internal class MachineHealthService: IMachineHealthService
     {
         private readonly MachineManagement _machineManager;
 
