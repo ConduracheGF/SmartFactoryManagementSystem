@@ -42,3 +42,10 @@
 2026-07-16 15:37:51 | admin | Successful login
 2026-07-17 10:37:07 | admin | Successful login
 2026-07-17 10:38:08 | admin | Logged out
+2026-07-17 13:51:00 | admin | Successful login
+2026-07-17 13:51:21 | admin | Successful login
+2026-07-17 13:54:29 | admin | Successful login
+2026-07-17 13:57:09 | admin | Successful login
+2026-07-17 13:58:59 | admin | Failed login attempt
+2026-07-17 13:59:30 | admin | Failed login attempt
+2026-07-17 13:59:40 | admin | Successful login

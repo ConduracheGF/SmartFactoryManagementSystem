@@ -80,6 +80,8 @@ namespace ElectronicsFactory
                 }
             }
         }
+
+        // EMPLOYEES PERSISTENCE
         public void SaveEmployees(string filename, EmployeeManagement employeeManager)
         {
             var rows = employeeManager.Employees.Select(e => e.ToFileRow());
@@ -153,6 +155,13 @@ namespace ElectronicsFactory
                 {
                     employeeManager.HiredEmployee(employee);
                 }
+            }
+
+            if (employeeManager.Employees.Any())
+            {
+                int maxId = employeeManager.Employees.Select(e => int.TryParse(e.Id, out int parseId) ? parseId : 0).Max();
+
+                Employee.SetNextId(maxId + 1);
             }
         }
 

@@ -439,7 +439,31 @@ namespace ElectronicsFactory
             Logger.Info("Choice: ");
             string? sub = Console.ReadLine();
 
-            if (sub == "2")
+            if (sub == "1")
+            {
+
+                bool empty = true;
+                foreach (var prod in _factory.ProductManager.Storage)
+                {
+                    if (prod != null)
+                    {
+                        empty = false;
+                        Logger.Info(prod.ToString());
+
+                        // Invoke the type-specific description for each concrete product subtype
+                        if (prod is Phones phone) phone.DisplayFunctionality();
+                        else if (prod is Tablets tablet) tablet.DisplayFunctionality();
+                        else if (prod is Computers computer) computer.WifiConectionDescription();
+                        else if (prod is Headphones headphones) headphones.TestProduct();
+                    }
+                }
+
+                if (empty)
+                {
+                    Logger.Warning("Inventory is currently empty. No products in storage.");
+                }
+            }
+            else if (sub == "2")
             {
                 Logger.Info("Enter search text: ");
                 string searchText = Console.ReadLine() ?? "";
@@ -478,28 +502,7 @@ namespace ElectronicsFactory
                 WaitForEnter();
                 return;
             }
-
-            bool empty = true;
-            foreach (var prod in _factory.ProductManager.Storage)
-            {
-                if (prod != null)
-                {
-                    empty = false;
-                    Logger.Info($"Product ID: {prod.Id} | Type: {prod.ProductType} | Cost: {prod.Price}| Quality: {prod.Quality}");
-
-                    // Invoke the type-specific description for each concrete product subtype
-                    if (prod is Phones phone) phone.DisplayFunctionality();
-                    else if (prod is Tablets tablet) tablet.DisplayFunctionality();
-                    else if (prod is Computers computer) computer.WifiConectionDescription();
-                    else if (prod is Headphones headphones) headphones.TestProduct();
-                }
-            }
-
-            if (empty)
-            {
-                Logger.Warning("Inventory is currently empty. No products in storage.");
-            }
-
+            
             WaitForEnter();
         }
 

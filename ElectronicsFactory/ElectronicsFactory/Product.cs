@@ -71,7 +71,7 @@ namespace ElectronicsFactory
 
         public override string ToString()
         {
-            return $"{ProductType} '{Name}' (ID: #{Id}, Price: {Price} RON, Quality: {Quality ?? "N/A"})";
+            return $"{ProductType} | {Name} | ID: #{Id} | Price: {Price} RON | Quality: {Quality ?? "N/A"}";
         }
     }
 

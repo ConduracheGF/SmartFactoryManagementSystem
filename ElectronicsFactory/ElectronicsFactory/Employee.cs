@@ -37,6 +37,10 @@ namespace ElectronicsFactory
         // Static counter shared across all Employee instances, used to auto-generate unique IDs
         private static int nextId = 1;
 
+        public static void SetNextId(int id)
+        {
+            nextId = id;
+        }
         
         public string Id { get; private set; }
 
