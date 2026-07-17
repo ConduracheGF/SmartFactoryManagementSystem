@@ -4,23 +4,21 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
-    /// <summary>
-    /// Central orchestrator of the Smart Factory Management System
-    /// Owns the employee, machine, and product managers, and coordinates all cross-cutting
-    /// business workflows (production, inspection, repair, sales, reporting).
-    /// </summary>
+    
+    // Central orchestrator of the Smart Factory Management System
+    // Owns the employee, machine, and product managers, and coordinates all cross-cutting
+    // business workflows (production, inspection, repair, sales, reporting).
     internal class Factory
     {
         private readonly FileStorageService _storageService;
         private readonly DataPersistenceService _persistenceService;
 
-        // Manages the factory's employee roster
         public EmployeeManagement EmployeeManager { get; private set; }
 
-        // Manages the factory's registered machines
+       
         public MachineManagement MachineManager { get; private set; }
 
-        // Manages the factory's product inventory
+       
         public ProductManagement ProductManager { get; private set; }
 
         public OrderPriorityService OrderManager { get; private set; } = new OrderPriorityService();
@@ -29,10 +27,10 @@ namespace ElectronicsFactory
         public MachineHealthService HealthService { get; private set; }
         public InventoryDashboardService DashboardService { get; private set; }
 
-        // Current factory income/budget, in RON
+      
         public float Income { get; set; }
 
-        // Initializes a new Factory with the given capacities and starting income
+      
         public Factory(float initialIncome)
         {
             _storageService = new FileStorageService();
@@ -58,12 +56,12 @@ namespace ElectronicsFactory
             DashboardService = new InventoryDashboardService(ProductManager);
         }
 
-        /// Validates the manager/operator/machine
-        /// Starts the machine if needed, then manufactures the requested quantity
-        /// of a product one unit at a time (stopping early if the machine breaks down)
+        // Validates the manager/operator/machine
+        // Starts the machine if needed, then manufactures the requested quantity
+        // of a product one unit at a time (stopping early if the machine breaks down)
         public void RunProductionCycle(string managerId, string operatorId, string machineSerial, Product targetProduct, int quantity)
         {
-            // Product quantity can never become negative
+           
             if (quantity <= 0)
             {
                 Logger.Error("Quantity must be greater than 0!");
@@ -142,12 +140,12 @@ namespace ElectronicsFactory
                 Logger.Warning($"Production cycle finished incomplete. Only {producedCount}/{quantity} units were produced before machine failure.");
             }
 
-            // La finalul logicii de producție din RunProductionCycle, după ce s-au adăugat produsele:
+          
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             new FileStorageService().Append("operations.txt", $"{timestamp} | System | Produced {quantity} (Type: {targetProduct})");
         }
 
-        //  An Engineer inspects the selected machine.
+        // An Engineer inspects the selected machine.
         public void InspectMachineWithEngineer(string engineerId, string machineSerial)
         {
             int engIdx = EmployeeManager.SearchEmployee(engineerId);

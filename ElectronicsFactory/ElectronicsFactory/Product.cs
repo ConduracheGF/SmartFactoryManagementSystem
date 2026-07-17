@@ -6,9 +6,8 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
-    /// <summary>
-    /// Category of manufactured electronic product
-    /// </summary>
+    
+    // Category of manufactured electronic product
     public enum ProductType_t
     {
         Phones,
@@ -17,13 +16,12 @@ namespace ElectronicsFactory
         Headphones
     }
 
-    /// <summary>
-    /// Abstract base class representing any manufactured product in the factory
-    /// Provides shared identity (auto-generated ID), pricing, and quality-testing behavior
-    /// </summary>
+   
+    // Abstract base class representing any manufactured product in the factory
+    // Provides shared identity (auto-generated ID), pricing, and quality-testing behavior
     public abstract class Product
     {
-        // Static counter shared across all Product instances, used to auto-generate unique IDs
+        
         private static int _nextId = 1;
 
         private int _id;
@@ -32,27 +30,16 @@ namespace ElectronicsFactory
         private float _consumption;
         private string? _quality;
 
-        // Unique, auto-generated identifier assigned at construction time
         public int Id { get { return _id; } private set { _id = value; } }
-
-        // Business-facing name of the product
         public string Name { get { return _name; } set { _name = value; } }
-
-        // Selling price / production cost of the product, in RON
         public float Price { get { return _price; } set { _price = value; } }
-
-        // Energy consumption metric used to compute the product's quality grade
         public float Consumption { get { return _consumption; } set { _consumption = value; } }
-
-        // Current quality grade of the product (A-E)
         public string? Quality { get { return _quality; } set { _quality = value; } }
 
- 
 
         // The product category (Phones, Tablets, Computers, Headphones)
         public ProductType_t ProductType { get; set; }
 
-        // Initializes a new product with an auto-generated unique ID
         public Product(string name, float price, float consumption, string? quality, ProductType_t ProductType)
         {
             _id = _nextId++;
@@ -63,20 +50,20 @@ namespace ElectronicsFactory
             this.ProductType = ProductType;
         }
 
-        /// Computes the updated factory income after selling this product
+        // Computes the updated factory income after selling this product
         public float SellProduct(float income)
         {
             return Price + income;
         }
 
-        /// Recalculates this product's quality grade based on its consumption ratio
+        // Recalculates this product's quality grade based on its consumption ratio
         public abstract void TestProduct();
 
-        /// Creates a new, independent instance of this product with the same attributes, but a freshly auto-generated ID
-        /// Used when manufacturing multiple units from a single "template" product during a production run
+        // Creates a new, independent instance of this product with the same attributes, but a freshly auto-generated ID
+        // Used when manufacturing multiple units from a single "template" product during a production run
         public abstract Product Clone();
 
-        /// Converts the product data into a standardized CSV string format for file persistence
+        // Converts the product data into a standardized CSV string format for file persistence
         public virtual string ToFileRow()
         {
             return $"{Id};{Name};{Price};{Consumption};{Quality};{ProductType}";
@@ -88,21 +75,16 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Represents a manufactured smartphone product
-    /// </summary>
+ 
     internal class Phones : Product
     {
         private int _yearOfProduction;
         private string? _processor;
 
-        // Year the phone model was produced
         public int YearOfProduction { get { return _yearOfProduction; } set { _yearOfProduction = value; } }
 
-        // Processor chip model used in the phone
         public string? Processor { get { return _processor; } set { _processor = value; } }
 
-        /// Initializes a new Phones product
         public Phones(string name, float currency, float consumption, string? quality, ProductType_t productType, int yearOfProduction, string? processor) : base(name, currency, consumption, quality, productType)
         {
             this._yearOfProduction = yearOfProduction;
@@ -155,21 +137,15 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Represents a manufactured tablet product
-    /// </summary>
     internal class Tablets : Product
     {
         private int _yearOfProduction;
         private string? _processor;
 
-        // Year the tablet model was produced
         public int YearOfProduction { get { return _yearOfProduction; } set { _yearOfProduction = value; } }
 
-        // Processor chip model used in the tablet
         public string? Processor { get { return _processor; } set { _processor = value; } }
 
-        // Initializes a new Tablets product
         public Tablets(string name, float currency, float consumption, string? quality, ProductType_t productType, int yearOfProduction, string? processor) : base(name, currency, consumption, quality, productType)
         {
             this._yearOfProduction = yearOfProduction;
@@ -205,7 +181,6 @@ namespace ElectronicsFactory
             Logger.Info($"The tablet is of quality type: {Quality}");
         }
 
-        // Displays the tablet's core functionality description
         public void DisplayFunctionality()
         {
             Logger.Info("The tablet can perform any task you want, as long as you download the application!");
@@ -222,9 +197,6 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Represents a manufactured computer product
-    /// </summary>
     internal class Computers : Product
     {
         private int _weight;
@@ -233,10 +205,7 @@ namespace ElectronicsFactory
         // Physical weight of the computer, in kilograms
         public int Weight { get { return _weight; } set { _weight = value; } }
 
-        // Processor chip model used in the computer
         public string? Processor { get { return _processor; } set { _processor = value; } }
-
-        // Initializes a new Computers product
         public Computers(string name, float currency, float consumption, string? quality, ProductType_t productType, string? processor, int weight) : base(name, currency, consumption, quality, productType)
         {
             this._processor = processor;
@@ -272,7 +241,6 @@ namespace ElectronicsFactory
             Logger.Info($"The computer is of quality type: {Quality}");
         }
 
-        // Displays the computer's Wi-Fi connectivity description
         public void WifiConectionDescription()
         {
             Logger.Info("The computer can perform searches and any connection to Wifi!");
@@ -289,21 +257,18 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Represents a manufactured headphones product
-    /// </summary>
+    // Represents a manufactured headphones product
     internal class Headphones : Product
     {
         private int _yearOfProduction;
         private int _power;
 
-        // Year the headphones model was produced
+
         public int YearOfProduction { get { return _yearOfProduction; } set { _yearOfProduction = value; } }
 
         // Audio output power of the headphones, in milliwatts
         public int Power { get { return _power; } set { _power = value; } }
 
-        // Initializes a new Headphones product
         public Headphones(string name, float currency, float consumption, string? quality, ProductType_t productType, int yearOfProduction, int power) : base(name, currency, consumption, quality, productType)
         {
             this._yearOfProduction = yearOfProduction;
@@ -340,7 +305,6 @@ namespace ElectronicsFactory
             Logger.Info($"The headphone is of quality type: {Quality} and it is optimal sound");
         }
 
-        // Computes the sound quality metric as the ratio of output power to energy consumption
         public float QualitySound()
         {
             return Power / Consumption;

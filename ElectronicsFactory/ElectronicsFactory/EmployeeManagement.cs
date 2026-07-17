@@ -8,7 +8,7 @@ namespace ElectronicsFactory
     // Manages the factory's employee roster: hiring, firing, and lookup, enforcing the unique-ID business rule
     internal class EmployeeManagement: GenericRepository<Employee>
     {
-        // Underlying fixed-size storage array for employees (may contain unused trailing slots)
+        
         public int EmployeeCount => _storage.Count;
         public List<Employee> Employees => _storage;
 
@@ -25,7 +25,7 @@ namespace ElectronicsFactory
             Logger.Info($"Employee {employee.Name} (ID: {employee.Id}) details have been updated.");
         }
 
-        // Hires a new employee, rejecting it if capacity is full or if an employee with the same ID already exists
+        // Hires the employee
         public bool HiredEmployee(Employee employee)
         {
             if (employee == null) return false;

@@ -4,9 +4,8 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
-    /// <summary>
-    /// Manages the collection of machines owned by the factory: registration, lookup, and capacity/duplicate validation
-    /// </summary>
+   
+    // Manages the collection of machines owned by the factory: registration, lookup, and capacity/duplicate validation
     internal class MachineManagement : GenericRepository<Machine>
     {
         public int MachineCount => _storage.Count;
@@ -45,7 +44,6 @@ namespace ElectronicsFactory
             return _storage.Where(m => m.Status == status);
         }
 
-        // Looks up a machine by its serial number
         public Machine? FindMachine(string serialNumber)
         {
             var machine = _storage.Find(m => m.SerialNumber == serialNumber);

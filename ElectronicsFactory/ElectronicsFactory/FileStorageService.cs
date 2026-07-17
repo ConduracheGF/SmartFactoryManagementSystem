@@ -6,6 +6,8 @@ namespace ElectronicsFactory
 {
     internal class FileStorageService
     {
+
+        // Overwrites the specified file with the provided collection of text lines.
         public void Write(string fileName, IEnumerable<string> text)
         {
             try
@@ -22,6 +24,7 @@ namespace ElectronicsFactory
             }
         }
 
+        // Reads and returns all lines from the specified file.
         public IEnumerable<string> Read(string fileName)
         {
             if (!File.Exists(fileName))
@@ -40,6 +43,7 @@ namespace ElectronicsFactory
             }
         }
 
+        // Appends a single line of text to the specified file.
         public void Append(string fileName, string text)
         {
             try

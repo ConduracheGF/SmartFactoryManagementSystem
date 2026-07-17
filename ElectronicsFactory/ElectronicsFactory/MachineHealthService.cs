@@ -4,6 +4,8 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
+
+    // Monitors and reports the health, performance, and maintenance needs of all machines in the factory.
     internal class MachineHealthService: IMachineHealthService
     {
         private readonly MachineManagement _machineManager;
@@ -25,6 +27,7 @@ namespace ElectronicsFactory
             }
         }
 
+        // Estimates how many runs each machine has left before it breaks down and warns us if we need to plan repairs.
         public void RunPredictiveMaintenanceReport()
         {
             Logger.Info("PREDICTIVE MAINTENANCE REPORT");
@@ -54,6 +57,7 @@ namespace ElectronicsFactory
             }
         }
 
+        // Scans all machines and triggers alerts if any machine is broken, in critical condition, or wearing out too fast.
         public void CheckMachineAlerts()
         {
             Logger.Info("MONITORING SYSTEM: MACHINE ALERTS");

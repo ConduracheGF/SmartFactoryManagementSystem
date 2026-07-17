@@ -141,7 +141,7 @@ namespace ElectronicsFactory
                     WaitForEnter();
                     return;
                 }
-                // Hire a new employee of the chosen type. ID is auto-generated internally
+                
                 Logger.Info("Name: "); string? name = Console.ReadLine()!;
                 Logger.Info("Salary: "); double salary = double.Parse(Console.ReadLine()!);
                 if ( salary <= 0)
@@ -193,7 +193,7 @@ namespace ElectronicsFactory
                     WaitForEnter();
                     return;
                 }
-                // Fire an employee by ID
+                
                 Logger.Info("Enter Unique ID: ");
                 string? id = Console.ReadLine()!;
 
@@ -233,7 +233,7 @@ namespace ElectronicsFactory
             }
             else if (sub == "3")
             {
-                // Each derived employee and machine class should override at least one inherited method
+               
                 foreach (var emp in _factory.EmployeeManager.Employees)
                 {
                     if (emp != null)
@@ -276,7 +276,7 @@ namespace ElectronicsFactory
             }
 
             Product? target = null;
-            // Products cannot have a negative production cost or selling price
+            
             if (prodType == "1")
                 target = new Phones("PhoneTemplate", 1200f, 2.5f, "A", ProductType_t.Phones, 2026, "M3");
 
@@ -607,6 +607,7 @@ namespace ElectronicsFactory
             }
         }
 
+        // Asks the user for product details, quantity, and priority to create a new production order, then saves it.
         private void AddNewOrder()
         {
             Console.Clear();
@@ -676,6 +677,7 @@ namespace ElectronicsFactory
             WaitForEnter();
         }
 
+        // Displays all active production orders, showing the most urgent ones first.
         private void DisplayOrders()
         {
             Console.Clear();
@@ -698,6 +700,7 @@ namespace ElectronicsFactory
             WaitForEnter();
         }
 
+        // Takes the most urgent order from the queue, processes it, and updates the saved files and log history.
         private void ProcessNextOrder()
         {
             Console.Clear();

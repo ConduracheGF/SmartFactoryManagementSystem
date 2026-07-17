@@ -13,6 +13,7 @@ namespace ElectronicsFactory
             _productManager = productManager;
         }
 
+        // Scans the warehouse storage and warns if any product category falls below the specified safety threshold.
         public void VerifyStockThresholds(int minimumAllowedUnits)
         {
             Logger.Info("Scanning inventory stocks...");

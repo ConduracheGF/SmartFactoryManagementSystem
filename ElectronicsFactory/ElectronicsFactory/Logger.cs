@@ -4,10 +4,8 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
-    /// <summary>
-    /// Static utility class responsible for all console output in the application.
-    /// Centralizes logging so that message formatting and coloring stays consistent
-    /// </summary>
+    
+    // Static utility class responsible for all console output in the application.
     internal static class Logger
     {
         // Logs a general informational message in white text, prefixed with a timestamp.
@@ -18,7 +16,7 @@ namespace ElectronicsFactory
             Console.ResetColor();
         }
 
-        // Logs a warning message in yellow text, with a timestamp and used for issues (invalid state or non-critical business rule)
+        // Logs a warning message in yellow text, with a timestamp and used for issues 
         public static void Warning(string message)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -34,13 +32,13 @@ namespace ElectronicsFactory
             Console.ResetColor();
         }
 
-        // Clears the console screen. Used before redrawing menus
+        
         public static void Clear()
         {
             Console.Clear();
         }
 
-        // Resets the console foreground color to its default value
+        
         public static void ResetColor()
         {
             Console.ResetColor();

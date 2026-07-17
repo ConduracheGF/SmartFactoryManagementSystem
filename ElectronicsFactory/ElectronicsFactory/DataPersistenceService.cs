@@ -7,6 +7,7 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
+    // Handles saving and loading all factory data (products, employees, machines, and orders) to and from text files.
     internal class DataPersistenceService
     {
         private readonly FileStorageService _storageService;
@@ -23,6 +24,7 @@ namespace ElectronicsFactory
             _storageService.Write(filename, rows);
         }
 
+        // Takes a single line of text, decodes it, and reconstructs the specific product object (like Phone, Tablet, etc.).
         public Product? LoadProduct(string row)
         {
             if (string.IsNullOrWhiteSpace(row)) return null;
@@ -61,6 +63,8 @@ namespace ElectronicsFactory
                 throw new DataPersistenceException($"Failed parsing product row: '{row}'. Inner details: {e.Message}", e);
             }
         }
+
+        // Reads all lines from a product file, converts them into products, and loads them into the system.
         public void LoadProducts(string filename, ProductManagement productManager)
         {
             IEnumerable<string> rows = _storageService.Read(filename);
@@ -76,8 +80,6 @@ namespace ElectronicsFactory
                 }
             }
         }
-
-        // EMPLOYEES PERSISTENCE
         public void SaveEmployees(string filename, EmployeeManagement employeeManager)
         {
             var rows = employeeManager.Employees.Select(e => e.ToFileRow());

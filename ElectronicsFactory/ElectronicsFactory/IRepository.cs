@@ -5,6 +5,7 @@ using System.Text;
 
 namespace ElectronicsFactory
 {
+    // A simple blueprint for managing a collection of items (like adding, removing, or finding them).
     internal interface IRepository<T> where T: class
     {
         void Add(T genericObject);
@@ -14,11 +15,13 @@ namespace ElectronicsFactory
         IEnumerable<T?> Find(Predicate<T> predicate);
     }
 
+    // A general list that stores items in memory and automatically saves changes to files.
     public class GenericRepository<T>: IRepository<T> where T: class
     {
         protected readonly List<T> _storage = new List<T>();
         private readonly Action _saveCallback;
 
+        // A general list that stores items in memory and automatically runs a save function whenever things change.
         public GenericRepository(IEnumerable<T> initialData, Action saveCallback)
         {
             if (initialData != null)
@@ -41,6 +44,7 @@ namespace ElectronicsFactory
             return flag;
         }
 
+        // Finds an existing item in the list, replaces it with the updated version, and saves the changes.
         public void Update(T genericObject)
         {
             var index = _storage.IndexOf(genericObject);
@@ -51,8 +55,10 @@ namespace ElectronicsFactory
             _saveCallback.Invoke();
         }
 
+        // Returns all the items currently stored in our list.
         public IEnumerable<T> GetAll() => _storage;
 
+        // Searches the list and returns only the items that match a specific condition (like searching by ID or name).
         public IEnumerable<T?> Find(Predicate<T> predicate) => _storage.Where(x => predicate(x));
     }
 }

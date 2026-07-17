@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace ElectronicsFactory
 {
+    // Defines how urgent a production order is (from Low to Critical)
     internal enum PriorityLevel_t
     {
         Low,
@@ -35,6 +36,7 @@ namespace ElectronicsFactory
         }
     }
 
+    // Manages the queue of active orders, making sure higher priority and older orders are handled first.
     internal class OrderPriorityService
     {
         private readonly Queue<ProductionOrder> _orderQueue = new Queue<ProductionOrder>();
@@ -49,7 +51,7 @@ namespace ElectronicsFactory
             return newOrder;
         }
 
-        
+        // Returns all orders sorted from the most urgent to the least urgent.
         public IEnumerable<ProductionOrder> GetAllOrders()
         {
             return _orders.OrderByDescending(o => o.Priority).ThenBy(o => o.Created);
@@ -63,12 +65,14 @@ namespace ElectronicsFactory
             _processedOrdersIds.Clear();
         }
 
+        // Deletes a specific order from the list and updates the waiting line.
         public void RemoveOrder(ProductionOrder order)
         {
             _orders.RemoveAll(o => o.Id == order.Id);
             RebuildQueue();
         }
 
+        // Retrieves and removes the next most urgent order from the queue to process it.
         public ProductionOrder? GetNextOrder()
         {
             if (_orderQueue.Count == 0)
@@ -83,6 +87,7 @@ namespace ElectronicsFactory
             return next;
         }
 
+        // Re-sorts all remaining orders so the queue always processes the highest priority items first.
         public void RebuildQueue()
         {
             _orderQueue.Clear();

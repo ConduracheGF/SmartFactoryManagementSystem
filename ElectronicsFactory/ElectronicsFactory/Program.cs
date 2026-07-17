@@ -2,13 +2,14 @@
 
 namespace ElectronicsFactory
 {
+ 
     internal class Program
     {
         static void Main(string[] args)
         {
             Console.Title = "Smart Factory Management System";
 
-            
+            // Define the text files used to store all the factory's information
             const string EmployeesFile = "employees.txt";
             const string MachinesFile = "machines.txt";
             const string ProductsFile = "products.txt";
@@ -18,15 +19,17 @@ namespace ElectronicsFactory
             FileStorageService storageService = new FileStorageService();
             DataPersistenceService persistenceService = new DataPersistenceService(storageService);
 
-           
+            // Create the factory with a starting budget of 50000 RON
             Factory electronicsFactory = new Factory(50000f);
 
+            // Load all existing products, employees, machines, and orders from files into memory
             persistenceService.LoadProducts(ProductsFile, electronicsFactory.ProductManager);
             persistenceService.LoadEmployees(EmployeesFile, electronicsFactory.EmployeeManager);
             persistenceService.LoadMachines(MachinesFile, electronicsFactory.MachineManager);
             persistenceService.LoadOrders(OrdersFile, electronicsFactory.OrderManager, electronicsFactory.ProductManager);
 
-            
+
+            // Initialize the login system with the loaded employees
             AuthService authService = new AuthService(electronicsFactory.EmployeeManager, storageService, OperationsFile);
 
             Logger.Info("The factory was initialised and data has been loaded from files.");

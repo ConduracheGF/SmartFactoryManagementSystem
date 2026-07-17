@@ -3,12 +3,14 @@ using System.Collections.Generic;
 
 namespace ElectronicsFactory
 {
+    // A simple blueprint for any action in the system that can be undone (reversed).
     internal interface IReversibleAction
     {
         string Description { get; }
         void Undo();
     }
 
+    // Handles reversing the process of hiring a new employee by removing them from the system.
     internal class HireEmployeeAction : IReversibleAction
     {
         private readonly EmployeeManagement _employeeManager;
@@ -29,6 +31,7 @@ namespace ElectronicsFactory
         }
     }
 
+    // Handles reversing a newly added production order by removing it from the waiting queue.
     internal class AddOrderAction : IReversibleAction
     {
         private readonly OrderPriorityService _orderManager;
@@ -48,6 +51,7 @@ namespace ElectronicsFactory
         }
     }
 
+    // Handles reversing the firing of an employee by bringing them back (reinstating them) into the system.
     internal class FireEmployeeAction : IReversibleAction
     {
         private readonly EmployeeManagement _employeeManager;
@@ -69,6 +73,7 @@ namespace ElectronicsFactory
         }
     }
 
+    // Handles cancelling a product sale by returning the product to stock and subtracting the money from the budget.
     internal class SellProductAction : IReversibleAction
     {
         private readonly ProductManagement _productManager;
@@ -94,10 +99,12 @@ namespace ElectronicsFactory
         }
     }
 
+    // Keeps track of a history of actions so we can reverse (undo) them one by one, starting with the most recent.
     internal class UndoService: IUndoService
     {
-        private readonly Stack<IReversibleAction> _actionHistory = new Stack<IReversibleAction>(); 
+        private readonly Stack<IReversibleAction> _actionHistory = new Stack<IReversibleAction>();
 
+        // Saves a completed action to the history list so it can be undone later if needed.
         public void RegisterAction(IReversibleAction action)
         {
             _actionHistory.Push(action);
@@ -116,6 +123,7 @@ namespace ElectronicsFactory
             lastAction.Undo();
         }
 
+        // Peeks at the history and returns a description of the last action made, without removing it.
         public string GetLastActionDescription()
         {
             if (_actionHistory.Count == 0) return "None";

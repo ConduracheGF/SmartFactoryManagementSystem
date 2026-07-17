@@ -8,9 +8,8 @@ using System.Xml.Linq;
 
 namespace ElectronicsFactory
 {
-    /// <summary>
-    /// Operational status of a machine
-    /// </summary>
+
+    // Represents what a machine is currently doing
     public enum MachineStatus_t
     {
         Offline,
@@ -18,10 +17,8 @@ namespace ElectronicsFactory
         Maintenance,
         Broken
     }
-
-    /// <summary>
-    /// Physical condition of a machine, degrades over production cycles
-    /// </summary>
+    
+    // Physical condition of a machine, degrades over production cycle
     public enum ConditionStatus_t
     {
         Good,
@@ -29,25 +26,18 @@ namespace ElectronicsFactory
         Critical
     }
 
-    /// <summary>
-    /// Abstract base class representing any production machine in the factory.
-    /// Encapsulates shared behavior (start/stop/repair/inspect/process) while leaving type-specific production logic to be overridden by derived classes.
-    /// </summary>
+    // Abstract base class representing any production machine in the factory.
     public abstract class Machine
     {
-        // Static counter shared across all Machine instances, used to auto-generate unique IDs.
+        
         private static int _nextId = 1;
 
-        // Unique, auto-generated numeric identifier assigned at construction time
+        
         public int Id { get; private set; }
-
         public string Name { get; set; }
         public string SerialNumber { get; set; }
-
-        // Current operational status of the machine (Stopped, Running, Maintenance, Broken)
         public MachineStatus_t Status { get; set; }
 
-        // Current physical condition of the machine; degrades with use and resets on repair
         public ConditionStatus_t Condition { get; set; }
 
         public float WearLevel { get; set; }
@@ -57,7 +47,6 @@ namespace ElectronicsFactory
 
         public List<MachineParts> Components { get; set; } = new List<MachineParts>();
 
-        // Initializes a new machine with a default set of 5 standard components
         public Machine(string name, string serialNumber, MachineStatus_t status, ConditionStatus_t condition)
         {
             Id = _nextId++;
@@ -137,7 +126,6 @@ namespace ElectronicsFactory
 
         // Repairs the machine by replacing one randomly-selected component
         // Restoring its condition to Good and its status to Stopped
-        // Cannot be performed while running
         public virtual bool Repair(ref float income)
         {
             if (Status == MachineStatus_t.Running)
@@ -180,7 +168,6 @@ namespace ElectronicsFactory
 
         // Processes a single unit of the given product
         // Base implementation handles status validation and condition degradation
-        // Derived classes extend this with machine-type-specific production behavior
         public virtual bool Process(Product product)
         {
             TotalCyclesAttempted++;
@@ -212,7 +199,6 @@ namespace ElectronicsFactory
 
         // Randomly degrades the machine's condition after processing a unit
         // 20% chance per unit: escalates Good → Bad → Critical
-        // The machine as Broken once it reaches Critical.
         private void DegradeCondition()
         {
             if (Random.Shared.NextDouble() < 0.20)
@@ -238,12 +224,11 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Machine specialized in packaging finished products into boxes
-    /// </summary>
+   
+    // Machine specialized in packaging finished products into boxes
     internal class PackagingMachine : Machine
     {
-        // Initializes a new PackagingMachine
+      
         public PackagingMachine(string name, string serialNumber, MachineStatus_t status, ConditionStatus_t condition)
                     : base(name, serialNumber, status, condition) { }
         public override bool Start()
@@ -256,8 +241,9 @@ namespace ElectronicsFactory
             return false;
         }
 
-        /// Packages a product unit and re-evaluates its quality
-        /// Aborts mid-cycle if the machine breaks down due to condition degradation
+
+        // Packages a product unit and re-evaluates its quality
+        // Aborts mid-cycle if the machine breaks down due to condition degradation
         public override bool Process(Product product)
         {
             if (Status == MachineStatus_t.Offline)
@@ -286,12 +272,10 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Machine specialized in soldering/fabricating PCBs for products
-    /// </summary>
+    // Machine specialized in soldering/fabricating PCBs for products
     internal class PcbFabricationMachine : Machine
     {
-        // Initializes a new PcbFabricationMachine
+       
         public PcbFabricationMachine(string name, string serialNumber, MachineStatus_t status, ConditionStatus_t condition)
                     : base(name, serialNumber, status, condition) { }
         public override bool Start()
@@ -304,8 +288,7 @@ namespace ElectronicsFactory
             return false;
         }
 
-        /// Solders a product's PCB and re-evaluates its quality
-        /// Aborts mid-cycle if the machine breaks down due to condition degradation
+        // Solders a product's PCB and re-evaluates its quality
         public override bool Process(Product product)
         {
             if (Status == MachineStatus_t.Offline)
@@ -334,12 +317,11 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Machine specialized in assembling product components together
-    /// </summary>
+  
+    // Machine specialized in assembling product components together
     internal class AssemblyMachine : Machine
     {
-        // Initializes a new AssemblyMachine
+        
         public AssemblyMachine(string name, string serialNumber, MachineStatus_t status, ConditionStatus_t condition)
                     : base(name, serialNumber, status, condition) { }
         public override bool Start()
@@ -352,8 +334,8 @@ namespace ElectronicsFactory
             return false;
         }
 
-        /// Assembles a product and re-evaluates its quality
-        /// Aborts mid-cycle if the machine breaks down due to condition degradation
+        // Assembles a product and re-evaluates its quality
+        // Aborts mid-cycle if the machine breaks down due to condition degradation
         public override bool Process(Product product)
         {
             if (Status == MachineStatus_t.Offline)
@@ -382,9 +364,8 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Machine specialized in quality-testing finished products before storage
-    /// </summary>
+ 
+    // Machine specialized in quality-testing finished products before storage
     internal class TestingMachine : Machine
     {
         // Initializes a new TestingMachine
@@ -400,7 +381,7 @@ namespace ElectronicsFactory
             return false;
         }
 
-        /// Provides testing-machine-specific diagnostic output (voltage/calibration checks)
+        // Provides testing-machine-specific diagnostic output (voltage/calibration checks)
         public override bool Inspect()
         {
             if (Condition == ConditionStatus_t.Good)
@@ -415,7 +396,6 @@ namespace ElectronicsFactory
         }
 
         // Tests a product and re-evaluates its quality
-        // Aborts mid-cycle if the machine breaks down due to condition degradation
         public override bool Process(Product product)
         {
             if (Status == MachineStatus_t.Offline)

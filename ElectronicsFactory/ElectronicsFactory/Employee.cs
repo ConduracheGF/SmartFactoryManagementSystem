@@ -6,9 +6,7 @@ using System.Reflection.PortableExecutable;
 
 namespace ElectronicsFactory
 {
-    /// <summary>
-    /// Organizational department an employee belongs to
-    /// </summary>
+   
     public enum DepartmentStatus_t
     {
         Management,
@@ -18,9 +16,8 @@ namespace ElectronicsFactory
         Finance
     }
 
-    /// <summary>
-    /// Job role/title of an employee
-    /// </summary>
+   
+    // Job role/title of an employee
     public enum JobStatus_t
     {
         Director,
@@ -32,30 +29,26 @@ namespace ElectronicsFactory
         Accountant
     }
 
-    /// <summary>
-    /// Abstract base class representing any employee working in the factory.
-    /// Provides shared identity (auto-generated ID) and common employment attributes.
-    /// </summary>
+    
+    // Abstract base class representing any employee working in the factory.
+    // Provides shared identity (auto-generated ID) and common employment attributes.
     public abstract class Employee
     {
         // Static counter shared across all Employee instances, used to auto-generate unique IDs
         private static int nextId = 1;
 
-        // Unique, auto-generated identifier assigned at construction time
+        
         public string Id { get; private set; }
 
-        // Full name of the employee
+        
         public string Name { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
 
-        // Organizational department this employee belongs to
         public DepartmentStatus_t Department { get; set; }
 
-        // Job role of this employee
         public JobStatus_t JobStatus { get; set; }
 
-        // Monthly salary, in RON
         public double Salary { get; set; }
 
         // Initializes a new employee with an auto-generated unique ID
@@ -71,8 +64,7 @@ namespace ElectronicsFactory
             Password = password;
         }
 
-        // Displays this employee's basic information 
-        // Overridden by each derived class to add role-specific details
+        
         public virtual void DisplayInfo()
         {
             Logger.Info($"[{Id}] Employee: {Name}, Department: {Department}, Job: {JobStatus}, Salary: {Salary} RON");
@@ -85,12 +77,11 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Represents the factory Director, responsible for reviewing factory-wide statistics but not for operating machines directly.
-    /// </summary>
+    
+    // Represents the factory Director, responsible for reviewing factory-wide statistics but not for operating machines directly.
     internal class Director : Employee
     {
-        // Initializes a new Director
+        
         public Director(string name, double salary, string username, string password): base(name, DepartmentStatus_t.Management, JobStatus_t.Director, salary, username, password) { }
 
         public Director(string name, double salary)
@@ -98,7 +89,7 @@ namespace ElectronicsFactory
            name.ToLower().Replace(" ", "") + ".director", "parola123")
         { }
 
-        // Prints a factory-wide overview report: employee count, machine count, stock levels, and current income
+        
         public void ReviewProductionStatistics(int totalEmployees, int totalMachines, int totalStock, float income)
         {
             Logger.Info($"Director {Name} reviews the factory report:");
@@ -115,12 +106,11 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Represents a Production Manager, the only role authorized to create production orders
-    /// </summary>
+    
+    // Represents a Production Manager, the only role authorized to create production orders
     internal class ProductionManager : Employee
     {
-        // Initializes a new ProductionManager
+       
         public ProductionManager(string name, double salary, string username, string password)
             : base(name, DepartmentStatus_t.Production, JobStatus_t.ProductionManager, salary, username, password) { }
 
@@ -163,12 +153,11 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Represents an Engineer, responsible for diagnosing machine condition before maintenance can proceed
-    /// </summary>
+    
+    // Represents an Engineer, responsible for diagnosing machine condition before maintenance can proceed
     internal class Engineer : Employee
     {
-        // Initializes a new Engineer
+        
         public Engineer(string name, double salary, string username, string password)
             : base(name, DepartmentStatus_t.Technical, JobStatus_t.Engineer, salary, username, password) { }
 
@@ -202,12 +191,11 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Represents a Technician, the only role authorized to repair machines and only when they are not currently running
-    /// </summary>
+    
+    // Represents a Technician, the only role authorized to repair machines and only when they are not currently running
     internal class Technician : Employee
     {
-        // Initializes a new Technician
+       
         public Technician(string name, double salary, string username, string password)
             : base(name, DepartmentStatus_t.Technical, JobStatus_t.Technician, salary, username, password) { }
 
@@ -221,7 +209,7 @@ namespace ElectronicsFactory
         {
             Logger.Info($"Technician {Name} is attempting to repair machine {machine.SerialNumber}.");
 
-            // A technician cannot repair a running machine.
+            
             if (machine.Status == MachineStatus_t.Running)
             {
                 Logger.Error($"Technician {Name} CANNOT repair a working machine!");
@@ -242,12 +230,10 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Represents a Sales Agent, responsible for selling products from inventory
-    /// </summary>
+
     internal class SalesAgent : Employee
     {
-        // Initializes a new SalesAgent
+        
         public SalesAgent(string name, double salary, string username, string password)
             : base(name, DepartmentStatus_t.Sales, JobStatus_t.SalesAgent, salary, username, password) { }
 
@@ -270,12 +256,11 @@ namespace ElectronicsFactory
         }
     }
 
-    /// <summary>
-    /// Represents an Accountant, responsible for generating the factory's financial report (income, profit, costs, and overall balance)
-    /// </summary>
+ 
+    // Represents an Accountant, responsible for generating the factory's financial report (income, profit, costs, and overall balance)
     internal class Accountant : Employee
     {
-        // Initializes a new Accountant
+        
         public Accountant(string name, double salary, string username, string password)
             : base(name, DepartmentStatus_t.Finance, JobStatus_t.Accountant, salary, username, password) { }
 
@@ -293,7 +278,7 @@ namespace ElectronicsFactory
 
             Logger.Info($"Accountant {Name} is calculating the value of current production...");
 
-            // Only iterate the populated portion of storage (avoids null-reference on unused slots)
+           
             for (int i = 0; i < productManagement.ProductCount; i++)
             {
                 Product product = productManagement.Storage[i];
@@ -301,7 +286,7 @@ namespace ElectronicsFactory
                 profit += product.Price;
             }
 
-            // Only iterate the populated portion of storage (avoids null-reference on unused slots)
+            
             for (int i = 0; i < machineManagement.MachineCount; i++)
             {
                 Machine machine = machineManagement.Machines[i];
@@ -339,12 +324,11 @@ namespace ElectronicsFactory
 
     }
 
-    /// <summary>
-    /// Represents a Machine Operator, the only role authorized to start machines for production
-    /// </summary>
+    
+    // Represents a Machine Operator, the only role authorized to start machines for production
     internal class MachineOperator : Employee
     {
-        // Initializes a new MachineOperator
+       
         public MachineOperator(string name, double salary, string username, string password)
             : base(name, DepartmentStatus_t.Production, JobStatus_t.MachineOperator, salary, username, password) { }
 
@@ -353,7 +337,7 @@ namespace ElectronicsFactory
            name.ToLower().Replace(" ", "") + ".operator", "parola123")
         { }
 
-        // Attempts to start the given machine
+        
         public bool StartMachine(Machine machine)
         {
             Logger.Info($"Operator {Name} is attempting to start machine {machine.SerialNumber}.");
